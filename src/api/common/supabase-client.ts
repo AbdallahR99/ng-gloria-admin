@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, User } from '@supabase/supabase-js';
 import { NextFunction, Request, Response } from 'express';
 import { AppRequest } from './types';
 
@@ -53,4 +53,14 @@ export function createSupabaseAdminClient() {
       persistSession: false,
     },
   });
+}
+
+export const supabaseAdminClient = createSupabaseAdminClient();
+export const supabaseClient = createSupabaseClient();
+
+export function getUserIdentitfier(user: User | null) {
+  if (!user) {
+    return 'Anonymous';
+  }
+  return user.email || user.phone || user.id || 'Anonymous';
 }

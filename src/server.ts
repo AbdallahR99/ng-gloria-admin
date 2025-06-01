@@ -8,6 +8,12 @@ import express from 'express';
 import { join } from 'node:path';
 import { apiRouter } from './api';
 import 'dotenv/config';
+import {
+  supabaseAdminClient,
+  supabaseClient,
+} from '@api/common/supabase-client';
+supabaseAdminClient;
+supabaseClient;
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();

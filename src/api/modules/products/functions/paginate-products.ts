@@ -1,62 +1,25 @@
+import { SupabaseTableNames } from '@api/common/supabase-table-names';
 import { toCamelCase } from '@api/common/utils/case-converter';
 import { PaginatedResponse } from '@app/core/models/common/paginated-response.model';
 import { Product, ProductQuery } from '@app/core/models/product.model';
 import { SupabaseClient } from '@supabase/supabase-js';
+import { queryFilterProducts } from './query-filter-products';
+import { supabaseClient } from '@api/common/supabase-client';
 
 export async function paginateProducts(
-  supabaseClient: SupabaseClient,
-  input: ProductQuery
+  input: ProductQuery,
+  supabase: SupabaseClient = supabaseClient
 ): Promise<PaginatedResponse<Product>> {
-  const {
-    page,
-    pageSize,
-    queryString,
-    categoryId,
-    categorySlug,
-    minPrice,
-    maxPrice,
-    sortBy,
-    sortOrder,
-    showDeleted,
-  } = input;
-  const query = supabaseClient
-    .from('products')
-    .select<any, Product>('*, category:categories(name_en, name_ar)');
-
-  if (!showDeleted) {
-    query.eq('is_deleted', false);
-  }
-  if (queryString) {
-    query.or(
-      `name_en.ilike.%${queryString}%,name_ar.ilike.%${queryString}%,keywords.ilike.%${queryString}%,sku.ilike.%${queryString}%`
+  const { page, pageSize } = input;
+  const query = supabase
+    .from(SupabaseTableNames.PRODUCTS)
+    .select(
+      `*, category:${SupabaseTableNames.CATEGORIES}(name_en, name_ar), inspired_by:${SupabaseTableNames.INSPIRED_PRODUCTS}(name_en, name_ar, description_en, description_ar, image)`
     );
-  }
-  if (categoryId) {
-    query.eq('category_id', categoryId);
-  }
-  if (categorySlug) {
-    query.or(
-      `category.slug_en.eq.${categorySlug},category.slug_ar.eq.${categorySlug}`
-    );
-  }
-  if (maxPrice) {
-    query.lte('price', +maxPrice);
-  }
-  if (minPrice) {
-    query.gte('price', +minPrice);
-  }
-  if (sortBy) {
-    query.order(sortBy, { ascending: sortOrder === 'asc' });
-  } else {
-    query.order('created_at', { ascending: false });
-  }
 
-  if (page && pageSize) {
-    query.range((page - 1) * pageSize, page * pageSize - 1);
-  }
-  const { data, count, error } = await query;
+  const { data, count, error } = await queryFilterProducts(query, input || {});
   if (error) {
-    throw new Error(`Failed to fetch products: ${error.message}`);
+    throw error;
   }
   return {
     data: data.map(toCamelCase) || [],
