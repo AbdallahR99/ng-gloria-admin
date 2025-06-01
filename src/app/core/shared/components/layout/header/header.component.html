@@ -1,0 +1,149 @@
+<app-header-banner class="p-1 bg-secondary text-white text-xs m-0" domElement #banner="domElement" />
+<header #header class="navbar bg-primary text-white relative">
+  <div class="navbar-start">
+    <div class="md:hidden">
+      <label class="swap swap-rotate">
+        <!-- this hidden checkbox controls the state -->
+        <input type="checkbox" [(ngModel)]="menuCollapse" />
+
+        <!-- on icon -->
+        <mat-icon class="swap-on fill-current" fontIcon="close" />
+
+
+        <!-- off icon -->
+        <mat-icon class="swap-off fill-current" svgIcon="menu" />
+
+      </label>
+      <a class="btn btn-link link-hover text-xl max-md:hidden">
+        <mat-icon svgIcon="menu" />
+      </a>
+    </div>
+    <div class="max-md:hidden">
+      <a [routerLink]="[appRoutes.HOME]" class="btn btn-link link-hover text-xl text-white">
+        <img src="images/logo_white.png" class="h-10" alt="Gloria">
+      </a>
+    </div>
+  </div>
+  <div class="navbar-center gap-4">
+    <div class="md:hidden">
+      <a [routerLink]="[appRoutes.HOME]" class="btn btn-link link-hover text-xl text-white md:hidden">
+        <img src="images/logo_white.png" class="h-8" alt="Gloria">
+      </a>
+    </div>
+    <div class="flex gap-4 max-md:hidden">
+      @for (item of navItems; track item.name) {
+      <a class="btn btn-link link-hover text-white text-xl" [routerLink]="item.route"
+        routerLinkActive="!text-secondary">
+        {{item.name | translate}}
+      </a>
+      }
+    </div>
+
+  </div>
+  <div class="navbar-end">
+    <div class="flex gap-3">
+      <a class="btn btn-link link-hover p-0 text-white hover:text-secondary" [routerLink]="[appRoutes.Cart]"
+        routerLinkActive="!text-secondary">
+        <mat-icon [matBadge]="cartCount.value()" [matBadgeHidden]="(cartCount.value() ?? 0) < 1" svgIcon="cart"
+          class="scale-75" [inline]="true" />
+      </a>
+      <!-- Language Switch Button -->
+      <label class="swap swap-rotate">
+        <!-- Hidden checkbox to control the state -->
+        <input type="checkbox" (change)="toggleLanguage()" [checked]="!isEn" />
+
+        <!-- English Icon -->
+        <div class="swap-off text-white">عربي</div>
+
+        <!-- Arabic Icon -->
+        <div class="swap-on text-white">EN</div>
+      </label>
+      @if (isLoggedIn()) {
+      @if (user(); as userValue) {
+      <div class="dropdown dropdown-bottom dropdown-end">
+        <div tabindex="0" role="button" class=" m-1">
+          <div class="avatar">
+            <div class="w-10 rounded-full">
+              @if (userValue.avatar) {
+              <img [src]="imagePath + userValue.avatar" alt="{{userValue.firstName}}" />
+              } @else {
+              <div class="bg-secondary text-white w-full h-full flex items-center justify-center">
+                <span class="text-xl font-bold">{{userValue.firstName?.charAt(0)}}</span>
+              </div>
+              }
+
+
+            </div>
+          </div>
+        </div>
+        <ul tabindex="0"
+          class="dropdown-content menu bg-neutral-content text-primary  rounded-box z-1 w-52 p-2 shadow-sm">
+          <li>
+            <a [routerLink]="[appRoutes.Profile]">
+              <mat-icon fontIcon="person" class="scale-75" />
+              {{"Profile" | translate}}
+            </a>
+          </li>
+          <li>
+            <a [routerLink]="[appRoutes.Orders]">
+              <mat-icon fontIcon="receipt" class="scale-75" />
+              {{"Orders" | translate}}
+            </a>
+          </li>
+          <li>
+            <a (click)="logout()" class="text-error">
+              <mat-icon fontIcon="logout" class="scale-75" />
+              {{"Logout" | translate}}
+            </a>
+          </li>
+        </ul>
+      </div>
+      <!-- <div class="dropdown dropdown-end">
+        <label tabindex="0" class="btn btn-link link-hover text-white">
+          <div class="avatar">
+            <div class="w-10 rounded-full">
+              @if (userValue.avatar) {
+              <img [src]="imagePath + userValue.avatar" alt="{{userValue.firstName}}" />
+              } @else {
+              <div class="bg-secondary text-white w-full h-full flex items-center justify-center">
+                <span class="text-xl font-bold">{{userValue.firstName?.charAt(0)}}</span>
+              </div>
+              }
+
+
+            </div>
+          </div>
+        </label>
+      </div> -->
+
+
+      }
+      } @else {
+      <div class="flex max-md:hidden">
+        <a class="btn btn-link link-hover text-white" [routerLink]="[appRoutes.AUTH_LOGIN]"
+          routerLinkActive="!text-secondary">
+          {{"Login" | translate}}
+        </a>
+        <span class="m-auto">
+          {{"|"}}
+        </span>
+        <a class="btn btn-link link-hover text-white" [routerLink]="[appRoutes.AUTH_SIGNUP]"
+          routerLinkActive="!text-secondary">
+          {{"Sign Up" | translate}}
+        </a>
+      </div>
+      }
+
+    </div>
+  </div>
+  @if (loadingService.isLoading() ) {
+  <div class="absolute left-0 right-0 bottom-0">
+    <mat-progress-bar mode="indeterminate" class="text-secondary" />
+  </div>
+  }
+</header>
+@let topSpace = (header?.clientHeight ?? 0) + (banner?.element?.nativeElement?.clientHeight ?? 0);
+<div (window:resize)="0" class="fixed left-0 right-0 bottom-0 transition-all  overflow-hidden bg-white z-50"
+  [ngStyle]="{'top.px': topSpace, 'height': menuCollapse() ? 'calc(100% - '+topSpace+'px)' : '0'}">
+  <header-nav-menu (navigated)="menuCollapse.set(false)" class="h-full" />
+</div>

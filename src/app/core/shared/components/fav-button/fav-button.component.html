@@ -1,0 +1,7 @@
+@if (isLoading()) {
+<span class="loading loading-spinner text-primary loading-sm"></span>
+} @else {
+<button (click)="toggle()" class="btn btn-link btn-sm px-1 hover:text-secondary">
+  <mat-icon class="scale-75" [svgIcon]="isInFav() ? 'heart-filled' : 'heart'" />
+</button>
+}

@@ -1,0 +1,22 @@
+@use 'colors.scss';
+@use "tailwindcss";
+@plugin "daisyui";
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark;
+}
+@plugin "daisyui/theme" {
+  name: "light";
+  default: true;
+  --color-primary: var(--primary);
+  --color-primary-content: var(--primary-light);
+  --color-neutral-content	: var(--neutral-light);
+  --color-secondary: var(--secondary);
+  --color-success: var(--success);
+  --color-info: var(--info);
+  --color-danger: var(--danger);
+  --color-warning: var(--warning);
+  --color-light: var(--light);
+  --color-dark: var(--dark);
+  --color-white: var(--white);
+}
+

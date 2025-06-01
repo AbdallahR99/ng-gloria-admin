@@ -1,0 +1,43 @@
+$primary: #3F4A5D;
+$primary-light: #D5DAE2;
+$secondary: #9B78A5;
+$success: #198754;
+$danger: #dc3545;
+$warning: #ffc107;
+$info: #0dcaf0;
+$neutral-light: #F7F7F7;
+$light: #F4F6FB;
+$dark: #212529;
+$white: #fff;
+$border: #dee2e6;
+$blue: #2257f9;
+$blue-grey: #607d8b;
+$transparent: transparent;
+
+
+:root {
+  --primary: #{$primary};
+  --primary-light: #{$primary-light};
+  --secondary: #{$secondary};
+  --success: #{$success};
+  --danger: #{$danger};
+  --warning: #{$warning};
+  --neutral-light: #{$neutral-light};
+  --info: #{$info};
+  --light: #{$light};
+  --dark: #{$dark};
+  --white: #{$white};
+  --border: #{$border};
+  --blue: #{$blue};
+  --blue-grey: #{$blue-grey};
+  --transparent: #{$transparent};
+}
+
+
+@function tint($color, $percentage) {
+  @return mix(white, $color, $percentage);
+}
+@function shade($color, $percentage) {
+  @return mix(black, $color, $percentage);
+}
+

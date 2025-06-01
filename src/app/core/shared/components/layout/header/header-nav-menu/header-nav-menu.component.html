@@ -1,0 +1,35 @@
+<div class="flex flex-col bg-white h-full w-full">
+  <div class="flex flex-col flex-1 ">
+    @for (item of navItems; track item.route) {
+    <a [routerLink]="item.route" (click)="navigated.emit()"
+      class="btn btn-link link-hover hover:bg-neutral-content text-dark flex justify-between hover:text-primary px-3 py-6">
+      <span>
+        {{item.name | translate}}
+      </span>
+      <mat-icon fontIcon="chevron_right" />
+    </a>
+    }
+
+  </div>
+  <div class="flex flex-col  bg-neutral-content py-4 gap-4 ">
+    <div class="flex px-3 gap-2">
+      <a (click)="navigated.emit()" [routerLink]="appRoutes.AUTH_SIGNUP"
+        class="btn flex-1 border-2 btn-outline btn-primary shadow-none">
+        {{"Sign Up" | translate}}
+      </a>
+      <a (click)="navigated.emit()" [routerLink]="appRoutes.AUTH_LOGIN"
+        class="btn flex-1 btn-primary shadow-none text-white">
+        {{"Login" | translate}}
+      </a>
+
+    </div>
+    <div class="flex gap-3">
+      <a href="btn btn-link text-secondary">
+        <mat-icon svgIcon="fb" />
+        <mat-icon svgIcon="insta" />
+        <mat-icon svgIcon="whatsapp" />
+        <mat-icon svgIcon="linkedin" />
+      </a>
+    </div>
+  </div>
+</div>

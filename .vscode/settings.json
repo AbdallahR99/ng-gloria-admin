@@ -1,0 +1,14 @@
+{
+  "github.copilot.chat.codeGeneration.instructions": [
+    {
+      "file": "./.github/copilot-instructions.md"
+    }
+  ],
+  "tailwindCSS.experimental.configFile": "public/styles/tailwind.scss",
+  "angular-schematics.schematicsDefaultOptions": {
+    "angular-*": {
+      "style": "scss",
+      "externalTemplate": true
+    }
+  }
+}

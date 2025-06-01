@@ -3,6 +3,33 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@app/*": [
+        "src/app/*"
+      ],
+      "@assets/*": [
+        "src/assets/*"
+      ],
+      "@core/*": [
+        "src/app/core/*"
+      ],
+      "@environments/*": [
+        "src/environments/*"
+      ],
+      "@pages/*": [
+        "src/app/*"
+      ],
+      "@server/*": [
+        "src/app/server/*"
+      ],
+        "@public/*": [
+        "public/*"
+      ],
+      "@api/*": [
+        "src/api/*"
+      ],
+    },
     "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,

@@ -1,0 +1,43 @@
+// @import "colors.scss";
+
+
+// ::-webkit-scrollbar {
+//   width: 4px;
+//   height: 4px;
+// }
+
+// ::-webkit-scrollbar-track {
+//   background: #ffffff;
+//   border-radius: 0px
+// }
+
+// ::-webkit-scrollbar-thumb {
+//   background: #9e9e9e;
+//   border-radius: 0px
+// }
+body {
+  --sb-track-color: transparent;
+  --sb-thumb-color: var(--primary);
+  --sb-size: 5px;
+}
+
+body::-webkit-scrollbar {
+  width: var(--sb-size);
+}
+
+body::-webkit-scrollbar-track {
+  background: var(--sb-track-color);
+  border-radius: 8px;
+}
+
+body::-webkit-scrollbar-thumb {
+  background: var(--sb-thumb-color);
+  border-radius: 8px;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  body {
+      scrollbar-color: var(--sb-thumb-color)
+                     var(--sb-track-color);
+  }
+}

@@ -6,7 +6,8 @@ import {
 } from '@angular/ssr/node';
 import express from 'express';
 import { join } from 'node:path';
-
+import { apiRouter } from './api';
+import 'dotenv/config';
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
@@ -24,6 +25,8 @@ const angularApp = new AngularNodeAppEngine();
  * ```
  */
 
+app.use('/api', apiRouter);
+
 /**
  * Serve static files from /browser
  */
@@ -32,7 +35,7 @@ app.use(
     maxAge: '1y',
     index: false,
     redirect: false,
-  }),
+  })
 );
 
 /**
@@ -42,7 +45,7 @@ app.use((req, res, next) => {
   angularApp
     .handle(req)
     .then((response) =>
-      response ? writeResponseToNodeResponse(response, res) : next(),
+      response ? writeResponseToNodeResponse(response, res) : next()
     )
     .catch(next);
 });

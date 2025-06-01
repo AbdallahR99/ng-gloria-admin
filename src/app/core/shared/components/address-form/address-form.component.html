@@ -1,0 +1,176 @@
+<h2 class="text-2xl font-medium text-primary text-center mb-8">
+  {{ isEdit() ? ('Edit Address' | translate) : ('Add New Address' | translate) }}
+</h2>
+
+<form #form="ngForm" (ngSubmit)="submit(form)" class="flex flex-col gap-4">
+
+  <!-- Label Field -->
+  <label class="form-control floating-label">
+    <span>{{"Label" | translate}}</span>
+    <input type="text" name="label" #label="ngModel" class="input input-primary border border-primary/50 w-full"
+      placeholder="{{'Home, Office, ...' | translate}}" [ngModel]="addressToEdit()?.label" required />
+    <div class="label">
+      @if (label?.invalid && label?.touched) {
+      <span class="label-text-alt text-error text-xs">
+        {{"Label is required" | translate}}
+      </span>
+      }
+    </div>
+  </label>
+
+  <!-- Name Fields Row -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- First Name -->
+
+    <label class="form-control floating-label">
+      <span>{{"First Name" | translate}}</span>
+      <input type="text" name="firstName" #firstName="ngModel"
+        class="input input-primary border border-primary/50 w-full" placeholder="{{'Enter First Name' | translate}}"
+        [ngModel]="addressToEdit()?.firstName || user()?.firstName" required />
+      <div class="label">
+        @if (firstName?.invalid && firstName?.touched) {
+        <span class="label-text-alt text-error text-xs">
+          {{"First Name is required" | translate}}
+        </span>
+        }
+      </div>
+    </label>
+
+    <!-- Last Name -->
+    <label class="form-control floating-label">
+      <span>{{"Last Name" | translate}}</span>
+      <input type="text" name="lastName" #lastName="ngModel" class="input input-primary border border-primary/50 w-full"
+        placeholder="{{'Enter Last Name' | translate}}" [ngModel]="addressToEdit()?.lastName ?? user()?.lastName"
+        required />
+      <div class="label">
+        @if (lastName?.invalid && lastName?.touched) {
+        <span class="label-text-alt text-error text-xs">
+          {{"Last Name is required" | translate}}
+        </span>
+        }
+      </div>
+    </label>
+  </div>
+
+  <!-- Phone Field -->
+  <label class="form-control floating-label">
+    <span>{{"Phone" | translate}}</span>
+    <input type="tel" name="phone" #phone="ngModel" class="input input-primary border border-primary/50 w-full"
+      placeholder="{{'Enter Phone Number' | translate}}" [ngModel]="addressToEdit()?.phone ?? user()?.phone" required />
+    <div class="label">
+      @if (phone?.invalid && phone?.touched) {
+      <span class="label-text-alt text-error text-xs">
+        {{"Phone is required" | translate}}
+      </span>
+      }
+    </div>
+  </label>
+
+  <!-- Location Fields Row -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- State -->
+    <label class="form-control floating-label">
+      <span>{{"State" | translate}}</span>
+      <select [ngModel]="addressToEdit()?.state" name="state" #state="ngModel"
+        class="select select-primary border border-primary/50 w-full" required>
+        <option [value]="null" disabled selected>{{"Select State" | translate}}</option>
+        @for (stateItem of states.value(); track stateItem.id) {
+        <option [value]="stateItem.id">
+          {{ isEn ? stateItem.nameEn : stateItem.nameAr }}
+        </option>
+        }
+      </select>
+      <div class="label">
+        @if (state?.invalid && state?.touched) {
+        <span class="label-text-alt text-error text-xs">
+          {{"State is required" | translate}}
+        </span>
+        }
+      </div>
+    </label>
+    <!-- City -->
+    <label class="form-control floating-label">
+      <span>{{"City" | translate}}</span>
+      <input type="text" name="city" #city="ngModel" class="input input-primary border border-primary/50 w-full"
+        placeholder="{{'Enter City' | translate}}" [ngModel]="addressToEdit()?.city" required />
+      <div class="label">
+        @if (city?.invalid && city?.touched) {
+        <span class="label-text-alt text-error text-xs">
+          {{"City is required" | translate}}
+        </span>
+        }
+      </div>
+    </label>
+
+
+  </div>
+
+  <!-- Address Details -->
+  <div class="divider text-sm text-primary/70">{{"Address Details" | translate}}</div>
+
+  <!-- Area and Street Row -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- Area -->
+    <label class="form-control floating-label">
+      <span>{{"Area" | translate}}</span>
+      <input type="text" name="area" #area="ngModel" class="input input-primary border border-primary/50 w-full"
+        placeholder="{{'Enter Area' | translate}}" [ngModel]="addressToEdit()?.area" />
+    </label>
+
+    <!-- Street -->
+    <label class="form-control floating-label">
+      <span>{{"Street" | translate}}</span>
+      <input type="text" name="street" #street="ngModel" class="input input-primary border border-primary/50 w-full"
+        placeholder="{{'Enter Street' | translate}}" [ngModel]="addressToEdit()?.street" />
+    </label>
+  </div>
+
+  <!-- Building and Apartment Row -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- Building -->
+    <label class="form-control floating-label">
+      <span>{{"Building" | translate}}</span>
+      <input type="text" name="building" #building="ngModel" class="input input-primary border border-primary/50 w-full"
+        placeholder="{{'Enter Building' | translate}}" [ngModel]="addressToEdit()?.building" />
+    </label>
+
+    <!-- Apartment -->
+    <label class="form-control floating-label">
+      <span>{{"Apartment" | translate}}</span>
+      <input type="text" name="apartment" #apartment="ngModel"
+        class="input input-primary border border-primary/50 w-full" placeholder="{{'Enter Apartment' | translate}}"
+        [ngModel]="addressToEdit()?.apartment" />
+    </label>
+  </div>
+
+  <!-- Notes -->
+  <label class="form-control floating-label">
+    <span>{{"Notes" | translate}}</span>
+    <textarea name="notes" #notes="ngModel"
+      class="textarea textarea-primary border border-primary/50 w-full h-20 resize-none"
+      placeholder="{{'Additional notes or delivery instructions' | translate}}"
+      [ngModel]="addressToEdit()?.notes"></textarea>
+  </label>
+
+  <!-- Default Address Checkbox -->
+  <!-- <div class="form-control mt-2">
+    <label class="label cursor-pointer justify-start gap-3">
+      <input type="checkbox" name="isDefault" #isDefault="ngModel" class="checkbox checkbox-primary"
+        [checked]="addressToEdit()?.isDefault" />
+      <span class="label-text font-medium">{{"Set as Default Address" | translate}}</span>
+    </label>
+  </div> -->
+
+  <!-- Submit Button -->
+  <div class="form-control my-4">
+    <button type="submit" class="btn btn-primary text-white btn-block" [disabled]="isLoading()">
+      @if (isLoading()) {
+      <span class="loading loading-spinner loading-sm"></span>
+      {{"Processing..." | translate}}
+      } @else {
+      {{ isEdit() ? ('Update Address' | translate) : ('Add Address' | translate) }}
+      }
+    </button>
+  </div>
+
+</form>
