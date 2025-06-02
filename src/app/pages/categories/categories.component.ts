@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { SHARED_MODULES } from '@app/core/shared/modules/shared.module';
 
 @Component({
   selector: 'app-categories',

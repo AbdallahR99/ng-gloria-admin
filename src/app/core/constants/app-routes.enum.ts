@@ -1,9 +1,9 @@
 export enum APP_ROUTES {
   HOME = '/',
-  PRODUCTS = 'products',
-  PRODUCT_DETAIL = `products`,
-  PRODUCT_CREATE = `products/create`,
-  PRODUCT_UPDATE = `products/update`,
+  PRODUCTS = '/products',
+  PRODUCT_DETAIL = `/products`,
+  PRODUCT_CREATE = `/products/create`,
+  PRODUCT_UPDATE = `/products/update`,
 
   ORDERS = '/orders',
   ORDER_DETAIL = '/orders',

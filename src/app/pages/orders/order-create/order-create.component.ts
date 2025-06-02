@@ -2,10 +2,10 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { SHARED_MODULES } from '@app/core/shared/modules/shared.module';
 
 @Component({
-  selector: 'app-inspired-product-create',
+  selector: 'app-order-create',
   imports: [SHARED_MODULES],
-  templateUrl: './inspired-product-create.component.html',
-  styleUrl: './inspired-product-create.component.scss',
+  templateUrl: './order-create.component.html',
+  styleUrl: './order-create.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InspiredProductCreateComponent {}
+export class OrderCreateComponent {}
