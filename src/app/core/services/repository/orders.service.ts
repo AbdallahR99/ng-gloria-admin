@@ -4,6 +4,7 @@ import { FacadeService } from '../facade-service.service';
 import { tap } from 'rxjs';
 import { OrderStatus } from '@app/core/constants/order-status.enum';
 import { Order } from '@app/core/models/order.model';
+import { SupabaseTableNames } from '@app/core/constants/supabase-table-names';
 type CheckoutRequest = {
   addressId?: string;
   note?: string;
@@ -99,7 +100,7 @@ export class OrdersService {
     note?: string;
   }) {
     return this.fn.callFunction<{ status: 'updated' }>(
-      `${this.endpoint}/status`,
+      `${SupabaseTableNames.ORDERS}/status`,
       {
         method: 'PUT',
         body: payload,
@@ -117,14 +118,14 @@ export class OrdersService {
   bulkUpdateStatus(
     payloads: { order_id: string; status: string; note?: string }[]
   ) {
-    return this.fn.callFunction(`${this.endpoint}/bulk`, {
+    return this.fn.callFunction(`${SupabaseTableNames.ORDERS}/bulk`, {
       method: 'PUT',
       body: payloads,
     });
   }
 
   bulkDelete(orderIds: string[]) {
-    return this.fn.callFunction(`${this.endpoint}/bulk`, {
+    return this.fn.callFunction(`${SupabaseTableNames.ORDERS}/bulk`, {
       method: 'DELETE',
       body: orderIds,
     });
