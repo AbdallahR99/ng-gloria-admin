@@ -1,8 +1,9 @@
+import { supabaseClient } from '@api/common/supabase-client';
 import { SupabaseClient } from '@supabase/supabase-js';
 
 export async function bulkUpdateOrderStatus(
   updates: { orderId: string; status: string; note?: string }[],
-  supabase: SupabaseClient
+  supabase: SupabaseClient = supabaseClient,
 ) {
   const { data, error } = await supabase
     .from('orders')

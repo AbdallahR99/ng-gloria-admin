@@ -1,5 +1,7 @@
 import { supabaseClient } from '@api/common/supabase-client';
 import { SupabaseTableNames } from '@api/common/supabase-table-names';
+import { Order } from '@app/core/models/order.model';
+import { toCamelCase } from '@app/core/utils/case-converter';
 import { SupabaseClient } from '@supabase/supabase-js';
 
 export async function getOrder(
@@ -16,5 +18,9 @@ export async function getOrder(
     throw error;
   }
 
-  return data;
+  if (!data) {
+    throw new Error(`Order with ID ${orderId} not found`);
+  }
+
+  return toCamelCase(data) as Order;
 }

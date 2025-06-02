@@ -5,11 +5,12 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { queryFilterOrder } from './query-filter-order';
 import { NotFoundException } from '@api/common/exceptions/not-found.exception';
 import { toCamelCase } from '@app/core/utils/case-converter';
+import { PaginatedResponse } from '@app/core/models/common/paginated-response.model';
 
-export async function listOrders(
+export async function paginateOrders(
   input: OrderQuery,
   supabase: SupabaseClient = supabaseClient,
-): Promise<Order[]> {
+): Promise<PaginatedResponse<Order>> {
   const query = supabase.from(SupabaseTableNames.ORDERS).select('*');
 
 
@@ -23,5 +24,13 @@ export async function listOrders(
     throw new NotFoundException('No orders found');
   }
 
-  return data.map(toCamelCase) as Order[];
+  return {
+    data: data.map(toCamelCase) as Order[],
+    pagination: {
+      total: count || 0,
+      page: input.page || 1,
+      pageSize: input.pageSize || 10,
+      totalPages: Math.ceil((count || 0) / (input.pageSize || 10)),
+    }
+  };
 }

@@ -1,9 +1,9 @@
 import { AppRequest } from '@api/common/types';
-import { getOrder } from './functions/get-order';
-import { listOrders } from './functions/list-orders';
-import { paginateOrders } from './functions/paginate-orders';
+import { getOrder } from './functions';
+import { listOrders } from './functions';
 import { Response, NextFunction } from 'express';
 import { handleControllerError } from '@api/common/utils/error-handler';
+import { paginateOrders } from './functions';
 
 export async function orderGetById(
   req: AppRequest,

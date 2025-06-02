@@ -12,7 +12,7 @@ export async function createOrder(
 ): Promise<Order> {
   const { items, addressId, userNote } = input;
   let { userId, status, note } = input;
-  const { data: {user}, error } = await supabase.auth.getUser();
+  const { data: { user }, error } = await supabase.auth.getUser();
   if (!userId) {
 
     if (error || !user) {
@@ -38,11 +38,11 @@ export async function createOrder(
     }
   }
 
-  const {data: products} = await supabase.from(SupabaseTableNames.PRODUCTS).select('id, price').in('id', items.map(item => item.productId));
+  const { data: products } = await supabase.from(SupabaseTableNames.PRODUCTS).select('id, price').in('id', items.map(item => item.productId));
   if (!products || products.length === 0) {
     throw new BadRequestException('No valid products found for the order items');
   }
-  const totalPrice  = products.reduce((total, product) => {
+  const totalPrice = products.reduce((total, product) => {
     const item = items.find(item => item.productId === product.id);
     if (item) {
       return total + (+(product.price) * +(item.quantity ?? 1));
@@ -69,6 +69,7 @@ export async function createOrder(
   const createPayload = {
     user_id: userId,
     address_id: addressId,
+    order_code: `ORD-${Math.random().toString(36).substring(2, 10).toUpperCase()}`,
     order_items: orderItemsMapped,
     status: status ?? OrderStatus.Pending,
     note: note ?? 'Initial order creation',

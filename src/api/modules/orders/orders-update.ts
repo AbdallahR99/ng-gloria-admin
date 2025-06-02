@@ -1,6 +1,5 @@
 import { AppRequest } from '@api/common/types';
 import { updateOrder } from './functions/update-order';
-import { bulkUpdateOrders } from './functions/bulk-update-orders';
 import { Response, NextFunction } from 'express';
 import { handleControllerError } from '@api/common/utils/error-handler';
 

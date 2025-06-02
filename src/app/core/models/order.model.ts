@@ -1,12 +1,33 @@
 import { OrderStatus } from '../constants/order-status.enum';
 import { Address } from './address.model';
+import { PaginatedRequest } from './common/paginated-request';
 import { Product } from './product.model';
+
+export interface OrderQuery extends PaginatedRequest<Order> {
+  userId?: string; // ID of the user who placed the order
+  status?: OrderStatus; // Status of the order (e.g., pending, completed)
+  fromDate?: string; // Start date for filtering orders
+  toDate?: string; // End date for filtering orders
+  showDeleted?: boolean; // Whether to include deleted orders
+  addressId?: string; // ID of the address associated with the order
+}
+
+export interface OrderStatusUpdate extends Pick<OrderCreateOrUpdate, 'status' | 'note' | 'userNote' | 'userId' | 'id' | 'orderCode'> {
+
+}
+
+export interface OrderCheckoutDirect extends OrderCheckout {
+  productId: string; // ID of the product to be ordered
+  quantity?: number; // Quantity of the product to be ordered
+  size?: string | null; // Size of the product (optional)
+  color?: string | null; // Color of the product (optional)
+}
 
 export interface OrderCheckout extends Omit<OrderCreateOrUpdate, 'items' | 'id' | 'status' | 'note'> {
 
 }
 
-export interface OrderCreateOrUpdate extends Omit<Order,  'createdAt' | 'address'| 'totalPrice'> {
+export interface OrderCreateOrUpdate extends Omit<Order, 'createdAt' | 'address' | 'totalPrice'> {
 
 }
 

@@ -1,3 +1,4 @@
+import { toSnakeCase } from '@api/common/utils/case-converter';
 import { ProductQuery } from '@app/core/models/product.model';
 
 export function queryFilterProducts<T>(query: T, input: ProductQuery): T {
@@ -39,7 +40,7 @@ export function queryFilterProducts<T>(query: T, input: ProductQuery): T {
     (query as any).gte('price', +minPrice);
   }
   if (sortBy) {
-    (query as any).order(sortBy, { ascending: sortOrder === 'asc' });
+    (query as any).order(toSnakeCase(sortBy), { ascending: sortOrder === 'asc' });
   } else {
     (query as any).order('created_at', { ascending: false });
   }

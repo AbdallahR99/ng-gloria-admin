@@ -1,15 +1,15 @@
 import { Category } from './category.model';
 import { PaginatedRequest } from './common/paginated-request';
 
-export interface ProductQuery extends PaginatedRequest {
+export interface ProductQuery extends PaginatedRequest<Product> {
   categoryId?: string;
   categorySlug?: string; // Slug for category filtering
   minPrice?: number;
   maxPrice?: number;
-  sortBy?: string;
+
   size?: string;
   color?: string;
-  sortOrder?: 'asc' | 'desc';
+
 }
 
 export interface Product {

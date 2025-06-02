@@ -1,8 +1,9 @@
+import { supabaseClient } from '@api/common/supabase-client';
 import { SupabaseClient } from '@supabase/supabase-js';
 
 export async function getOrderByCodeOrId(
   { id, orderCode }: { id?: string; orderCode?: string },
-  supabase: SupabaseClient
+  supabase: SupabaseClient = supabaseClient,
 ) {
   const query = supabase.from('orders').select('*').limit(1);
 
