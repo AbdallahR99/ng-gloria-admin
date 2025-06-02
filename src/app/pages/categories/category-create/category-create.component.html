@@ -1,1 +1,444 @@
-<p>category-create works!</p>,
+<!-- Page Header -->
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h1 class="text-2xl font-bold text-base-content">
+      {{ "Create Category" | translate }}
+    </h1>
+    <div class="breadcrumbs text-sm mt-2">
+      <ul>
+        <li>
+          <a [routerLink]="[routes.CATEGORIES]" class="link link-hover">{{
+            "Categories" | translate
+          }}</a>
+        </li>
+        <li>{{ "Create" | translate }}</li>
+      </ul>
+    </div>
+  </div>
+  <button
+    type="button"
+    [routerLink]="[routes.CATEGORIES]"
+    class="btn btn-ghost btn-sm"
+  >
+    <mat-icon fontIcon="arrow_back" />
+    {{ "Back to Categories" | translate }}
+  </button>
+</div>
+
+<!-- Form Card -->
+<div class="card bg-base-100 shadow-sm border border-base-300">
+  <div class="card-body">
+    <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()" class="space-y-6">
+      <!-- Basic Information Section -->
+      <div>
+        <h2
+          class="text-lg font-semibold text-base-content mb-4 flex items-center"
+        >
+          <mat-icon class="mr-2 before:text-primary" fontIcon="info" />
+          {{ "Basic Information" | translate }}
+        </h2>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Name (English) -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium"
+                >{{ "Name (English)" | translate }}*</span
+              >
+            </label>
+            <input
+              type="text"
+              formControlName="nameEn"
+              placeholder="Enter category name in English"
+              class="input input-bordered w-full"
+              [class.input-error]="isFieldInvalid('nameEn')"
+              maxlength="100"
+            />
+            @if (isFieldInvalid('nameEn')) {
+            <label class="label">
+              <span class="label-text-alt text-error">
+                @if (categoryForm.get('nameEn')?.errors?.['required']) {
+                {{ "English name is required" | translate }}
+                } @if (categoryForm.get('nameEn')?.errors?.['minlength']) {
+                {{ "Name must be at least 2 characters" | translate }}
+                } @if (categoryForm.get('nameEn')?.errors?.['maxlength']) {
+                {{ "Name must not exceed 100 characters" | translate }}
+                }
+              </span>
+            </label>
+            }
+          </div>
+
+          <!-- Name (Arabic) -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium"
+                >{{ "Name (Arabic)" | translate }} *</span
+              >
+            </label>
+            <input
+              type="text"
+              formControlName="nameAr"
+              placeholder="أدخل اسم الفئة بالعربية"
+              class="input input-bordered w-full"
+              [class.input-error]="isFieldInvalid('nameAr')"
+              maxlength="100"
+              dir="rtl"
+            />
+            @if (isFieldInvalid('nameAr')) {
+            <label class="label">
+              <span class="label-text-alt text-error">
+                @if (categoryForm.get('nameAr')?.errors?.['required']) {
+                {{ "Arabic name is required" | translate }}
+                } @if (categoryForm.get('nameAr')?.errors?.['minlength']) {
+                {{ "Name must be at least 2 characters" | translate }}
+                } @if (categoryForm.get('nameAr')?.errors?.['maxlength']) {
+                {{ "Name must not exceed 100 characters" | translate }}
+                }
+              </span>
+            </label>
+            }
+          </div>
+
+          <!-- Slug (English) -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium"
+                >{{ "Slug (English)" | translate }} *</span
+              >
+              <span class="label-text-alt">{{
+                "Auto-generated from English name" | translate
+              }}</span>
+            </label>
+            <input
+              type="text"
+              formControlName="slugEn"
+              placeholder="category-slug"
+              class="input input-bordered w-full"
+              [class.input-error]="isFieldInvalid('slugEn')"
+              maxlength="100"
+            />
+            @if (isFieldInvalid('slugEn')) {
+            <label class="label">
+              <span class="label-text-alt text-error">
+                @if (categoryForm.get('slugEn')?.errors?.['required']) {
+                {{ "English slug is required" | translate }}
+                } @if (categoryForm.get('slugEn')?.errors?.['invalidSlug']) {
+                {{
+                  "Slug can only contain lowercase letters, numbers, and hyphens"
+                    | translate
+                }}
+                } @if (categoryForm.get('slugEn')?.errors?.['maxlength']) {
+                {{ "Slug must not exceed 100 characters" | translate }}
+                }
+              </span>
+            </label>
+            }
+          </div>
+
+          <!-- Slug (Arabic) -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium"
+                >{{ "Slug (Arabic)" | translate }} *</span
+              >
+              <span class="label-text-alt">{{
+                "Auto-generated from Arabic name" | translate
+              }}</span>
+            </label>
+            <input
+              type="text"
+              formControlName="slugAr"
+              placeholder="فئة-المنتجات"
+              class="input input-bordered w-full"
+              [class.input-error]="isFieldInvalid('slugAr')"
+              maxlength="100"
+              dir="rtl"
+            />
+            @if (isFieldInvalid('slugAr')) {
+            <label class="label">
+              <span class="label-text-alt text-error">
+                @if (categoryForm.get('slugAr')?.errors?.['required']) {
+                {{ "Arabic slug is required" | translate }}
+                } @if (categoryForm.get('slugAr')?.errors?.['invalidSlug']) {
+                {{
+                  "Slug can only contain Arabic letters, numbers, and hyphens"
+                    | translate
+                }}
+                } @if (categoryForm.get('slugAr')?.errors?.['maxlength']) {
+                {{ "Slug must not exceed 100 characters" | translate }}
+                }
+              </span>
+            </label>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Description Section -->
+      <div class="divider"></div>
+      <div>
+        <h2
+          class="text-lg font-semibold text-base-content mb-4 flex items-center"
+        >
+          <mat-icon class="mr-2 text-primary" fontIcon="description" />
+          {{ "Description" | translate }}
+        </h2>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Description (English) -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium">{{
+                "Description (English)" | translate
+              }}</span>
+            </label>
+            <textarea
+              formControlName="descriptionEn"
+              placeholder="Enter category description in English"
+              class="textarea textarea-bordered h-24 resize-none"
+              [class.textarea-error]="isFieldInvalid('descriptionEn')"
+              maxlength="500"
+            ></textarea>
+            @if (isFieldInvalid('descriptionEn')) {
+            <label class="label">
+              <span class="label-text-alt text-error">
+                @if (categoryForm.get('descriptionEn')?.errors?.['maxlength']) {
+                {{ "Description must not exceed 500 characters" | translate }}
+                }
+              </span>
+            </label>
+            }
+          </div>
+
+          <!-- Description (Arabic) -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium">{{
+                "Description (Arabic)" | translate
+              }}</span>
+            </label>
+            <textarea
+              formControlName="descriptionAr"
+              placeholder="أدخل وصف الفئة بالعربية"
+              class="textarea textarea-bordered h-24 resize-none"
+              [class.textarea-error]="isFieldInvalid('descriptionAr')"
+              maxlength="500"
+              dir="rtl"
+            ></textarea>
+            @if (isFieldInvalid('descriptionAr')) {
+            <label class="label">
+              <span class="label-text-alt text-error">
+                @if (categoryForm.get('descriptionAr')?.errors?.['maxlength']) {
+                {{ "Description must not exceed 500 characters" | translate }}
+                }
+              </span>
+            </label>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Image Section -->
+      <div class="divider"></div>
+      <div>
+        <h2
+          class="text-lg font-semibold text-base-content mb-4 flex items-center"
+        >
+          <mat-icon class="mr-2 before:text-primary" fontIcon="image" />
+          Category Image
+        </h2>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Image Upload -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium">{{
+                "Upload Image" | translate
+              }}</span>
+              <span class="label-text-alt">{{
+                "Recommended: 400x400px, Max: 5MB" | translate
+              }}</span>
+            </label>
+
+            <div class="relative">
+              <input
+                aria-label="Category Image"
+                type="file"
+                #fileInput
+                (change)="onImageSelected($event)"
+                accept="image/*"
+                class="file-input file-input-bordered w-full"
+                [class.file-input-error]="isFieldInvalid('image')"
+              />
+
+              @if (imagePreview()) {
+              <button
+                type="button"
+                (click)="clearImage()"
+                class="btn btn-ghost btn-xs absolute top-2 right-2 z-10"
+              >
+                <mat-icon class="text-error">close</mat-icon>
+              </button>
+              }
+            </div>
+
+            @if (isFieldInvalid('image')) {
+            <label class="label">
+              <span class="label-text-alt text-error">
+                @if (categoryForm.get('image')?.errors?.['required']) {
+                {{ "Category image is required" | translate }}
+                } @if (categoryForm.get('image')?.errors?.['invalidFileType']) {
+                {{
+                  "Please select a valid image file (JPG, PNG, WebP)"
+                    | translate
+                }}
+                } @if (categoryForm.get('image')?.errors?.['fileTooLarge']) {
+                {{ "File size must not exceed 5MB" | translate }}
+                }
+              </span>
+            </label>
+            }
+          </div>
+
+          <!-- Image Preview -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium">{{
+                "Preview" | translate
+              }}</span>
+            </label>
+
+            @if (imagePreview(); as preview) {
+            <div class="card bg-base-200 border border-base-300">
+              <figure class="px-4 pt-4">
+                <img
+                  [src]="preview"
+                  alt="Category preview"
+                  class="rounded-lg w-full h-48 object-cover"
+                />
+              </figure>
+              <div class="card-body p-4">
+                <p class="text-sm text-base-content/70">
+                  {{ "Image preview" | translate }}
+                </p>
+              </div>
+            </div>
+            } @else {
+            <div class="card bg-base-200 border border-base-300 border-dashed">
+              <div class="card-body items-center text-center py-12">
+                <mat-icon
+                  class="text-4xl before:text-base-content/30 mb-2"
+                  fontIcon="image"
+                />
+                <p class="text-base-content/50">
+                  {{ "No image selected" | translate }}
+                </p>
+              </div>
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings Section -->
+      <div class="divider"></div>
+      <div>
+        <h2
+          class="text-lg font-semibold text-base-content mb-4 flex items-center"
+        >
+          <mat-icon class="mr-2 text-primary" fontIcon="settings" />
+          {{ "Settings" | translate }}
+        </h2>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Is Active -->
+          <div class="form-control">
+            <label class="label cursor-pointer justify-start">
+              <input
+                type="checkbox"
+                formControlName="isActive"
+                class="toggle toggle-primary mr-3"
+              />
+              <span class="label-text font-medium">{{
+                "Active Category" | translate
+              }}</span>
+            </label>
+            <p class="text-sm text-base-content/70 mt-1">
+              {{ "Active categories are visible to customers" | translate }}
+            </p>
+          </div>
+
+          <!-- Is Featured -->
+          <div class="form-control">
+            <label class="label cursor-pointer justify-start">
+              <input
+                type="checkbox"
+                formControlName="isFeatured"
+                class="toggle toggle-secondary mr-3"
+              />
+              <span class="label-text font-medium">{{
+                "Featured Category" | translate
+              }}</span>
+            </label>
+            <p class="text-sm text-base-content/70 mt-1">
+              {{ "Featured categories appear prominently" | translate }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="divider"></div>
+      <div class="flex flex-col sm:flex-row gap-4 justify-end">
+        <button
+          type="button"
+          [routerLink]="routes.CATEGORIES"
+          class="btn btn-ghost"
+        >
+          <mat-icon fontIcon="cancel" />
+          {{ "Cancel" | translate }}
+        </button>
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="categoryForm.invalid || isLoading()"
+          [class.loading]="isLoading()"
+        >
+          @if (isLoading()) {
+          <span class="loading loading-spinner loading-sm"></span>
+          {{ "Creating" | translate }}... } @else {
+          <mat-icon fontIcon="save" />
+          {{ "Create Category" | translate }}
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Loading Overlay -->
+@if (isLoading()) {
+<div
+  class="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center"
+>
+  <div class="bg-base-100 p-6 rounded-lg shadow-lg flex items-center space-x-3">
+    <span class="loading loading-spinner loading-md"></span>
+    <span>{{ "Creating category" | translate }}...</span>
+  </div>
+</div>
+}
+
+<!-- Error Alert -->
+@if (error(); as errorMsg) {
+<div class="toast toast-top toast-end">
+  <div class="alert alert-error">
+    <mat-icon>error</mat-icon>
+    <span>{{ errorMsg }}</span>
+    <button class="btn btn-ghost btn-xs" (click)="clearError()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+</div>
+},

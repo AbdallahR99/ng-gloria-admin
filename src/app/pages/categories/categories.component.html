@@ -1,1 +1,363 @@
-<p>categories works!</p>,
+<!-- Categories Management Page -->
+<div class="container mx-auto p-6 max-w-7xl">
+  <!-- Page Header -->
+  <div
+    class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6"
+  >
+    <div>
+      <h1 class="text-3xl font-bold text-base-content">
+        {{ "Categories" | translate }}
+      </h1>
+      <p class="text-base-content/70 mt-1">Manage your product categories</p>
+    </div>
+
+    <div class="flex flex-col sm:flex-row gap-2">
+      <button class="btn btn-primary" (click)="navigateToCreate()">
+        <mat-icon>add</mat-icon>
+        Add Category
+      </button>
+
+      @if (selectedIds().length > 0) {
+      <button class="btn btn-error btn-outline" (click)="onBulkDelete()">
+        <mat-icon>delete</mat-icon>
+        Delete Selected ({{ selectedIds().length }})
+      </button>
+      }
+    </div>
+  </div>
+
+  <!-- Search and Filters -->
+  <div class="card bg-base-100 shadow-sm border border-base-300 mb-6">
+    <div class="card-body p-4">
+      <div class="flex flex-col lg:flex-row gap-4">
+        <!-- Search Input -->
+        <div class="flex-1">
+          <label class="input input-bordered flex items-center gap-2">
+            <mat-icon class="w-4 h-4 opacity-70">search</mat-icon>
+            <input
+              type="text"
+              class="grow"
+              placeholder="Search categories..."
+              [(ngModel)]="searchQuery"
+              name="searchQuery"
+              (input)="onSearch(searchQuery())"
+            />
+          </label>
+        </div>
+
+        <!-- Filters -->
+        <div class="flex flex-col sm:flex-row gap-2">
+          <!-- Show Deleted Toggle -->
+          <label class="label cursor-pointer gap-2">
+            <span class="label-text">Show Deleted</span>
+            <input
+              type="checkbox"
+              class="toggle toggle-primary"
+              [checked]="showDeleted()"
+              (change)="onToggleDeleted()"
+            />
+          </label>
+
+          <!-- Page Size Selector -->
+          <select
+            title="Select Page Size"
+            class="select select-bordered w-full sm:w-auto"
+            [(ngModel)]="pageSize"
+            name="pageSize"
+            (change)="onPageSizeChange(+pageSize() || 10)"
+          >
+            <option value="10">10 per page</option>
+            <option value="25">25 per page</option>
+            <option value="50">50 per page</option>
+            <option value="100">100 per page</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+  <div class="flex justify-center items-center py-12">
+    <span class="loading loading-spinner loading-lg"></span>
+  </div>
+  }
+
+  <!-- Error State -->
+  @if (error(); as errorMsg) {
+  <div class="alert alert-error">
+    <mat-icon>error</mat-icon>
+    <span>{{ errorMsg }}</span>
+  </div>
+  }
+
+  <!-- Categories Table -->
+  @if (!isLoading() && !error()) {
+  <div class="card bg-base-100 shadow-sm border border-base-300">
+    <div class="overflow-x-auto">
+      <table class="table table-zebra">
+        <!-- Table Header -->
+        <thead>
+          <tr>
+            <th>
+              <label>
+                <input
+                  title="Select All Categories"
+                  type="checkbox"
+                  class="checkbox"
+                  [checked]="isAllSelected()"
+                  (change)="onSelectAllCategories()"
+                />
+              </label>
+            </th>
+            <th>
+              <button
+                class="btn btn-ghost btn-sm justify-start p-0"
+                (click)="onSort('nameEn')"
+              >
+                Name (EN)
+                <mat-icon class="ml-1 text-sm">{{
+                  getSortIcon("nameEn")
+                }}</mat-icon>
+              </button>
+            </th>
+            <th>
+              <button
+                class="btn btn-ghost btn-sm justify-start p-0"
+                (click)="onSort('nameAr')"
+              >
+                Name (AR)
+                <mat-icon class="ml-1 text-sm">{{
+                  getSortIcon("nameAr")
+                }}</mat-icon>
+              </button>
+            </th>
+            <th>
+              <button
+                class="btn btn-ghost btn-sm justify-start p-0"
+                (click)="onSort('slug')"
+              >
+                Slug
+                <mat-icon class="ml-1 text-sm">{{
+                  getSortIcon("slug")
+                }}</mat-icon>
+              </button>
+            </th>
+            <th>Image</th>
+            <th>
+              <button
+                class="btn btn-ghost btn-sm justify-start p-0"
+                (click)="onSort('createdAt')"
+              >
+                Created
+                <mat-icon class="ml-1 text-sm">{{
+                  getSortIcon("createdAt")
+                }}</mat-icon>
+              </button>
+            </th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <!-- Table Body -->
+        <tbody>
+          @for (category of categories(); track category.id) {
+          <tr class="hover">
+            <th>
+              <label>
+                <input
+                  type="checkbox"
+                  class="checkbox"
+                  [checked]="isCategorySelected(category.id!)"
+                  (change)="onSelectCategory(category.id!)"
+                />
+                {{ "Select Category" | translate }}
+              </label>
+            </th>
+            <td>
+              <div class="flex items-center gap-3">
+                <div>
+                  <div class="font-bold">{{ category.nameEn }}</div>
+                  @if (category.metaTitleEn) {
+                  <div class="text-sm opacity-50">
+                    {{ category.metaTitleEn }}
+                  </div>
+                  }
+                </div>
+              </div>
+            </td>
+            <td>
+              <div>
+                <div class="font-bold">{{ category.nameAr }}</div>
+                @if (category.metaTitleAr) {
+                <div class="text-sm opacity-50">{{ category.metaTitleAr }}</div>
+                }
+              </div>
+            </td>
+            <td>
+              <div>
+                <div class="font-mono text-sm">{{ category.slug }}</div>
+                @if (category.slugAr) {
+                <div class="font-mono text-sm opacity-50">
+                  {{ category.slugAr }}
+                </div>
+                }
+              </div>
+            </td>
+            <td>
+              @if (category.image) {
+              <div class="avatar">
+                <div class="mask mask-squircle h-12 w-12">
+                  <img
+                    title="{{ category.nameEn }}"
+                    [src]="category.image"
+                    [alt]="category.nameEn"
+                  />
+                </div>
+              </div>
+              } @else {
+              <div class="avatar placeholder">
+                <div
+                  class="bg-neutral text-neutral-content mask mask-squircle h-12 w-12"
+                >
+                  <span class="text-xl">{{ category.nameEn?.charAt(0) }}</span>
+                </div>
+              </div>
+              }
+            </td>
+            <td>
+              @if (category.createdAt) {
+              <div class="text-sm">
+                {{ category.createdAt | date : "short" }}
+              </div>
+              }
+            </td>
+            <td>
+              @if (category.isDeleted) {
+              <div class="badge badge-error badge-outline">Deleted</div>
+              } @else {
+              <div class="badge badge-success badge-outline">Active</div>
+              }
+            </td>
+            <td>
+              <div class="flex gap-1">
+                <button
+                  class="btn btn-ghost btn-sm"
+                  (click)="navigateToDetails(category.id!)"
+                  [attr.aria-label]="'View ' + category.nameEn"
+                >
+                  <mat-icon>visibility</mat-icon>
+                </button>
+                <button
+                  class="btn btn-ghost btn-sm"
+                  (click)="navigateToEdit(category.id!)"
+                  [attr.aria-label]="'Edit ' + category.nameEn"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+                @if (!category.isDeleted) {
+                <button
+                  class="btn btn-ghost btn-sm text-error"
+                  (click)="onDeleteCategory(category.id!)"
+                  [attr.aria-label]="'Delete ' + category.nameEn"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+                }
+              </div>
+            </td>
+          </tr>
+          } @empty {
+          <tr>
+            <td colspan="8" class="text-center py-8">
+              <div class="flex flex-col items-center gap-4">
+                <mat-icon class="text-6xl text-base-content/30"
+                  >inventory_2</mat-icon
+                >
+                <div>
+                  <h3 class="font-bold">No categories found</h3>
+                  <p class="text-base-content/70">
+                    @if (searchQuery()) { Try adjusting your search criteria }
+                    @else { Start by creating your first category }
+                  </p>
+                </div>
+                @if (!searchQuery()) {
+                <button class="btn btn-primary" (click)="navigateToCreate()">
+                  <mat-icon>add</mat-icon>
+                  Create Category
+                </button>
+                }
+              </div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    @if (totalPages() > 1) {
+    <div
+      class="card-actions justify-between items-center p-4 border-t border-base-300"
+    >
+      <!-- Results Info -->
+      <div class="text-sm text-base-content/70">
+        Showing {{ paginationInfo().start }} to {{ paginationInfo().end }} of
+        {{ paginationInfo().totalItems }} results
+      </div>
+
+      <!-- Pagination Controls -->
+      <div class="join">
+        <!-- First Page -->
+        <button
+          class="join-item btn btn-sm"
+          [disabled]="isFirstPage()"
+          (click)="onPageChange(1)"
+        >
+          <mat-icon>first_page</mat-icon>
+        </button>
+
+        <!-- Previous Page -->
+        <button
+          class="join-item btn btn-sm"
+          [disabled]="isFirstPage()"
+          (click)="onPageChange(currentPage() - 1)"
+        >
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+
+        <!-- Page Numbers -->
+        @for (pageNum of getPageNumbers(); track pageNum) {
+        <button
+          class="join-item btn btn-sm"
+          [class.btn-active]="pageNum === currentPage()"
+          (click)="onPageChange(pageNum)"
+        >
+          {{ pageNum }}
+        </button>
+        }
+
+        <!-- Next Page -->
+        <button
+          class="join-item btn btn-sm"
+          [disabled]="isLastPage()"
+          (click)="onPageChange(currentPage() + 1)"
+        >
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+
+        <!-- Last Page -->
+        <button
+          class="join-item btn btn-sm"
+          [disabled]="isLastPage()"
+          (click)="onPageChange(totalPages())"
+        >
+          <mat-icon>last_page</mat-icon>
+        </button>
+      </div>
+    </div>
+    }
+  </div>
+  }
+</div>

@@ -1,1 +1,388 @@
-<p>category-details works!</p>,
+<!-- Page Header -->
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h1 class="text-2xl font-bold text-base-content">
+      {{ "Category Details" | translate }}
+    </h1>
+    <div class="breadcrumbs text-sm mt-2">
+      <ul>
+        <li>
+          <a (click)="navigateToCategories()" class="link link-hover">{{
+            "Categories" | translate
+          }}</a>
+        </li>
+        <li>{{ categoryResource.value()?.nameEn || "Category" }}</li>
+      </ul>
+    </div>
+  </div>
+  <div class="flex gap-2">
+    <button
+      type="button"
+      (click)="navigateToEdit()"
+      class="btn btn-primary btn-sm"
+      [disabled]="
+        !categoryResource.value() || categoryResource.value()?.isDeleted
+      "
+    >
+      <mat-icon fontIcon="edit" />
+      {{ "Edit Category" | translate }}
+    </button>
+    <button
+      type="button"
+      (click)="navigateToCategories()"
+      class="btn btn-ghost btn-sm"
+    >
+      <mat-icon>arrow_back</mat-icon>
+      Back to Categories
+    </button>
+  </div>
+</div>
+
+<!-- Loading State -->
+@if (categoryResource.isLoading()) {
+<div class="flex justify-center items-center py-12">
+  <span class="loading loading-spinner loading-lg"></span>
+</div>
+}
+
+<!-- Error State -->
+@if (categoryResource.error(); as errorMsg) {
+<div class="alert alert-error">
+  <mat-icon>error</mat-icon>
+  <span>Failed to load category: {{ errorMsg }}</span>
+  <button class="btn btn-ghost btn-sm" (click)="categoryResource.reload()">
+    <mat-icon>refresh</mat-icon>
+    Retry
+  </button>
+</div>
+}
+
+<!-- Category Details -->
+@if (categoryResource.value(); as category) {
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <!-- Category Image and Status -->
+  <div class="lg:col-span-1">
+    <div class="card bg-base-100 shadow-sm border border-base-300">
+      <figure class="px-6 pt-6">
+        @if (category.image) {
+        <img
+          title="{{ category.nameEn }}"
+          [src]="category.image"
+          [alt]="category.nameEn"
+          class="rounded-lg w-full h-64 object-cover"
+        />
+        } @else {
+        <div
+          class="bg-base-200 rounded-lg w-full h-64 flex items-center justify-center"
+        >
+          <div class="text-center">
+            <mat-icon class="text-6xl text-base-content/30">image</mat-icon>
+            <p class="text-base-content/50 mt-2">No image</p>
+          </div>
+        </div>
+        }
+      </figure>
+
+      <div class="card-body">
+        <!-- Status Badge -->
+        <div class="flex justify-center mb-4">
+          @if (category.isDeleted) {
+          <div class="badge badge-error badge-lg">
+            <mat-icon class="mr-1 text-sm">delete</mat-icon>
+            Deleted
+          </div>
+          } @else {
+          <div class="badge badge-success badge-lg">
+            <mat-icon class="mr-1 text-sm">check_circle</mat-icon>
+            Active
+          </div>
+          }
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="card-actions justify-center space-y-2">
+          @if (!category.isDeleted) {
+          <button
+            type="button"
+            class="btn btn-primary btn-block"
+            (click)="navigateToEdit()"
+          >
+            <mat-icon fontIcon="edit" />
+            {{ "Edit Category" | translate }}
+          </button>
+          <button
+            class="btn btn-error btn-outline btn-block"
+            (click)="onDelete()"
+          >
+            <mat-icon fontIcon="delete" />
+            {{ "Delete Category" | translate }}
+          </button>
+          } @else {
+          <button class="btn btn-disabled btn-block" disabled>
+            <mat-icon fontIcon="block" />
+            {{ "Category Deleted" | translate }}
+          </button>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category Information -->
+  <div class="lg:col-span-2 space-y-6">
+    <!-- Basic Information -->
+    <div class="card bg-base-100 shadow-sm border border-base-300">
+      <div class="card-body">
+        <h2 class="card-title text-lg flex items-center">
+          <mat-icon class="text-primary">info</mat-icon>
+          Basic Information
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+          <!-- Names -->
+          <div class="space-y-4">
+            <div>
+              <label class="text-sm font-medium text-base-content/70">{{
+                "Name (English)" | translate
+              }}</label>
+              <p class="text-base font-semibold">{{ category.nameEn }}</p>
+            </div>
+            <div>
+              <label class="text-sm font-medium text-base-content/70">{{
+                "Name (Arabic)" | translate
+              }}</label>
+              <p class="text-base font-semibold text-right" dir="rtl">
+                {{ category.nameAr }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Slugs -->
+          <div class="space-y-4">
+            <div>
+              <label class="text-sm font-medium text-base-content/70">{{
+                "Slug (English)" | translate
+              }}</label>
+              <p class="text-base font-mono bg-base-200 px-3 py-1 rounded">
+                {{ category.slug }}
+              </p>
+            </div>
+            @if (category.slugAr) {
+            <div>
+              <label class="text-sm font-medium text-base-content/70">{{
+                "Slug (Arabic)" | translate
+              }}</label>
+              <p
+                class="text-base font-mono bg-base-200 px-3 py-1 rounded text-right"
+                dir="rtl"
+              >
+                {{ category.slugAr }}
+              </p>
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Descriptions -->
+    @if (category.descriptionEn || category.descriptionAr) {
+    <div class="card bg-base-100 shadow-sm border border-base-300">
+      <div class="card-body">
+        <h2 class="card-title text-lg flex items-center">
+          <mat-icon class="before:text-primary" fontIcon="description" />
+          {{ "Descriptions" | translate }}
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+          @if (category.descriptionEn) {
+          <div>
+            <label class="text-sm font-medium text-base-content/70">{{
+              "Description (English)" | translate
+            }}</label>
+            <p class="text-base mt-2 leading-relaxed">
+              {{ category.descriptionEn }}
+            </p>
+          </div>
+          } @if (category.descriptionAr) {
+          <div>
+            <label class="text-sm font-medium text-base-content/70">{{
+              "Description (Arabic)" | translate
+            }}</label>
+            <p class="text-base mt-2 leading-relaxed text-right" dir="rtl">
+              {{ category.descriptionAr }}
+            </p>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- SEO Meta Information -->
+    @if (category.metaTitleEn || category.metaTitleAr ||
+    category.metaDescriptionEn || category.metaDescriptionAr) {
+    <div class="card bg-base-100 shadow-sm border border-base-300">
+      <div class="card-body">
+        <h2 class="card-title text-lg flex items-center">
+          <mat-icon class="text-primary">search</mat-icon>
+          SEO Meta Information
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+          <!-- Meta Titles -->
+          <div class="space-y-4">
+            @if (category.metaTitleEn) {
+            <div>
+              <label class="text-sm font-medium text-base-content/70"
+                >Meta Title (English)</label
+              >
+              <p class="text-base bg-base-200 px-3 py-2 rounded">
+                {{ category.metaTitleEn }}
+              </p>
+            </div>
+            } @if (category.metaTitleAr) {
+            <div>
+              <label class="text-sm font-medium text-base-content/70"
+                >Meta Title (Arabic)</label
+              >
+              <p
+                class="text-base bg-base-200 px-3 py-2 rounded text-right"
+                dir="rtl"
+              >
+                {{ category.metaTitleAr }}
+              </p>
+            </div>
+            }
+          </div>
+
+          <!-- Meta Descriptions -->
+          <div class="space-y-4">
+            @if (category.metaDescriptionEn) {
+            <div>
+              <label class="text-sm font-medium text-base-content/70"
+                >Meta Description (English)</label
+              >
+              <p
+                class="text-base bg-base-200 px-3 py-2 rounded leading-relaxed"
+              >
+                {{ category.metaDescriptionEn }}
+              </p>
+            </div>
+            } @if (category.metaDescriptionAr) {
+            <div>
+              <label class="text-sm font-medium text-base-content/70"
+                >Meta Description (Arabic)</label
+              >
+              <p
+                class="text-base bg-base-200 px-3 py-2 rounded text-right leading-relaxed"
+                dir="rtl"
+              >
+                {{ category.metaDescriptionAr }}
+              </p>
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- System Information -->
+    <div class="card bg-base-100 shadow-sm border border-base-300">
+      <div class="card-body">
+        <h2 class="card-title text-lg flex items-center">
+          <mat-icon class="text-primary">settings</mat-icon>
+          System Information
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+          <div class="space-y-4">
+            <div>
+              <label class="text-sm font-medium text-base-content/70"
+                >Category ID</label
+              >
+              <p class="text-base font-mono bg-base-200 px-3 py-1 rounded">
+                {{ category.id }}
+              </p>
+            </div>
+            @if (category.createdAt) {
+            <div>
+              <label class="text-sm font-medium text-base-content/70"
+                >Created Date</label
+              >
+              <p class="text-base">{{ formatDate(category.createdAt) }}</p>
+            </div>
+            }
+          </div>
+
+          <div class="space-y-4">
+            @if (category.updatedAt) {
+            <div>
+              <label class="text-sm font-medium text-base-content/70"
+                >Last Updated</label
+              >
+              <p class="text-base">{{ formatDate(category.updatedAt) }}</p>
+            </div>
+            } @if (category.deletedAt) {
+            <div>
+              <label class="text-sm font-medium text-base-content/70"
+                >Deleted Date</label
+              >
+              <p class="text-base text-error">
+                {{ formatDate(category.deletedAt) }}
+              </p>
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+<!-- Delete Confirmation Modal -->
+@if (showDeleteModal()) {
+<dialog class="modal modal-open">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg">Confirm Delete</h3>
+    <p class="py-4">
+      Are you sure you want to delete the category "{{
+        categoryResource.value()?.nameEn
+      }}"? This action cannot be undone.
+    </p>
+    <div class="modal-action">
+      <button class="btn btn-ghost" (click)="cancelDelete()">Cancel</button>
+      <button
+        class="btn btn-error"
+        (click)="confirmDelete()"
+        [disabled]="isDeleting()"
+        [class.loading]="isDeleting()"
+      >
+        @if (isDeleting()) {
+        <span class="loading loading-spinner loading-sm"></span>
+        Deleting... } @else {
+        <mat-icon>delete</mat-icon>
+        Delete }
+      </button>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button (click)="cancelDelete()">close</button>
+  </form>
+</dialog>
+}
+
+<!-- Error Alert -->
+@if (error(); as errorMsg) {
+<div class="toast toast-top toast-end">
+  <div class="alert alert-error">
+    <mat-icon>error</mat-icon>
+    <span>{{ errorMsg }}</span>
+    <button class="btn btn-ghost btn-xs" (click)="clearError()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+</div>
+},

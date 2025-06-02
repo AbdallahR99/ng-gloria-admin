@@ -9,6 +9,8 @@ export interface Category {
   slug?: string;
   slugAr?: string;
   image?: string;
+  descriptionEn?: string;
+  descriptionAr?: string;
   metaTitleEn?: string;
   metaTitleAr?: string;
   metaDescriptionEn?: string;
@@ -28,6 +30,8 @@ export interface CategoryCreateOrUpdate {
   slug?: string;
   slugAr?: string;
   imageFile?: string; // base64 image
+  descriptionEn?: string;
+  descriptionAr?: string;
   metaTitleEn?: string;
   metaTitleAr?: string;
   metaDescriptionEn?: string;

@@ -1,1 +1,489 @@
-<p>category-update works!</p>,
+<!-- Page Header -->
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h1 class="text-2xl font-bold text-base-content">Edit Category</h1>
+    <div class="breadcrumbs text-sm mt-2">
+      <ul>
+        <li>
+          <a (click)="navigateToCategories()" class="link link-hover"
+            >Categories</a
+          >
+        </li>
+        <li>
+          <a (click)="navigateToDetails()" class="link link-hover">{{
+            categoryResource.value()?.nameEn || "Category"
+          }}</a>
+        </li>
+        <li>Edit</li>
+      </ul>
+    </div>
+  </div>
+  <div class="flex gap-2">
+    <button
+      type="button"
+      (click)="navigateToDetails()"
+      class="btn btn-ghost btn-sm"
+    >
+      <mat-icon>visibility</mat-icon>
+      View Details
+    </button>
+    <button
+      type="button"
+      (click)="navigateToCategories()"
+      class="btn btn-ghost btn-sm"
+    >
+      <mat-icon>arrow_back</mat-icon>
+      Back to Categories
+    </button>
+  </div>
+</div>
+
+<!-- Loading State -->
+@if (categoryResource.isLoading()) {
+<div class="flex justify-center items-center py-12">
+  <span class="loading loading-spinner loading-lg"></span>
+</div>
+}
+
+<!-- Error State -->
+@if (categoryResource.error(); as errorMsg) {
+<div class="alert alert-error">
+  <mat-icon>error</mat-icon>
+  <span>Failed to load category: {{ errorMsg }}</span>
+  <button class="btn btn-ghost btn-sm" (click)="categoryResource.reload()">
+    <mat-icon>refresh</mat-icon>
+    Retry
+  </button>
+</div>
+}
+
+<!-- Form Card -->
+@if (categoryResource.value() && !categoryResource.isLoading()) {
+<div class="card bg-base-100 shadow-sm border border-base-300">
+  <div class="card-body">
+    <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()" class="space-y-6">
+      <!-- Basic Information Section -->
+      <div>
+        <h2
+          class="text-lg font-semibold text-base-content mb-4 flex items-center"
+        >
+          <mat-icon class="mr-2 text-primary">info</mat-icon>
+          Basic Information
+        </h2>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Name (English) -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium">Name (English) *</span>
+            </label>
+            <input
+              type="text"
+              formControlName="nameEn"
+              placeholder="Enter category name in English"
+              class="input input-bordered w-full"
+              [class.input-error]="isFieldInvalid('nameEn')"
+              maxlength="100"
+            />
+            @if (isFieldInvalid('nameEn')) {
+            <label class="label">
+              <span class="label-text-alt text-error">
+                @if (categoryForm.get('nameEn')?.errors?.['required']) { English
+                name is required } @if
+                (categoryForm.get('nameEn')?.errors?.['maxlength']) { Name
+                cannot exceed 100 characters }
+              </span>
+            </label>
+            }
+          </div>
+
+          <!-- Name (Arabic) -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium">Name (Arabic) *</span>
+            </label>
+            <input
+              type="text"
+              formControlName="nameAr"
+              placeholder="أدخل اسم الفئة بالعربية"
+              class="input input-bordered w-full text-right"
+              [class.input-error]="isFieldInvalid('nameAr')"
+              dir="rtl"
+              maxlength="100"
+            />
+            @if (isFieldInvalid('nameAr')) {
+            <label class="label">
+              <span class="label-text-alt text-error">
+                @if (categoryForm.get('nameAr')?.errors?.['required']) { Arabic
+                name is required } @if
+                (categoryForm.get('nameAr')?.errors?.['maxlength']) { Name
+                cannot exceed 100 characters }
+              </span>
+            </label>
+            }
+          </div>
+
+          <!-- Slug (English) -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium">Slug (English) *</span>
+              <span class="label-text-alt">URL-friendly identifier</span>
+            </label>
+            <input
+              type="text"
+              formControlName="slug"
+              placeholder="category-slug"
+              class="input input-bordered w-full font-mono"
+              [class.input-error]="isFieldInvalid('slug')"
+              maxlength="100"
+            />
+            @if (isFieldInvalid('slug')) {
+            <label class="label">
+              <span class="label-text-alt text-error">
+                @if (categoryForm.get('slug')?.errors?.['required']) { English
+                slug is required } @if
+                (categoryForm.get('slug')?.errors?.['pattern']) { Slug can only
+                contain lowercase letters, numbers, and hyphens } @if
+                (categoryForm.get('slug')?.errors?.['maxlength']) { Slug cannot
+                exceed 100 characters }
+              </span>
+            </label>
+            }
+          </div>
+
+          <!-- Slug (Arabic) -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium">Slug (Arabic)</span>
+              <span class="label-text-alt">URL-friendly identifier</span>
+            </label>
+            <input
+              type="text"
+              formControlName="slugAr"
+              placeholder="فئة-المنتج"
+              class="input input-bordered w-full font-mono text-right"
+              [class.input-error]="isFieldInvalid('slugAr')"
+              dir="rtl"
+              maxlength="100"
+            />
+            @if (isFieldInvalid('slugAr')) {
+            <label class="label">
+              <span class="label-text-alt text-error">
+                @if (categoryForm.get('slugAr')?.errors?.['pattern']) { Slug can
+                only contain Arabic letters, numbers, and hyphens } @if
+                (categoryForm.get('slugAr')?.errors?.['maxlength']) { Slug
+                cannot exceed 100 characters }
+              </span>
+            </label>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Descriptions Section -->
+      <div>
+        <h2
+          class="text-lg font-semibold text-base-content mb-4 flex items-center"
+        >
+          <mat-icon class="mr-2 text-primary">description</mat-icon>
+          Descriptions
+        </h2>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Description (English) -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium">Description (English)</span>
+            </label>
+            <textarea
+              formControlName="descriptionEn"
+              placeholder="Enter category description in English"
+              class="textarea textarea-bordered w-full h-32 resize-none"
+              [class.textarea-error]="isFieldInvalid('descriptionEn')"
+              maxlength="500"
+            ></textarea>
+            @if (isFieldInvalid('descriptionEn')) {
+            <label class="label">
+              <span class="label-text-alt text-error">
+                @if (categoryForm.get('descriptionEn')?.errors?.['maxlength']) {
+                Description cannot exceed 500 characters }
+              </span>
+            </label>
+            }
+          </div>
+
+          <!-- Description (Arabic) -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium">Description (Arabic)</span>
+            </label>
+            <textarea
+              formControlName="descriptionAr"
+              placeholder="أدخل وصف الفئة بالعربية"
+              class="textarea textarea-bordered w-full h-32 resize-none text-right"
+              [class.textarea-error]="isFieldInvalid('descriptionAr')"
+              dir="rtl"
+              maxlength="500"
+            ></textarea>
+            @if (isFieldInvalid('descriptionAr')) {
+            <label class="label">
+              <span class="label-text-alt text-error">
+                @if (categoryForm.get('descriptionAr')?.errors?.['maxlength']) {
+                Description cannot exceed 500 characters }
+              </span>
+            </label>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- SEO Meta Information Section -->
+      <div>
+        <h2
+          class="text-lg font-semibold text-base-content mb-4 flex items-center"
+        >
+          <mat-icon class="mr-2 text-primary">search</mat-icon>
+          SEO Meta Information
+        </h2>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Meta Title (English) -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium">Meta Title (English)</span>
+              <span class="label-text-alt">For search engines</span>
+            </label>
+            <input
+              type="text"
+              formControlName="metaTitleEn"
+              placeholder="SEO title for English pages"
+              class="input input-bordered w-full"
+              [class.input-error]="isFieldInvalid('metaTitleEn')"
+              maxlength="60"
+            />
+            @if (isFieldInvalid('metaTitleEn')) {
+            <label class="label">
+              <span class="label-text-alt text-error">
+                @if (categoryForm.get('metaTitleEn')?.errors?.['maxlength']) {
+                Meta title cannot exceed 60 characters }
+              </span>
+            </label>
+            }
+          </div>
+
+          <!-- Meta Title (Arabic) -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium">Meta Title (Arabic)</span>
+              <span class="label-text-alt">For search engines</span>
+            </label>
+            <input
+              type="text"
+              formControlName="metaTitleAr"
+              placeholder="عنوان SEO للصفحات العربية"
+              class="input input-bordered w-full text-right"
+              [class.input-error]="isFieldInvalid('metaTitleAr')"
+              dir="rtl"
+              maxlength="60"
+            />
+            @if (isFieldInvalid('metaTitleAr')) {
+            <label class="label">
+              <span class="label-text-alt text-error">
+                @if (categoryForm.get('metaTitleAr')?.errors?.['maxlength']) {
+                Meta title cannot exceed 60 characters }
+              </span>
+            </label>
+            }
+          </div>
+
+          <!-- Meta Description (English) -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium"
+                >Meta Description (English)</span
+              >
+              <span class="label-text-alt">Search result snippet</span>
+            </label>
+            <textarea
+              formControlName="metaDescriptionEn"
+              placeholder="SEO description for English pages"
+              class="textarea textarea-bordered w-full h-24 resize-none"
+              [class.textarea-error]="isFieldInvalid('metaDescriptionEn')"
+              maxlength="160"
+            ></textarea>
+            @if (isFieldInvalid('metaDescriptionEn')) {
+            <label class="label">
+              <span class="label-text-alt text-error">
+                @if
+                (categoryForm.get('metaDescriptionEn')?.errors?.['maxlength']) {
+                Meta description cannot exceed 160 characters }
+              </span>
+            </label>
+            }
+          </div>
+
+          <!-- Meta Description (Arabic) -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium"
+                >Meta Description (Arabic)</span
+              >
+              <span class="label-text-alt">Search result snippet</span>
+            </label>
+            <textarea
+              formControlName="metaDescriptionAr"
+              placeholder="وصف SEO للصفحات العربية"
+              class="textarea textarea-bordered w-full h-24 resize-none text-right"
+              [class.textarea-error]="isFieldInvalid('metaDescriptionAr')"
+              dir="rtl"
+              maxlength="160"
+            ></textarea>
+            @if (isFieldInvalid('metaDescriptionAr')) {
+            <label class="label">
+              <span class="label-text-alt text-error">
+                @if
+                (categoryForm.get('metaDescriptionAr')?.errors?.['maxlength']) {
+                Meta description cannot exceed 160 characters }
+              </span>
+            </label>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Image Section -->
+      <div>
+        <h2
+          class="text-lg font-semibold text-base-content mb-4 flex items-center"
+        >
+          <mat-icon class="mr-2 text-primary">image</mat-icon>
+          Category Image
+        </h2>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+          <!-- Current Image Display -->
+          <div class="lg:col-span-1">
+            @if (imagePreview() || categoryForm.get('image')?.value) {
+            <div class="card bg-base-200 border border-base-300">
+              <figure class="px-4 pt-4">
+                <img
+                  [src]="imagePreview() || categoryForm.get('image')?.value"
+                  alt="Category preview"
+                  class="rounded-lg w-full h-48 object-cover"
+                />
+              </figure>
+              <div class="card-actions justify-center p-4">
+                <button
+                  type="button"
+                  class="btn btn-ghost btn-sm text-error"
+                  (click)="onRemoveImage()"
+                >
+                  <mat-icon>delete</mat-icon>
+                  Remove
+                </button>
+              </div>
+            </div>
+            } @else {
+            <div class="card bg-base-200 border border-base-300 border-dashed">
+              <div class="card-body items-center text-center py-12">
+                <mat-icon class="text-4xl text-base-content/30">image</mat-icon>
+                <p class="text-base-content/70">No image selected</p>
+              </div>
+            </div>
+            }
+          </div>
+
+          <!-- Image Upload Controls -->
+          <div class="lg:col-span-2">
+            <div class="form-control">
+              <label id="myLable21" class="label">
+                <span class="label-text font-medium">Upload New Image</span>
+                <span class="label-text-alt">JPG, PNG up to 5MB</span>
+              </label>
+
+              <input
+                aria-label="Upload category image"
+                type="file"
+                #fileInput
+                accept="image/*"
+                (change)="onImageSelected($event)"
+                class="file-input file-input-bordered w-full"
+              />
+
+              @if (isFieldInvalid('image')) {
+              <label class="label">
+                <span class="label-text-alt text-error">
+                  {{ categoryForm.get('image')?.errors?.['required'] ? 'Image is required' : 'Invalid image format' }}
+                </span>
+              </label>
+              }
+
+              <div class="mt-4 space-y-2">
+                <div class="text-sm text-base-content/70">
+                  <mat-icon class="text-xs mr-1">info</mat-icon>
+                  Recommended: 800x600px or higher for best quality
+                </div>
+                <div class="text-sm text-base-content/70">
+                  <mat-icon class="text-xs mr-1">info</mat-icon>
+                  Supported formats: JPEG, PNG, WebP
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="divider"></div>
+      <div class="flex flex-col sm:flex-row gap-4 justify-end">
+        <button
+          type="button"
+          (click)="navigateToCategories()"
+          class="btn btn-ghost"
+        >
+          <mat-icon>cancel</mat-icon>
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="categoryForm.invalid || isLoading()"
+          [class.loading]="isLoading()"
+        >
+          @if (isLoading()) {
+          <span class="loading loading-spinner loading-sm"></span>
+          Updating... } @else {
+          <mat-icon>save</mat-icon>
+          Update Category }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+}
+
+<!-- Loading Overlay -->
+@if (isLoading()) {
+<div
+  class="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center"
+>
+  <div class="bg-base-100 p-6 rounded-lg shadow-lg flex items-center space-x-3">
+    <span class="loading loading-spinner loading-md"></span>
+    <span>Updating category...</span>
+  </div>
+</div>
+}
+
+<!-- Error Alert -->
+@if (error(); as errorMsg) {
+<div class="toast toast-top toast-end">
+  <div class="alert alert-error">
+    <mat-icon>error</mat-icon>
+    <span>{{ errorMsg }}</span>
+    <button class="btn btn-ghost btn-xs" (click)="clearError()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+</div>
+},
