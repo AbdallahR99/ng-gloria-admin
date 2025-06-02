@@ -1,5 +1,6 @@
 import { AppRequest } from '@api/common/types';
-import { updateOrder, bulkUpdateOrders } from './functions';
+import { updateOrder } from './functions/update-order';
+import { bulkUpdateOrders } from './functions/bulk-update-orders';
 import { Response, NextFunction } from 'express';
 import { handleControllerError } from '@api/common/utils/error-handler';
 
@@ -13,13 +14,7 @@ export async function orderPutUpdate(
   const body = req.body;
 
   try {
-    const order = await updateOrder(
-      {
-        id,
-        ...body,
-      },
-      supabase
-    );
+    const order = await updateOrder({ ...body, id }, supabase);
     res.status(200).json(order);
   } catch (error) {
     handleControllerError(res, error, 'Failed to update order');

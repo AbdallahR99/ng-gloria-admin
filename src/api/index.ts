@@ -3,6 +3,7 @@ import { productsRouter } from './modules/products/products.routes';
 import { createSupabaseAuthClient } from './common/supabase-client';
 import { ordersRouter } from './modules/orders/orders.routes';
 import { inspiredProductsRouter } from './modules/inspired-products/inspired-products.routes';
+import { categoriesRouter } from './modules/categories/categories.routes';
 
 const apiRouter = Router();
 apiRouter.use(createSupabaseAuthClient);
@@ -16,7 +17,7 @@ apiRouter.use('/inspired-products', inspiredProductsRouter);
 // apiRouter.use('/bundles', bundlesRouter);
 // apiRouter.use('/invoices', invoicesRouter);
 // apiRouter.use('/addresses', addressesRouter);
-// apiRouter.use('/categories', categoriesRouter);
+apiRouter.use('/categories', categoriesRouter);
 // apiRouter.use('/auth', authRouter);
 // apiRouter.use('/favorites', favoritesRouter);
 // apiRouter.use('/reviews', reviewsRouter);

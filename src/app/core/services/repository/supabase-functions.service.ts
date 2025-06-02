@@ -1,9 +1,8 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { LocalStorageKeys } from '@app/core/constants/local_storage';
-import { toSnakeCase, toCamelCase } from '@app/core/utils/case-converter';
 import { environment } from '@environments/environment';
-import { firstValueFrom, map, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { PlatformService } from '../platform/platform.service';
 import { JwtHelperService } from '@auth0/angular-jwt';
 
@@ -11,7 +10,7 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 export class SupabaseFunctionsService {
   private readonly http = inject(HttpClient);
   private readonly platformService = inject(PlatformService);
-  private readonly baseUrl = environment.supabaseFunctions;
+  private readonly baseUrl = '/api/';
   private readonly jwtHelper = new JwtHelperService();
 
   callFunction<T>(
@@ -27,24 +26,24 @@ export class SupabaseFunctionsService {
     const headers = this.buildHeaders(authToken);
     const url = this.buildUrl(path, queryParams);
 
-    let response$;
-    const payload = toSnakeCase(body ?? {});
+    let response$: Observable<T>;
+    const payload = body;
 
     switch (method) {
       case 'GET':
-        response$ = this.http.get(url, { headers });
+        response$ = this.http.get<T>(url, { headers });
         break;
       case 'POST':
-        response$ = this.http.post(url, payload, { headers });
+        response$ = this.http.post<T>(url, payload, { headers });
         break;
       case 'PUT':
-        response$ = this.http.put(url, payload, { headers });
+        response$ = this.http.put<T>(url, payload, { headers });
         break;
       case 'PATCH':
-        response$ = this.http.patch(url, payload, { headers });
+        response$ = this.http.patch<T>(url, payload, { headers });
         break;
       case 'DELETE':
-        response$ = this.http.request('DELETE', url, {
+        response$ = this.http.request<T>('DELETE', url, {
           headers,
           body: payload,
         });
@@ -53,7 +52,7 @@ export class SupabaseFunctionsService {
         throw new Error(`Unsupported method: ${method}`);
     }
 
-    return response$.pipe(map(toCamelCase));
+    return response$.pipe();
     // return toCamelCase(response);
   }
 
@@ -61,8 +60,8 @@ export class SupabaseFunctionsService {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
-    headers['Authorization'] = `Bearer ${token ?? environment.anonymousJwt}`;
-    headers['apikey'] = environment.apiKey;
+    headers['Authorization'] = `Bearer ${token ?? environment.adminJwt}`;
+    headers['apikey'] = environment.adminJwt;
     return new HttpHeaders(headers);
   }
 
@@ -72,7 +71,7 @@ export class SupabaseFunctionsService {
   ): string {
     const url = new URL(`${this.baseUrl}${path}`);
     if (queryParams) {
-      Object.entries(toSnakeCase(queryParams)).forEach(([key, value]) =>
+      Object.entries(queryParams).forEach(([key, value]) =>
         url.searchParams.append(key, String(value))
       );
     }
