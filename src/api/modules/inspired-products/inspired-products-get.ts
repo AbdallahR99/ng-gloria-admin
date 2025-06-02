@@ -1,7 +1,9 @@
 import { AppRequest } from '@api/common/types';
 import { getInspiredProduct } from './functions/get-inspired-product';
-import { listInspiredProducts } from './functions/list-inspired-products';
-import { paginateInspiredProducts } from './functions/paginate-inspired-products';
+import {
+  filterInspiredProducts,
+  listInspiredProducts,
+} from './functions/list-inspired-products';
 import { NextFunction, Response } from 'express';
 import { handleControllerError } from '@api/common/utils/error-handler';
 import { InspiredProduct } from '@app/core/models/inspired-product.model';
@@ -70,7 +72,7 @@ export async function inspiredProductPostFilter(
   const { supabase } = req;
   const body = req.body;
   try {
-    const inspiredProducts = await paginateInspiredProducts(body, supabase);
+    const inspiredProducts = await filterInspiredProducts(body, supabase);
     res.status(200).json(inspiredProducts);
   } catch (error) {
     handleControllerError(res, error, 'Failed to filter inspired products');
@@ -90,11 +92,12 @@ export async function inspiredProductGetFilter(
 
   // Parse filter parameters
   const queryString = url.searchParams.get('queryString');
-  const sortBy = url.searchParams.get('sortBy') ?? 'created_at';
+  const sortBy = (url.searchParams.get('sortBy') ??
+    'created_at') as keyof InspiredProduct;
   const sortOrder = url.searchParams.get('sortOrder');
 
   try {
-    const inspiredProducts = await paginateInspiredProducts(
+    const inspiredProducts = await filterInspiredProducts(
       {
         page,
         pageSize,
