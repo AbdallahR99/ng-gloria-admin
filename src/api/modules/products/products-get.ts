@@ -5,6 +5,7 @@ import { handleControllerError } from '@api/common/utils/error-handler';
 import { listProducts } from './functions/list-products';
 import { queryFilterProducts } from './functions/query-filter-products';
 import { paginateProducts } from './functions/paginate-products';
+import { Product } from '@app/core/models/product.model';
 
 export async function productGetById(
   req: AppRequest,
@@ -68,7 +69,8 @@ export async function productGetList(
   const categorySlug = url.searchParams.get('categorySlug');
   const minPrice = url.searchParams.get('minPrice');
   const maxPrice = url.searchParams.get('maxPrice');
-  const sortBy = url.searchParams.get('sortBy') ?? 'created_at';
+  const sortBy = (url.searchParams.get('sortBy') ??
+    'created_at') as keyof Product;
   const sortOrder = url.searchParams.get('sortOrder');
 
   try {
@@ -143,7 +145,8 @@ export async function productGetFilter(
   const categorySlug = url.searchParams.get('categorySlug');
   const minPrice = url.searchParams.get('minPrice');
   const maxPrice = url.searchParams.get('maxPrice');
-  const sortBy = url.searchParams.get('sortBy') ?? 'created_at';
+  const sortBy = (url.searchParams.get('sortBy') ??
+    'created_at') as keyof Product;
   const sortOrder = url.searchParams.get('sortOrder');
 
   try {
@@ -158,7 +161,7 @@ export async function productGetFilter(
         categorySlug: categorySlug ? categorySlug : undefined,
         minPrice: minPrice ? +minPrice : undefined,
         maxPrice: maxPrice ? +maxPrice : undefined,
-        sortBy,
+        sortBy: sortBy,
         sortOrder: sortOrder ? 'asc' : 'desc',
       },
       supabase

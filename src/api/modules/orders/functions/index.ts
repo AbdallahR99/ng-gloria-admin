@@ -11,4 +11,5 @@ export * from './get-order';
 export * from './get-order-by-code-or-id';
 export * from './checkout';
 export * from './checkout-direct';
+export * from './bulk-update-orders';
 // ...add other functions as needed...
