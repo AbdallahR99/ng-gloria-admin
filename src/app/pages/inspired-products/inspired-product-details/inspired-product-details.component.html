@@ -1,1 +1,292 @@
-<p>inspired-product-details works!</p>,
+<div class="container mx-auto p-4 max-w-6xl">
+  <!-- Header with Breadcrumbs -->
+  <div class="breadcrumbs mb-6">
+    <ul>
+      <li>
+        <button
+          type="button"
+          class="link link-primary"
+          (click)="goBack()"
+          [attr.aria-label]="'common.back' | translate"
+        >
+          <mat-icon fontIcon="home" class="w-4 h-4"></mat-icon>
+          {{ "inspired_products.title" | translate }}
+        </button>
+      </li>
+      <li>
+        <span class="text-base-content/70">{{
+          "inspired_products.details" | translate
+        }}</span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading()) {
+  <div class="flex justify-center items-center min-h-96">
+    <div class="loading loading-spinner loading-lg text-primary"></div>
+    <span class="ml-4 text-lg">{{ "common.loading" | translate }}</span>
+  </div>
+  }
+
+  <!-- Error State -->
+  @else if (error()) {
+  <div class="alert alert-error">
+    <mat-icon fontIcon="error" class="w-6 h-6"></mat-icon>
+    <div>
+      <h3 class="font-bold">{{ "common.error" | translate }}</h3>
+      <div class="text-xs">
+        {{ error()?.message || ("common.unknown_error" | translate) }}
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <button
+        type="button"
+        class="btn btn-sm btn-outline"
+        (click)="productResource.reload()"
+        [attr.aria-label]="'common.retry' | translate"
+      >
+        <mat-icon fontIcon="refresh" class="w-4 h-4"></mat-icon>
+        {{ "common.retry" | translate }}
+      </button>
+      <button
+        type="button"
+        class="btn btn-sm btn-ghost"
+        (click)="goBack()"
+        [attr.aria-label]="'common.back' | translate"
+      >
+        {{ "common.back" | translate }}
+      </button>
+    </div>
+  </div>
+  }
+
+  <!-- Product Details -->
+  @else if (product(); as product) {
+  <!-- Action Buttons -->
+  <div class="flex flex-wrap gap-4 mb-6">
+    <button
+      type="button"
+      class="btn btn-ghost"
+      (click)="goBack()"
+      [attr.aria-label]="'common.back' | translate"
+    >
+      <mat-icon fontIcon="arrow_back" class="w-5 h-5"></mat-icon>
+      {{ "common.back" | translate }}
+    </button>
+
+    <button
+      type="button"
+      class="btn btn-primary"
+      (click)="editProduct()"
+      [attr.aria-label]="'inspired_products.edit' | translate"
+    >
+      <mat-icon fontIcon="edit" class="w-5 h-5"></mat-icon>
+      {{ "inspired_products.edit" | translate }}
+    </button>
+
+    <button
+      type="button"
+      class="btn btn-error btn-outline"
+      (click)="deleteProduct()"
+      [attr.aria-label]="'inspired_products.delete' | translate"
+    >
+      <mat-icon fontIcon="delete" class="w-5 h-5"></mat-icon>
+      {{ "inspired_products.delete" | translate }}
+    </button>
+  </div>
+
+  <!-- Product Information Card -->
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <!-- Product Header -->
+      <div class="flex flex-col lg:flex-row gap-8">
+        <!-- Product Image -->
+        <div class="flex-shrink-0">
+          <figure
+            class="w-full lg:w-80 h-80 rounded-xl overflow-hidden bg-base-200"
+          >
+            <img
+              [src]="getImageUrl(product.imagePath)"
+              [alt]="
+                product.nameEn ||
+                product.nameAr ||
+                ('inspired_products.no_name' | translate)
+              "
+              class="w-full h-full object-cover"
+              loading="lazy"
+              [attr.title]="
+                product.nameEn ||
+                product.nameAr ||
+                ('inspired_products.no_name' | translate)
+              "
+            />
+          </figure>
+        </div>
+
+        <!-- Product Details -->
+        <div class="flex-grow">
+          <!-- Product Names -->
+          <div class="mb-6">
+            <h1 class="text-3xl font-bold text-base-content mb-2">
+              {{
+                product.nameEn ||
+                  product.nameAr ||
+                  ("inspired_products.no_name" | translate)
+              }}
+            </h1>
+            @if (product.nameEn && product.nameAr && product.nameEn !==
+            product.nameAr) {
+            <h2 class="text-xl text-base-content/70">
+              {{
+                product.nameEn === (product.nameEn || product.nameAr)
+                  ? product.nameAr
+                  : product.nameEn
+              }}
+            </h2>
+            }
+          </div>
+
+          <!-- Product Status -->
+          <div class="flex flex-wrap gap-2 mb-6">
+            <div
+              class="badge badge-lg"
+              [ngClass]="{
+                'badge-success': product.isActive,
+                'badge-error': !product.isActive
+              }"
+            >
+              <mat-icon
+                [fontIcon]="product.isActive ? 'check_circle' : 'cancel'"
+                class="w-4 h-4 mr-1"
+              >
+              </mat-icon>
+              {{
+                (product.isActive ? "common.active" : "common.inactive")
+                  | translate
+              }}
+            </div>
+          </div>
+
+          <!-- Product Descriptions -->
+          @if (product.descriptionEn || product.descriptionAr) {
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold mb-3">
+              {{ "inspired_products.description" | translate }}
+            </h3>
+            @if (product.descriptionEn) {
+            <div class="mb-4">
+              <h4 class="font-medium text-base-content/80 mb-2">
+                {{ "common.english" | translate }}
+              </h4>
+              <p class="text-base-content/90 leading-relaxed">
+                {{ product.descriptionEn }}
+              </p>
+            </div>
+            } @if (product.descriptionAr) {
+            <div class="mb-4">
+              <h4 class="font-medium text-base-content/80 mb-2">
+                {{ "common.arabic" | translate }}
+              </h4>
+              <p class="text-base-content/90 leading-relaxed" dir="rtl">
+                {{ product.descriptionAr }}
+              </p>
+            </div>
+            }
+          </div>
+          }
+
+          <!-- Additional Information -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Metadata -->
+            <div class="card bg-base-200">
+              <div class="card-body">
+                <h3 class="card-title text-lg">
+                  {{ "common.information" | translate }}
+                </h3>
+                <div class="space-y-3">
+                  <div class="flex justify-between">
+                    <span class="font-medium"
+                      >{{ "common.id" | translate }}:</span
+                    >
+                    <span class="font-mono text-sm">{{ product.id }}</span>
+                  </div>
+                  @if (product.createdAt) {
+                  <div class="flex justify-between">
+                    <span class="font-medium"
+                      >{{ "common.created_at" | translate }}:</span
+                    >
+                    <span class="text-sm">{{
+                      product.createdAt | date : "medium"
+                    }}</span>
+                  </div>
+                  } @if (product.updatedAt) {
+                  <div class="flex justify-between">
+                    <span class="font-medium"
+                      >{{ "common.updated_at" | translate }}:</span
+                    >
+                    <span class="text-sm">{{
+                      product.updatedAt | date : "medium"
+                    }}</span>
+                  </div>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="card bg-base-200">
+              <div class="card-body">
+                <h3 class="card-title text-lg">
+                  {{ "common.actions" | translate }}
+                </h3>
+                <div class="space-y-2">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline w-full"
+                    (click)="editProduct()"
+                    [attr.aria-label]="'inspired_products.edit' | translate"
+                  >
+                    <mat-icon fontIcon="edit" class="w-4 h-4"></mat-icon>
+                    {{ "inspired_products.edit" | translate }}
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-error btn-outline w-full"
+                    (click)="deleteProduct()"
+                    [attr.aria-label]="'inspired_products.delete' | translate"
+                  >
+                    <mat-icon fontIcon="delete" class="w-4 h-4"></mat-icon>
+                    {{ "inspired_products.delete" | translate }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- No Product Found -->
+  @else {
+  <div class="alert alert-warning">
+    <mat-icon fontIcon="warning" class="w-6 h-6"></mat-icon>
+    <div>
+      <h3 class="font-bold">{{ "inspired_products.not_found" | translate }}</h3>
+      <div class="text-xs">
+        {{ "inspired_products.not_found_message" | translate }}
+      </div>
+    </div>
+    <button
+      type="button"
+      class="btn btn-sm btn-ghost"
+      (click)="goBack()"
+      [attr.aria-label]="'common.back' | translate"
+    >
+      {{ "common.back" | translate }}
+    </button>
+  </div>
+  }
+</div>

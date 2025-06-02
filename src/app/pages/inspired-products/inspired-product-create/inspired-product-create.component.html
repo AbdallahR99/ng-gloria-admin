@@ -1,1 +1,407 @@
-<p>inspired-product-create works!</p>,
+<div class="container mx-auto px-4 py-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-base-content">
+        {{ "CREATE_INSPIRED_PRODUCT" | translate }}
+      </h1>
+      <p class="text-base-content/70 mt-1">
+        {{ "CREATE_INSPIRED_PRODUCT_DESCRIPTION" | translate }}
+      </p>
+    </div>
+    <button
+      type="button"
+      class="btn btn-outline btn-sm"
+      (click)="goBack()"
+      [title]="'BACK' | translate"
+      [attr.aria-label]="'BACK' | translate"
+    >
+      >
+      <svg
+        class="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M10 19l-7-7m0 0l7-7m-7 7h18"
+        />
+      </svg>
+      {{ "BACK" | translate }}
+    </button>
+  </div>
+
+  <form [formGroup]="productForm" (ngSubmit)="onSubmit()" novalidate>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Form Fields -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Basic Information Card -->
+        <div class="card card-border">
+          <div class="card-body">
+            <h2 class="card-title text-lg mb-4">
+              {{ "BASIC_INFORMATION" | translate }}
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- English Name -->
+              <label class="form-control">
+                <span class="label">
+                  <span class="label-text"
+                    >{{ "NAME_EN" | translate }}
+                    <span class="text-error">*</span></span
+                  >
+                </span>
+                <input
+                  type="text"
+                  class="input input-bordered validator"
+                  [class.input-error]="
+                    productForm.get('nameEn')?.invalid &&
+                    (productForm.get('nameEn')?.dirty ||
+                      productForm.get('nameEn')?.touched)
+                  "
+                  formControlName="nameEn"
+                  [placeholder]="'ENTER_NAME_EN' | translate"
+                  required
+                  aria-describedby="nameEn-error"
+                />
+                @if (productForm.get('nameEn')?.invalid &&
+                (productForm.get('nameEn')?.dirty ||
+                productForm.get('nameEn')?.touched)) {
+                <p
+                  id="nameEn-error"
+                  class="validator-hint text-error text-sm mt-1"
+                >
+                  @if (productForm.get('nameEn')?.hasError('required')) {
+                  {{ "NAME_EN_REQUIRED" | translate }}
+                  } @if (productForm.get('nameEn')?.hasError('minlength')) {
+                  {{ "NAME_EN_MIN_LENGTH" | translate }}
+                  }
+                </p>
+                }
+              </label>
+
+              <!-- Arabic Name -->
+              <label class="form-control">
+                <span class="label">
+                  <span class="label-text"
+                    >{{ "NAME_AR" | translate }}
+                    <span class="text-error">*</span></span
+                  >
+                </span>
+                <input
+                  type="text"
+                  class="input input-bordered validator"
+                  [class.input-error]="
+                    productForm.get('nameAr')?.invalid &&
+                    (productForm.get('nameAr')?.dirty ||
+                      productForm.get('nameAr')?.touched)
+                  "
+                  formControlName="nameAr"
+                  [placeholder]="'ENTER_NAME_AR' | translate"
+                  required
+                  dir="rtl"
+                  aria-describedby="nameAr-error"
+                />
+                @if (productForm.get('nameAr')?.invalid &&
+                (productForm.get('nameAr')?.dirty ||
+                productForm.get('nameAr')?.touched)) {
+                <p
+                  id="nameAr-error"
+                  class="validator-hint text-error text-sm mt-1"
+                >
+                  @if (productForm.get('nameAr')?.hasError('required')) {
+                  {{ "NAME_AR_REQUIRED" | translate }}
+                  } @if (productForm.get('nameAr')?.hasError('minlength')) {
+                  {{ "NAME_AR_MIN_LENGTH" | translate }}
+                  }
+                </p>
+                }
+              </label>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Price -->
+              <label class="form-control">
+                <span class="label">
+                  <span class="label-text"
+                    >{{ "PRICE" | translate }}
+                    <span class="text-error">*</span></span
+                  >
+                </span>
+                <input
+                  type="number"
+                  class="input input-bordered validator"
+                  [class.input-error]="
+                    productForm.get('price')?.invalid &&
+                    (productForm.get('price')?.dirty ||
+                      productForm.get('price')?.touched)
+                  "
+                  formControlName="price"
+                  [placeholder]="'ENTER_PRICE' | translate"
+                  min="0"
+                  step="0.01"
+                  required
+                  aria-describedby="price-error"
+                />
+                @if (productForm.get('price')?.invalid &&
+                (productForm.get('price')?.dirty ||
+                productForm.get('price')?.touched)) {
+                <p
+                  id="price-error"
+                  class="validator-hint text-error text-sm mt-1"
+                >
+                  @if (productForm.get('price')?.hasError('required')) {
+                  {{ "PRICE_REQUIRED" | translate }}
+                  } @if (productForm.get('price')?.hasError('min')) {
+                  {{ "PRICE_MIN" | translate }}
+                  }
+                </p>
+                }
+              </label>
+
+              <!-- Status -->
+              <label class="form-control">
+                <span class="label">
+                  <span class="label-text">{{ "STATUS" | translate }}</span>
+                </span>
+                <input
+                  type="checkbox"
+                  class="toggle toggle-primary"
+                  formControlName="isActive"
+                  [title]="'TOGGLE_STATUS' | translate"
+                  [attr.aria-label]="'TOGGLE_STATUS' | translate"
+                />
+                <span class="label-text-alt mt-1">
+                  {{
+                    (productForm.get("isActive")?.value ? "ACTIVE" : "INACTIVE")
+                      | translate
+                  }}
+                </span>
+              </label>
+            </div>
+
+            <!-- English Description -->
+            <label class="form-control">
+              <span class="label">
+                <span class="label-text">{{
+                  "DESCRIPTION_EN" | translate
+                }}</span>
+              </span>
+              <textarea
+                class="textarea textarea-bordered validator"
+                [class.textarea-error]="
+                  productForm.get('descriptionEn')?.invalid &&
+                  (productForm.get('descriptionEn')?.dirty ||
+                    productForm.get('descriptionEn')?.touched)
+                "
+                formControlName="descriptionEn"
+                [placeholder]="'ENTER_DESCRIPTION_EN' | translate"
+                rows="4"
+                aria-describedby="descriptionEn-error"
+              ></textarea>
+              @if (productForm.get('descriptionEn')?.invalid &&
+              (productForm.get('descriptionEn')?.dirty ||
+              productForm.get('descriptionEn')?.touched)) {
+              <p
+                id="descriptionEn-error"
+                class="validator-hint text-error text-sm mt-1"
+              >
+                @if (productForm.get('descriptionEn')?.hasError('minlength')) {
+                {{ "DESCRIPTION_EN_MIN_LENGTH" | translate }}
+                }
+              </p>
+              }
+            </label>
+
+            <!-- Arabic Description -->
+            <label class="form-control">
+              <span class="label">
+                <span class="label-text">{{
+                  "DESCRIPTION_AR" | translate
+                }}</span>
+              </span>
+              <textarea
+                class="textarea textarea-bordered validator"
+                [class.textarea-error]="
+                  productForm.get('descriptionAr')?.invalid &&
+                  (productForm.get('descriptionAr')?.dirty ||
+                    productForm.get('descriptionAr')?.touched)
+                "
+                formControlName="descriptionAr"
+                [placeholder]="'ENTER_DESCRIPTION_AR' | translate"
+                rows="4"
+                dir="rtl"
+                aria-describedby="descriptionAr-error"
+              ></textarea>
+              @if (productForm.get('descriptionAr')?.invalid &&
+              (productForm.get('descriptionAr')?.dirty ||
+              productForm.get('descriptionAr')?.touched)) {
+              <p
+                id="descriptionAr-error"
+                class="validator-hint text-error text-sm mt-1"
+              >
+                @if (productForm.get('descriptionAr')?.hasError('minlength')) {
+                {{ "DESCRIPTION_AR_MIN_LENGTH" | translate }}
+                }
+              </p>
+              }
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Image Upload Card -->
+      <div class="lg:col-span-1">
+        <div class="card card-border">
+          <div class="card-body">
+            <h2 class="card-title text-lg mb-4">
+              {{ "PRODUCT_IMAGE" | translate }}
+            </h2>
+
+            <!-- Image Preview -->
+            @if (imagePreview()) {
+            <div class="relative mb-4">
+              <img
+                [src]="imagePreview()"
+                [alt]="'IMAGE_PREVIEW' | translate"
+                [title]="'IMAGE_PREVIEW' | translate"
+                class="w-full h-48 object-cover rounded-lg border"
+              />
+              <button
+                type="button"
+                class="btn btn-circle btn-sm btn-error absolute top-2 right-2"
+                (click)="removeImage()"
+                [title]="'REMOVE_IMAGE' | translate"
+                [attr.aria-label]="'REMOVE_IMAGE' | translate"
+              >
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                <span class="sr-only">{{ "REMOVE_IMAGE" | translate }}</span>
+              </button>
+            </div>
+            } @else {
+            <!-- Upload Area -->
+            <div
+              class="border-2 border-dashed border-base-300 rounded-lg p-6 text-center mb-4"
+            >
+              <svg
+                class="mx-auto h-12 w-12 text-base-content/40"
+                stroke="currentColor"
+                fill="none"
+                viewBox="0 0 48 48"
+              >
+                <path
+                  d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              <p class="mt-2 text-sm text-base-content/60">
+                {{ "UPLOAD_IMAGE_HINT" | translate }}
+              </p>
+            </div>
+            }
+
+            <!-- File Input -->
+            <label class="floating-label">
+              <input
+                type="file"
+                class="file-input file-input-bordered w-full"
+                accept="image/*"
+                (change)="onImageSelected($event)"
+                #fileInput
+                [title]="'SELECT_IMAGE' | translate"
+                [attr.aria-label]="'SELECT_IMAGE' | translate"
+              />
+              <span class="sr-only">{{ "SELECT_IMAGE" | translate }}</span>
+            </label>
+
+            @if (uploadError()) {
+            <div class="alert alert-error mt-2">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fill-rule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              <span>{{ uploadError() }}</span>
+            </div>
+            }
+
+            <p class="text-xs text-base-content/60 mt-2">
+              {{ "IMAGE_UPLOAD_REQUIREMENTS" | translate }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="flex justify-end gap-3 mt-8 pt-6 border-t border-base-300">
+      <button
+        type="button"
+        class="btn btn-outline"
+        (click)="goBack()"
+        [disabled]="isSubmitting()"
+        [title]="'CANCEL' | translate"
+        [attr.aria-label]="'CANCEL' | translate"
+      >
+        {{ "CANCEL" | translate }}
+      </button>
+
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="productForm.invalid || isSubmitting()"
+        [title]="'CREATE_INSPIRED_PRODUCT' | translate"
+        [attr.aria-label]="'CREATE_INSPIRED_PRODUCT' | translate"
+      >
+        > @if (isSubmitting()) {
+        <span class="loading loading-spinner loading-sm"></span>
+        {{ "CREATING" | translate }}
+        } @else {
+        <svg
+          class="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 4v16m8-8H4"
+          />
+        </svg>
+        {{ "CREATE" | translate }}
+        }
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Success Toast -->
+@if (showSuccessToast()) {
+<div class="toast toast-top toast-end">
+  <div class="alert alert-success">
+    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+      <path
+        fill-rule="evenodd"
+        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+        clip-rule="evenodd"
+      />
+    </svg>
+    <span>{{ "INSPIRED_PRODUCT_CREATED_SUCCESSFULLY" | translate }}</span>
+  </div>
+</div>
+}

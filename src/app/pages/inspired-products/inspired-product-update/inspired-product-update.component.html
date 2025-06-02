@@ -1,1 +1,401 @@
-<p>inspired-product-update works!</p>,
+<div class="container mx-auto p-4 max-w-4xl">
+  <!-- Header with Breadcrumbs -->
+  <div class="breadcrumbs mb-6">
+    <ul>
+      <li>
+        <button
+          type="button"
+          class="link link-primary"
+          (click)="goToList()"
+          [attr.aria-label]="'inspired_products.title' | translate"
+        >
+          <mat-icon fontIcon="home" class="w-4 h-4"></mat-icon>
+          {{ "inspired_products.title" | translate }}
+        </button>
+      </li>
+      @if (product(); as product) {
+      <li>
+        <button
+          type="button"
+          class="link link-primary"
+          (click)="goBack()"
+          [attr.aria-label]="'inspired_products.details' | translate"
+        >
+          {{
+            product.nameEn ||
+              product.nameAr ||
+              ("inspired_products.product" | translate)
+          }}
+        </button>
+      </li>
+      }
+      <li>
+        <span class="text-base-content/70">{{
+          "inspired_products.edit" | translate
+        }}</span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading()) {
+  <div class="flex justify-center items-center min-h-96">
+    <div class="loading loading-spinner loading-lg text-primary"></div>
+    <span class="ml-4 text-lg">{{ "common.loading" | translate }}</span>
+  </div>
+  }
+
+  <!-- Error State -->
+  @else if (error()) {
+  <div class="alert alert-error">
+    <mat-icon fontIcon="error" class="w-6 h-6"></mat-icon>
+    <div>
+      <h3 class="font-bold">{{ "common.error" | translate }}</h3>
+      <div class="text-xs">
+        {{ error()?.message || ("common.unknown_error" | translate) }}
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <button
+        type="button"
+        class="btn btn-sm btn-outline"
+        (click)="productResource.reload()"
+        [attr.aria-label]="'common.retry' | translate"
+      >
+        <mat-icon fontIcon="refresh" class="w-4 h-4"></mat-icon>
+        {{ "common.retry" | translate }}
+      </button>
+      <button
+        type="button"
+        class="btn btn-sm btn-ghost"
+        (click)="goBack()"
+        [attr.aria-label]="'common.back' | translate"
+      >
+        {{ "common.back" | translate }}
+      </button>
+    </div>
+  </div>
+  }
+
+  <!-- Update Form -->
+  @else if (product()) {
+  <!-- Success Toast -->
+  @if (showSuccessToast()) {
+  <div class="toast toast-top toast-end">
+    <div class="alert alert-success">
+      <mat-icon fontIcon="check_circle" class="w-5 h-5"></mat-icon>
+      <span>{{ "inspired_products.updated_successfully" | translate }}</span>
+    </div>
+  </div>
+  }
+
+  <!-- Form Card -->
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <div class="flex items-center justify-between mb-6">
+        <h1 class="card-title text-2xl">
+          <mat-icon fontIcon="edit" class="w-6 h-6"></mat-icon>
+          {{ "inspired_products.edit" | translate }}
+        </h1>
+
+        <div class="flex gap-2">
+          <button
+            type="button"
+            class="btn btn-ghost"
+            (click)="goBack()"
+            [attr.aria-label]="'common.cancel' | translate"
+          >
+            <mat-icon fontIcon="close" class="w-5 h-5"></mat-icon>
+            {{ "common.cancel" | translate }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="space-y-6">
+        <!-- Name Fields -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- English Name -->
+          <div class="form-control">
+            <label class="label" for="nameEn">
+              <span class="label-text font-medium">
+                {{ "inspired_products.name_en" | translate }}
+                <span class="text-error">*</span>
+              </span>
+            </label>
+            <input
+              id="nameEn"
+              type="text"
+              formControlName="nameEn"
+              class="input input-bordered w-full"
+              [class.input-error]="hasError('nameEn')"
+              [attr.placeholder]="
+                'inspired_products.name_en_placeholder' | translate
+              "
+              [attr.aria-label]="'inspired_products.name_en' | translate"
+              [attr.aria-describedby]="
+                hasError('nameEn') ? 'nameEn-error' : null
+              "
+            />
+            @if (hasError('nameEn')) {
+            <div class="label">
+              <span id="nameEn-error" class="label-text-alt text-error">
+                {{ getErrorMessage("nameEn") }}
+              </span>
+            </div>
+            }
+          </div>
+
+          <!-- Arabic Name -->
+          <div class="form-control">
+            <label class="label" for="nameAr">
+              <span class="label-text font-medium">
+                {{ "inspired_products.name_ar" | translate }}
+                <span class="text-error">*</span>
+              </span>
+            </label>
+            <input
+              id="nameAr"
+              type="text"
+              formControlName="nameAr"
+              class="input input-bordered w-full"
+              [class.input-error]="hasError('nameAr')"
+              [attr.placeholder]="
+                'inspired_products.name_ar_placeholder' | translate
+              "
+              [attr.aria-label]="'inspired_products.name_ar' | translate"
+              [attr.aria-describedby]="
+                hasError('nameAr') ? 'nameAr-error' : null
+              "
+              dir="rtl"
+            />
+            @if (hasError('nameAr')) {
+            <div class="label">
+              <span id="nameAr-error" class="label-text-alt text-error">
+                {{ getErrorMessage("nameAr") }}
+              </span>
+            </div>
+            }
+          </div>
+        </div>
+
+        <!-- Description Fields -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- English Description -->
+          <div class="form-control">
+            <label class="label" for="descriptionEn">
+              <span class="label-text font-medium">{{
+                "inspired_products.description_en" | translate
+              }}</span>
+            </label>
+            <textarea
+              id="descriptionEn"
+              formControlName="descriptionEn"
+              class="textarea textarea-bordered h-32 resize-none"
+              [class.textarea-error]="hasError('descriptionEn')"
+              [attr.placeholder]="
+                'inspired_products.description_en_placeholder' | translate
+              "
+              [attr.aria-label]="'inspired_products.description_en' | translate"
+              [attr.aria-describedby]="
+                hasError('descriptionEn') ? 'descriptionEn-error' : null
+              "
+            >
+            </textarea>
+            @if (hasError('descriptionEn')) {
+            <div class="label">
+              <span id="descriptionEn-error" class="label-text-alt text-error">
+                {{ getErrorMessage("descriptionEn") }}
+              </span>
+            </div>
+            }
+          </div>
+
+          <!-- Arabic Description -->
+          <div class="form-control">
+            <label class="label" for="descriptionAr">
+              <span class="label-text font-medium">{{
+                "inspired_products.description_ar" | translate
+              }}</span>
+            </label>
+            <textarea
+              id="descriptionAr"
+              formControlName="descriptionAr"
+              class="textarea textarea-bordered h-32 resize-none"
+              [class.textarea-error]="hasError('descriptionAr')"
+              [attr.placeholder]="
+                'inspired_products.description_ar_placeholder' | translate
+              "
+              [attr.aria-label]="'inspired_products.description_ar' | translate"
+              [attr.aria-describedby]="
+                hasError('descriptionAr') ? 'descriptionAr-error' : null
+              "
+              dir="rtl"
+            >
+            </textarea>
+            @if (hasError('descriptionAr')) {
+            <div class="label">
+              <span id="descriptionAr-error" class="label-text-alt text-error">
+                {{ getErrorMessage("descriptionAr") }}
+              </span>
+            </div>
+            }
+          </div>
+        </div>
+
+        <!-- Image Upload Section -->
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text font-medium">{{
+              "inspired_products.image" | translate
+            }}</span>
+          </label>
+
+          <div class="flex flex-col lg:flex-row gap-6">
+            <!-- Image Preview -->
+            <div class="flex-shrink-0">
+              @if (imagePreview()) {
+              <div class="relative">
+                <figure
+                  class="w-48 h-48 rounded-lg overflow-hidden bg-base-200"
+                >
+                  <img
+                    [src]="imagePreview()!"
+                    [alt]="'inspired_products.image_preview' | translate"
+                    class="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                </figure>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-circle btn-error absolute -top-2 -right-2"
+                  (click)="removeImage()"
+                  [attr.aria-label]="
+                    'inspired_products.remove_image' | translate
+                  "
+                >
+                  <mat-icon fontIcon="close" class="w-4 h-4"></mat-icon>
+                  <span class="sr-only">{{
+                    "inspired_products.remove_image" | translate
+                  }}</span>
+                </button>
+              </div>
+              } @else {
+              <div
+                class="w-48 h-48 rounded-lg bg-base-200 flex items-center justify-center"
+              >
+                <div class="text-center text-base-content/50">
+                  <mat-icon
+                    fontIcon="image"
+                    class="w-12 h-12 mx-auto mb-2"
+                  ></mat-icon>
+                  <p class="text-sm">
+                    {{ "inspired_products.no_image" | translate }}
+                  </p>
+                </div>
+              </div>
+              }
+            </div>
+
+            <!-- File Input -->
+            <div class="flex-grow">
+              <label for="imageFile" class="btn btn-outline w-full lg:w-auto">
+                <mat-icon fontIcon="upload" class="w-5 h-5"></mat-icon>
+                {{ "inspired_products.upload_image" | translate }}
+              </label>
+              <input
+                id="imageFile"
+                type="file"
+                accept="image/*"
+                class="hidden"
+                (change)="onFileSelected($event)"
+                [attr.aria-label]="'inspired_products.upload_image' | translate"
+              />
+
+              <div class="mt-2 text-sm text-base-content/70">
+                {{ "inspired_products.image_requirements" | translate }}
+              </div>
+
+              @if (uploadError()) {
+              <div class="alert alert-error mt-2">
+                <mat-icon fontIcon="error" class="w-5 h-5"></mat-icon>
+                <span>{{ uploadError() }}</span>
+              </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Status Toggle -->
+        <div class="form-control">
+          <label class="label cursor-pointer justify-start gap-4">
+            <input
+              type="checkbox"
+              formControlName="isActive"
+              class="toggle toggle-primary"
+              [attr.aria-label]="'inspired_products.is_active' | translate"
+            />
+            <span class="label-text font-medium">
+              {{ "inspired_products.is_active" | translate }}
+            </span>
+          </label>
+          <div class="label">
+            <span class="label-text-alt text-base-content/70">
+              {{ "inspired_products.is_active_description" | translate }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex flex-col sm:flex-row gap-4 pt-6">
+          <button
+            type="submit"
+            class="btn btn-primary flex-1 sm:flex-none"
+            [disabled]="isSubmitting() || productForm.invalid"
+            [attr.aria-label]="'inspired_products.update' | translate"
+          >
+            @if (isSubmitting()) {
+            <span class="loading loading-spinner loading-sm"></span>
+            } @else {
+            <mat-icon fontIcon="save" class="w-5 h-5"></mat-icon>
+            }
+            {{ "inspired_products.update" | translate }}
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-ghost flex-1 sm:flex-none"
+            (click)="goBack()"
+            [disabled]="isSubmitting()"
+            [attr.aria-label]="'common.cancel' | translate"
+          >
+            <mat-icon fontIcon="close" class="w-5 h-5"></mat-icon>
+            {{ "common.cancel" | translate }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  }
+
+  <!-- No Product Found -->
+  @else {
+  <div class="alert alert-warning">
+    <mat-icon fontIcon="warning" class="w-6 h-6"></mat-icon>
+    <div>
+      <h3 class="font-bold">{{ "inspired_products.not_found" | translate }}</h3>
+      <div class="text-xs">
+        {{ "inspired_products.not_found_message" | translate }}
+      </div>
+    </div>
+    <button
+      type="button"
+      class="btn btn-sm btn-ghost"
+      (click)="goToList()"
+      [attr.aria-label]="'common.back' | translate"
+    >
+      {{ "common.back" | translate }}
+    </button>
+  </div>
+  }
+</div>

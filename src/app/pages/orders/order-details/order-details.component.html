@@ -1,1 +1,274 @@
-<p>order-details works!</p>,
+<div class="container mx-auto p-6">
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <div class="flex items-center space-x-4">
+      <button class="btn btn-ghost btn-circle" (click)="navigateToOrders()">
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 19l-7-7 7-7"
+          ></path>
+        </svg>
+      </button>
+      <h1 class="text-3xl font-bold">Order Details</h1>
+    </div>
+    @if (order()) {
+    <button class="btn btn-primary" (click)="navigateToEdit()">
+      <svg
+        class="w-5 h-5 mr-2"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+        ></path>
+      </svg>
+      Edit Order
+    </button>
+    }
+  </div>
+
+  <!-- Loading State -->
+  @if (loading()) {
+  <div class="flex justify-center items-center py-12">
+    <span class="loading loading-spinner loading-lg"></span>
+  </div>
+  }
+
+  <!-- Error State -->
+  @if (error()) {
+  <div class="alert alert-error mb-6">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+      ></path>
+    </svg>
+    <span>{{ error() }}</span>
+  </div>
+  }
+
+  <!-- Order Details -->
+  @if (order(); as orderData) {
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Main Order Info -->
+    <div class="lg:col-span-2 space-y-6">
+      <!-- Order Summary Card -->
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <div class="flex justify-between items-start mb-4">
+            <h2 class="card-title">Order Summary</h2>
+            <span class="badge" [class]="getStatusBadgeClass(orderData.status)">
+              {{ orderData.status }}
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="label font-semibold">Order ID</label>
+              <div class="font-mono text-sm">
+                {{ orderData.orderCode || orderData.id }}
+              </div>
+            </div>
+            <div>
+              <label class="label font-semibold">Order Date</label>
+              <div>{{ formatDateTime(orderData.createdAt) }}</div>
+            </div>
+            <div>
+              <label class="label font-semibold">Total Amount</label>
+              <div class="text-lg font-bold">
+                {{ formatCurrency(orderData.totalAmount) }}
+              </div>
+            </div>
+            @if (orderData.updatedAt !== orderData.createdAt) {
+            <div>
+              <label class="label font-semibold">Last Updated</label>
+              <div>{{ formatDateTime(orderData.updatedAt) }}</div>
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Items -->
+      @if (orderData.items && orderData.items.length > 0) {
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <h2 class="card-title mb-4">Order Items</h2>
+          <div class="overflow-x-auto">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Quantity</th>
+                  <th>Price</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of orderData.items; track item.id) {
+                <tr>
+                  <td>
+                    <div class="flex items-center space-x-3">
+                      @if (item.product?.imageUrls?.[0]) {
+                      <div class="avatar">
+                        <div class="mask mask-squircle w-12 h-12">
+                          <img
+                            [src]="item.product.imageUrls[0]"
+                            [alt]="item.product.name"
+                          />
+                        </div>
+                      </div>
+                      }
+                      <div>
+                        <div class="font-medium">
+                          {{ item.product?.name || "Product" }}
+                        </div>
+                        @if (item.product?.brand) {
+                        <div class="text-sm text-base-content/70">
+                          {{ item.product.brand }}
+                        </div>
+                        }
+                      </div>
+                    </div>
+                  </td>
+                  <td>{{ item.quantity }}</td>
+                  <td>{{ formatCurrency(item.price) }}</td>
+                  <td class="font-medium">
+                    {{ formatCurrency(item.quantity * item.price) }}
+                  </td>
+                </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+
+    <!-- Sidebar -->
+    <div class="space-y-6">
+      <!-- Status Update -->
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <h2 class="card-title mb-4">Update Status</h2>
+          <div class="space-y-2">
+            <button
+              class="btn btn-block btn-outline btn-warning"
+              [class.btn-warning]="orderData.status === 'pending'"
+              (click)="updateOrderStatus('pending')"
+            >
+              Pending
+            </button>
+            <button
+              class="btn btn-block btn-outline btn-info"
+              [class.btn-info]="orderData.status === 'processing'"
+              (click)="updateOrderStatus('processing')"
+            >
+              Processing
+            </button>
+            <button
+              class="btn btn-block btn-outline btn-primary"
+              [class.btn-primary]="orderData.status === 'shipped'"
+              (click)="updateOrderStatus('shipped')"
+            >
+              Shipped
+            </button>
+            <button
+              class="btn btn-block btn-outline btn-success"
+              [class.btn-success]="orderData.status === 'delivered'"
+              (click)="updateOrderStatus('delivered')"
+            >
+              Delivered
+            </button>
+            <button
+              class="btn btn-block btn-outline btn-error"
+              [class.btn-error]="orderData.status === 'cancelled'"
+              (click)="updateOrderStatus('cancelled')"
+            >
+              Cancelled
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Customer Information -->
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <h2 class="card-title mb-4">Customer Information</h2>
+          <div class="space-y-3">
+            @if (orderData.customerEmail || orderData.guestEmail) {
+            <div>
+              <label class="label font-semibold">Email</label>
+              <div>{{ orderData.customerEmail || orderData.guestEmail }}</div>
+            </div>
+            } @if (orderData.customerName || orderData.guestName) {
+            <div>
+              <label class="label font-semibold">Name</label>
+              <div>{{ orderData.customerName || orderData.guestName }}</div>
+            </div>
+            } @if (orderData.shippingAddress) {
+            <div>
+              <label class="label font-semibold">Shipping Address</label>
+              <div class="text-sm">
+                <div>{{ orderData.shippingAddress.street }}</div>
+                <div>
+                  {{ orderData.shippingAddress.city }},
+                  {{ orderData.shippingAddress.state }}
+                  {{ orderData.shippingAddress.zipCode }}
+                </div>
+                <div>{{ orderData.shippingAddress.country }}</div>
+              </div>
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Totals -->
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <h2 class="card-title mb-4">Order Totals</h2>
+          <div class="space-y-2">
+            @if (orderData.subtotal) {
+            <div class="flex justify-between">
+              <span>Subtotal:</span>
+              <span>{{ formatCurrency(orderData.subtotal) }}</span>
+            </div>
+            } @if (orderData.tax) {
+            <div class="flex justify-between">
+              <span>Tax:</span>
+              <span>{{ formatCurrency(orderData.tax) }}</span>
+            </div>
+            } @if (orderData.shipping) {
+            <div class="flex justify-between">
+              <span>Shipping:</span>
+              <span>{{ formatCurrency(orderData.shipping) }}</span>
+            </div>
+            }
+            <div class="divider my-2"></div>
+            <div class="flex justify-between font-bold text-lg">
+              <span>Total:</span>
+              <span>{{ formatCurrency(orderData.totalAmount) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+</div>

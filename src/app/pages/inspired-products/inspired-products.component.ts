@@ -1,132 +1,285 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { CurrencyPipe } from '@angular/common';
+import { Component, computed, inject, signal, effect } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
-import { rxResource } from '@ngneat/rx-resource'; // Make sure this is installed
-import { InspiredProductsService } from '@app/core/services/repository/inspired-products.service';
-import { InspiredProduct } from '@app/core/models/inspired-product.model';
-import { switchMap } from 'rxjs/operators';
-import { toObservable } from '@angular/core/rxjs-interop';
 import { HttpErrorResponse } from '@angular/common/http';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { firstValueFrom } from 'rxjs';
+
+import { InspiredProductsService } from '@app/core/services/repository/inspired-products.service';
+import {
+  InspiredProduct,
+  InspiredProductsQuery,
+} from '@app/core/models/inspired-product.model';
+import { SHARED_MODULES } from '@app/core/shared/modules/shared.module';
 
 @Component({
   selector: 'app-inspired-products',
-  standalone: true,
-  imports: [CurrencyPipe],
+  imports: SHARED_MODULES,
   templateUrl: './inspired-products.component.html',
-  styleUrls: ['./inspired-products.component.scss'],
+  styleUrl: './inspired-products.component.scss',
 })
 export class InspiredProductsComponent {
   private readonly inspiredProductsService = inject(InspiredProductsService);
+  private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
 
-  readonly itemsPerPage = signal(10);
+  // Signals for component state
   readonly currentPage = signal(1);
-  private readonly refreshSignal = signal(0);
+  readonly pageSize = signal(10);
+  readonly sortBy = signal<keyof InspiredProduct>('createdAt');
+  readonly sortOrder = signal<'asc' | 'desc'>('desc');
+  readonly searchQuery = signal('');
+  readonly selectedProducts = signal<string[]>([]);
+  readonly isDeleting = signal(false);
+  readonly showDeleted = signal(false);
 
-  private readonly productsSource$ = computed(() => {
-    const page = this.currentPage();
-    const limit = this.itemsPerPage();
-    this.refreshSignal(); // Depend on refreshSignal
-
-    // Use postFilter as it expects pagination parameters in the body
-    return this.inspiredProductsService.postFilter({ page, limit });
+  // Search form
+  readonly searchForm = this.fb.group({
+    search: [''],
   });
 
-  readonly productsResource = rxResource(
-    toObservable(this.productsSource$).pipe(switchMap((obs) => obs)),
-    {
-      // Service returns PaginatedResponse<InspiredProduct> which has { data: T[], total: number }
-      initialValue: { data: [], total: 0 },
-    }
+  // Computed query for rxResource
+  private readonly query = computed(
+    (): InspiredProductsQuery => ({
+      page: this.currentPage(),
+      pageSize: this.pageSize(),
+      sortBy: this.sortBy(),
+      sortOrder: this.sortOrder(),
+      queryString: this.searchQuery() || undefined,
+      showDeleted: this.showDeleted(),
+    })
   );
 
-  readonly paginatedProducts = computed(() => {
-    const resourceState = this.productsResource();
-    // The structure from PaginatedResponse is { data: InspiredProduct[], total: number }
-    // So, resourceState.data is PaginatedResponse<InspiredProduct>
-    return resourceState.data?.data ?? [];
+  // resource for loading products with error handling
+  readonly productsResource = rxResource({
+    stream: () => this.inspiredProductsService.getFilter(this.query()),
   });
 
-  readonly totalItems = computed(() => {
-    const resourceState = this.productsResource();
-    return resourceState.data?.total ?? 0;
+  // Computed properties
+  readonly products = computed(() => this.productsResource.value()?.data || []);
+  readonly totalItems = computed(
+    () => this.productsResource.value()?.pagination.total || 0
+  );
+  readonly totalPages = computed(() =>
+    Math.ceil(this.totalItems() / this.pageSize())
+  );
+  readonly isLoading = computed(() => this.productsResource.isLoading());
+  readonly error = computed(() => this.productsResource.error());
+  readonly hasProducts = computed(() => this.products().length > 0);
+  readonly isAllSelected = computed(() => {
+    const products = this.products();
+    return (
+      products.length > 0 &&
+      products.every((p: InspiredProduct) =>
+        this.selectedProducts().includes(p.id!)
+      )
+    );
+  });
+  readonly isPartialSelected = computed(() => {
+    const products = this.products();
+    const selected = this.selectedProducts();
+    return (
+      selected.length > 0 &&
+      products.some((p) => selected.includes(p.id!)) &&
+      !this.isAllSelected()
+    );
   });
 
+  // Pagination info computed
   readonly paginationInfo = computed(() => {
-    const page = this.currentPage();
-    const itemsPerPage = this.itemsPerPage();
-    const total = this.totalItems();
-    const totalPages = Math.ceil(total / itemsPerPage) || 1;
-    const startItem = total > 0 ? (page - 1) * itemsPerPage + 1 : 0;
-    const endItem = total > 0 ? Math.min(page * itemsPerPage, total) : 0;
+    const totalItems = this.totalItems();
+    const pageSize = this.pageSize();
+    const currentPage = this.currentPage();
+    const totalPages = this.totalPages();
+    const startItem = totalItems > 0 ? (currentPage - 1) * pageSize + 1 : 0;
+    const endItem = Math.min(currentPage * pageSize, totalItems);
 
     return {
-      currentPage: page,
-      itemsPerPage,
-      totalItems: total,
+      currentPage,
       totalPages,
+      totalItems,
+      pageSize,
       startItem,
       endItem,
     };
   });
 
-  readonly isLoading = computed(() => this.productsResource().isLoading);
-  readonly error = computed(() => this.productsResource().error);
+  // Visible pagination pages computed
+  readonly getVisiblePages = computed(() => {
+    const current = this.currentPage();
+    const total = this.totalPages();
+    const maxVisible = 5;
 
-  goToPreviousPage(): void {
-    if (this.currentPage() > 1) {
-      this.currentPage.set(this.currentPage() - 1);
+    if (total <= maxVisible) {
+      return Array.from({ length: total }, (_, i) => i + 1);
+    }
+
+    const start = Math.max(1, current - 2);
+    const end = Math.min(total, start + maxVisible - 1);
+    const adjustedStart = Math.max(1, end - maxVisible + 1);
+
+    return Array.from(
+      { length: end - adjustedStart + 1 },
+      (_, i) => adjustedStart + i
+    );
+  });
+
+  constructor() {
+    // Effect to watch search form changes and auto-search
+    effect(() => {
+      const searchValue = this.searchForm.get('search')?.value;
+      if (searchValue !== undefined) {
+        // Debounce could be added here if needed
+        const trimmedValue = searchValue?.trim() || '';
+        if (trimmedValue !== this.searchQuery()) {
+          this.searchQuery.set(trimmedValue);
+          this.currentPage.set(1);
+          this.selectedProducts.set([]);
+        }
+      }
+    });
+  }
+
+  // Navigation methods
+  onPageChange(page: number): void {
+    if (page >= 1 && page <= this.totalPages()) {
+      this.currentPage.set(page);
+      this.selectedProducts.set([]);
     }
   }
 
-  goToNextPage(): void {
-    if (this.currentPage() < this.paginationInfo().totalPages) {
-      this.currentPage.set(this.currentPage() + 1);
+  onPageSizeChange(size: number): void {
+    this.pageSize.set(size);
+    this.currentPage.set(1);
+    this.selectedProducts.set([]);
+  }
+
+  // Search methods
+  onSearch(): void {
+    const searchValue = this.searchForm.get('search')?.value?.trim() || '';
+    this.searchQuery.set(searchValue);
+    this.currentPage.set(1);
+    this.selectedProducts.set([]);
+  }
+
+  onClearSearch(): void {
+    this.searchForm.patchValue({ search: '' });
+    this.searchQuery.set('');
+    this.currentPage.set(1);
+    this.selectedProducts.set([]);
+  }
+
+  // Toggle methods
+  onToggleDeleted(): void {
+    this.showDeleted.set(!this.showDeleted());
+    this.currentPage.set(1);
+    this.selectedProducts.set([]);
+  }
+
+  // Selection methods
+  onToggleSelectAll(): void {
+    if (this.isAllSelected()) {
+      this.selectedProducts.set([]);
+    } else {
+      const allIds = this.products()
+        .map((p) => p.id!)
+        .filter(Boolean);
+      this.selectedProducts.set(allIds);
     }
   }
 
-  addProduct(): void {
+  onToggleProduct(productId: string): void {
+    const selected = this.selectedProducts();
+    if (selected.includes(productId)) {
+      this.selectedProducts.set(selected.filter((id) => id !== productId));
+    } else {
+      this.selectedProducts.set([...selected, productId]);
+    }
+  }
+
+  // CRUD operations
+  onCreateProduct(): void {
     this.router.navigate(['/admin/inspired-products/new']);
   }
 
-  editProduct(product: InspiredProduct): void {
+  onEditProduct(product: InspiredProduct): void {
     this.router.navigate(['/admin/inspired-products/edit', product.id]);
   }
 
-  deleteProduct(productId: string): void {
-    if (confirm('Are you sure you want to delete this product?')) {
-      // Use the 'delete' method from the service
-      this.inspiredProductsService.delete(productId).subscribe({
-        next: () => {
-          console.log('Product deleted successfully');
-          const currentPageItems = this.paginatedProducts().length;
-          const currentTotalItems = this.totalItems();
-          // Check if it was the last item on a page that\'s not the first
-          if (
-            currentPageItems === 1 &&
-            this.currentPage() > 1 &&
-            currentTotalItems ===
-              (this.currentPage() - 1) * this.itemsPerPage() + 1
-          ) {
-            this.currentPage.set(this.currentPage() - 1); // Go to previous page
-          } else {
-            this.triggerRefresh(); // Refresh current page
-          }
-        },
-        error: (err: HttpErrorResponse) => {
-          // Added HttpErrorResponse type
-          console.error('Error deleting product:', err);
-          // Handle error (e.g., show toast message)
-        },
-      });
+  onDeleteProduct(productId: string): void {
+    if (confirm('Are you sure you want to delete this inspired product?')) {
+      this.isDeleting.set(true);
+      this.inspiredProductsService
+        .delete(productId)
+        .pipe(takeUntilDestroyed())
+        .subscribe({
+          next: () => {
+            this.isDeleting.set(false);
+            this.selectedProducts.set(
+              this.selectedProducts().filter((id) => id !== productId)
+            );
+            // Trigger refresh using rxResource reload
+            this.productsResource.reload();
+          },
+          error: (err: HttpErrorResponse) => {
+            this.isDeleting.set(false);
+            console.error('Error deleting inspired product:', err);
+            // TODO: Show error toast/notification
+          },
+        });
     }
   }
 
-  retryFetch(): void {
-    this.triggerRefresh();
+  async onBulkDelete(): Promise<void> {
+    const selectedIds = this.selectedProducts();
+    if (
+      selectedIds.length === 0 ||
+      !confirm(
+        `Are you sure you want to delete ${selectedIds.length} inspired product(s)?`
+      )
+    ) {
+      return;
+    }
+
+    this.isDeleting.set(true);
+    try {
+      // Use firstValueFrom for proper async/await pattern
+      await Promise.all(
+        selectedIds.map((id) =>
+          firstValueFrom(this.inspiredProductsService.delete(id))
+        )
+      );
+
+      this.isDeleting.set(false);
+      this.selectedProducts.set([]);
+      this.productsResource.reload();
+    } catch (err) {
+      this.isDeleting.set(false);
+      console.error('Error during bulk delete:', err);
+      // TODO: Show error toast/notification
+    }
   }
 
-  private triggerRefresh(): void {
-    this.refreshSignal.set(this.refreshSignal() + 1);
+  onRestoreProduct(productId: string): void {
+    // TODO: Implement restore functionality if needed
+    console.log('Restore product:', productId);
+  }
+
+  // Utility methods
+  onRefresh(): void {
+    this.productsResource.reload();
+  }
+
+  // Sort methods
+  onSort(field: keyof InspiredProduct): void {
+    if (this.sortBy() === field) {
+      this.sortOrder.set(this.sortOrder() === 'asc' ? 'desc' : 'asc');
+    } else {
+      this.sortBy.set(field);
+      this.sortOrder.set('asc');
+    }
+    this.currentPage.set(1);
+    this.selectedProducts.set([]);
   }
 }
