@@ -8,9 +8,9 @@ export const authGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
   // Check if the user is logged in
   if (!authService.isLoggedIn()) {
-    return new RedirectCommand(
-      router.parseUrl(APP_ROUTES.SignIn + '?redirectUrl=' + route.url)
-    );
+    // return new RedirectCommand(
+    //   router.parseUrl(APP_ROUTES.SignIn + '?redirectUrl=' + route.url)
+    // );
   }
   return true;
 };

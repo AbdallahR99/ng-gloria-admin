@@ -109,7 +109,7 @@ export async function bulkCreateProducts(
       colors: colors,
       keywords: keywords,
       inspired_by_id: inspiredById || null,
-      price: +price,
+      price: +(price ?? 0),
       old_price: oldPrice ? +oldPrice : null,
       slug: slug,
       slug_ar: slugAr,
