@@ -10,7 +10,10 @@ export async function orderGetById(
   res: Response,
   next: NextFunction
 ) {
-  const { supabase, params: { id } } = req;
+  const {
+    supabase,
+    params: { id },
+  } = req;
 
   if (!id) {
     res.status(400).json({ error: 'Order ID is required' });
@@ -31,7 +34,7 @@ export async function orderGetList(
   next: NextFunction
 ) {
   const { supabase } = req;
-  const url = new URL(req.url);
+  const url = new URL(req.url, `http://${req.headers.host}`);
   const page = Number(url.searchParams.get('page') ?? '1');
   const pageSize = Number(url.searchParams.get('pageSize') ?? '10');
 

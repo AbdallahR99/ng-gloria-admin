@@ -56,7 +56,7 @@ export async function productGetList(
   next: NextFunction
 ) {
   const { supabase } = req;
-  const url = new URL(req.url);
+  const url = new URL(req.url, `http://${req.headers.host}`);
   // Parse pagination parameters
   const page = Number(url.searchParams.get('page') ?? '1');
   const pageSize = Number(url.searchParams.get('pageSize') ?? '99');
@@ -132,7 +132,7 @@ export async function productGetFilter(
   next: NextFunction
 ) {
   const { supabase } = req;
-  const url = new URL(req.url);
+  const url = new URL(req.url, `http://${req.headers.host}`);
   // Parse pagination parameters
   const page = Number(url.searchParams.get('page') ?? '1');
   const pageSize = Number(url.searchParams.get('pageSize') ?? '99');

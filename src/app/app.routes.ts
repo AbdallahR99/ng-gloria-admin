@@ -3,11 +3,6 @@ import { APP_ROUTES } from './core/constants/app-routes.enum';
 
 export const routes: Routes = [
   {
-    path: '',
-    redirectTo: APP_ROUTES.HOME,
-    pathMatch: 'full',
-  },
-  {
     path: APP_ROUTES.HOME.slice(1), // Remove leading slash for routing
     loadComponent: () =>
       import('./pages/home/home.component').then((m) => m.HomeComponent),
@@ -128,5 +123,10 @@ export const routes: Routes = [
       import('./pages/not-found/not-found.component').then(
         (m) => m.NotFoundComponent
       ),
+  },
+  {
+    path: '',
+    redirectTo: APP_ROUTES.HOME,
+    pathMatch: 'full',
   },
 ];

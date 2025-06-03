@@ -10,7 +10,7 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 export class SupabaseFunctionsService {
   private readonly http = inject(HttpClient);
   private readonly platformService = inject(PlatformService);
-  private readonly baseUrl = '/api/';
+  private readonly baseUrl = 'http://localhost:4200/api/';
   private readonly jwtHelper = new JwtHelperService();
 
   callFunction<T>(
