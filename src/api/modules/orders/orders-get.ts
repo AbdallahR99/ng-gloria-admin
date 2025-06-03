@@ -34,9 +34,8 @@ export async function orderGetList(
   next: NextFunction
 ) {
   const { supabase } = req;
-  const url = new URL(req.url, `http://${req.headers.host}`);
-  const page = Number(url.searchParams.get('page') ?? '1');
-  const pageSize = Number(url.searchParams.get('pageSize') ?? '10');
+  const page = Number(req.query['page'] ?? '1');
+  const pageSize = Number(req.query['pageSize'] ?? '10');
 
   try {
     const orders = await listOrders({ page, pageSize }, supabase);

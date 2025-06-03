@@ -10,7 +10,7 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 export class SupabaseFunctionsService {
   private readonly http = inject(HttpClient);
   private readonly platformService = inject(PlatformService);
-  private readonly baseUrl = 'http://localhost:4200/api/';
+  private readonly baseUrl = '/api/';
   private readonly jwtHelper = new JwtHelperService();
 
   callFunction<T>(
@@ -69,7 +69,7 @@ export class SupabaseFunctionsService {
     path: string,
     queryParams?: Record<string, string | number | boolean>
   ): string {
-    const url = new URL(`${this.baseUrl}${path}`);
+    const url = new URL(`${this.baseUrl}${path}`, location.origin);
     if (queryParams) {
       Object.entries(queryParams).forEach(([key, value]) =>
         url.searchParams.append(key, String(value))

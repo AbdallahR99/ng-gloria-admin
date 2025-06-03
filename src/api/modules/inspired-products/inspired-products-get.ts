@@ -36,16 +36,14 @@ export async function inspiredProductGetList(
   next: NextFunction
 ) {
   const { supabase } = req;
-  const url = new URL(req.url, `http://${req.headers.host}`);
   // Parse pagination parameters
-  const page = Number(url.searchParams.get('page') ?? '1');
-  const pageSize = Number(url.searchParams.get('pageSize') ?? '99');
+  const page = Number(req.query['page'] ?? '1');
+  const pageSize = Number(req.query['pageSize'] ?? '99');
 
   // Parse filter parameters
-  const queryString = url.searchParams.get('queryString');
-  const sortBy = (url.searchParams.get('sortBy') ??
-    'created_at') as keyof InspiredProduct;
-  const sortOrder = url.searchParams.get('sortOrder');
+  const queryString = req.query['queryString'] as string | undefined;
+  const sortBy = (req.query['sortBy'] ?? 'created_at') as keyof InspiredProduct;
+  const sortOrder = req.query['sortOrder'];
 
   try {
     const inspiredProducts = await listInspiredProducts(
@@ -85,16 +83,14 @@ export async function inspiredProductGetFilter(
   next: NextFunction
 ) {
   const { supabase } = req;
-  const url = new URL(req.url, `http://${req.headers.host}`);
   // Parse pagination parameters
-  const page = Number(url.searchParams.get('page') ?? '1');
-  const pageSize = Number(url.searchParams.get('pageSize') ?? '99');
+  const page = Number(req.query['page'] ?? '1');
+  const pageSize = Number(req.query['pageSize'] ?? '99');
 
   // Parse filter parameters
-  const queryString = url.searchParams.get('queryString');
-  const sortBy = (url.searchParams.get('sortBy') ??
-    'created_at') as keyof InspiredProduct;
-  const sortOrder = url.searchParams.get('sortOrder');
+  const queryString = req.query['queryString'] as string | undefined;
+  const sortBy = (req.query['sortBy'] ?? 'created_at') as keyof InspiredProduct;
+  const sortOrder = req.query['sortOrder'];
 
   try {
     const inspiredProducts = await filterInspiredProducts(

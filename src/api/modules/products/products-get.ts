@@ -56,22 +56,20 @@ export async function productGetList(
   next: NextFunction
 ) {
   const { supabase } = req;
-  const url = new URL(req.url, `http://${req.headers.host}`);
   // Parse pagination parameters
-  const page = Number(url.searchParams.get('page') ?? '1');
-  const pageSize = Number(url.searchParams.get('pageSize') ?? '99');
+  const page = Number(req.query['page'] ?? '1');
+  const pageSize = Number(req.query['pageSize'] ?? '99');
 
   // Parse filter parameters
-  const size = url.searchParams.get('size');
-  const color = url.searchParams.get('color');
-  const queryString = url.searchParams.get('queryString');
-  const categoryId = url.searchParams.get('categoryId');
-  const categorySlug = url.searchParams.get('categorySlug');
-  const minPrice = url.searchParams.get('minPrice');
-  const maxPrice = url.searchParams.get('maxPrice');
-  const sortBy = (url.searchParams.get('sortBy') ??
-    'created_at') as keyof Product;
-  const sortOrder = url.searchParams.get('sortOrder');
+  const size = req.query['size'] as string | undefined;
+  const color = req.query['color'] as string | undefined;
+  const queryString = req.query['queryString'] as string | undefined;
+  const categoryId = req.query['categoryId'] as string | undefined;
+  const categorySlug = req.query['categorySlug'] as string | undefined;
+  const minPrice = req.query['minPrice'] as string | undefined;
+  const maxPrice = req.query['maxPrice'];
+  const sortBy = (req.query['sortBy'] ?? 'created_at') as keyof Product;
+  const sortOrder = req.query['sortOrder'];
 
   try {
     const products = await listProducts(
@@ -132,22 +130,20 @@ export async function productGetFilter(
   next: NextFunction
 ) {
   const { supabase } = req;
-  const url = new URL(req.url, `http://${req.headers.host}`);
   // Parse pagination parameters
-  const page = Number(url.searchParams.get('page') ?? '1');
-  const pageSize = Number(url.searchParams.get('pageSize') ?? '99');
+  const page = Number(req.query['page'] ?? '1');
+  const pageSize = Number(req.query['pageSize'] ?? '99');
 
   // Parse filter parameters
-  const size = url.searchParams.get('size');
-  const color = url.searchParams.get('color');
-  const queryString = url.searchParams.get('queryString');
-  const categoryId = url.searchParams.get('categoryId');
-  const categorySlug = url.searchParams.get('categorySlug');
-  const minPrice = url.searchParams.get('minPrice');
-  const maxPrice = url.searchParams.get('maxPrice');
-  const sortBy = (url.searchParams.get('sortBy') ??
-    'created_at') as keyof Product;
-  const sortOrder = url.searchParams.get('sortOrder');
+  const size = req.query['size'] as string | undefined;
+  const color = req.query['color'] as string | undefined;
+  const queryString = req.query['queryString'] as string | undefined;
+  const categoryId = req.query['categoryId'] as string | undefined;
+  const categorySlug = req.query['categorySlug'] as string | undefined;
+  const minPrice = req.query['minPrice'];
+  const maxPrice = req.query['maxPrice'];
+  const sortBy = (req.query['sortBy'] ?? 'created_at') as keyof Product;
+  const sortOrder = req.query['sortOrder'];
 
   try {
     const products = await paginateProducts(
