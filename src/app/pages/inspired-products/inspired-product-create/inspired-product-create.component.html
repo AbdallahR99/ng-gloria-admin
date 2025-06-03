@@ -1,15 +1,21 @@
 <div class="container mx-auto p-4 space-y-6">
   <!-- Header Section -->
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+  <div
+    class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+  >
     <div>
       <h1 class="text-3xl font-bold">Create Inspired Product</h1>
-      <p class="text-base-content/70 mt-1">Add a new inspired product to the catalog</p>
+      <p class="text-base-content/70 mt-1">
+        Add a new inspired product to the catalog
+      </p>
     </div>
 
     <!-- Breadcrumbs -->
     <div class="breadcrumbs">
       <ul>
-        <li><a [routerLink]="[routes.INSPIRED_PRODUCTS]">Inspired Products</a></li>
+        <li>
+          <a [routerLink]="[routes.INSPIRED_PRODUCTS]">Inspired Products</a>
+        </li>
         <li>Create</li>
       </ul>
     </div>
@@ -32,20 +38,19 @@
               type="text"
               placeholder="Enter English name"
               class="input input-bordered"
-              [class.input-error]="form.get('nameEn')?.invalid && form.get('nameEn')?.touched"
+              [class.input-error]="
+                form.get('nameEn')?.invalid && form.get('nameEn')?.touched
+              "
               formControlName="nameEn"
             />
             @if (form.get('nameEn')?.invalid && form.get('nameEn')?.touched) {
-              <label class="label">
-                <span class="label-text-alt text-error">
-                  @if (form.get('nameEn')?.errors?.['required']) {
-                    English name is required
-                  }
-                  @if (form.get('nameEn')?.errors?.['minlength']) {
-                    Minimum 2 characters required
-                  }
-                </span>
-              </label>
+            <label class="label">
+              <span class="label-text-alt text-error">
+                @if (form.get('nameEn')?.errors?.['required']) { English name is
+                required } @if (form.get('nameEn')?.errors?.['minlength']) {
+                Minimum 2 characters required }
+              </span>
+            </label>
             }
           </div>
 
@@ -58,21 +63,20 @@
               type="text"
               placeholder="أدخل الاسم باللغة العربية"
               class="input input-bordered"
-              [class.input-error]="form.get('nameAr')?.invalid && form.get('nameAr')?.touched"
+              [class.input-error]="
+                form.get('nameAr')?.invalid && form.get('nameAr')?.touched
+              "
               formControlName="nameAr"
               dir="rtl"
             />
             @if (form.get('nameAr')?.invalid && form.get('nameAr')?.touched) {
-              <label class="label">
-                <span class="label-text-alt text-error">
-                  @if (form.get('nameAr')?.errors?.['required']) {
-                    Arabic name is required
-                  }
-                  @if (form.get('nameAr')?.errors?.['minlength']) {
-                    Minimum 2 characters required
-                  }
-                </span>
-              </label>
+            <label class="label">
+              <span class="label-text-alt text-error">
+                @if (form.get('nameAr')?.errors?.['required']) { Arabic name is
+                required } @if (form.get('nameAr')?.errors?.['minlength']) {
+                Minimum 2 characters required }
+              </span>
+            </label>
             }
           </div>
         </div>
@@ -87,20 +91,22 @@
             <textarea
               placeholder="Enter English description"
               class="textarea textarea-bordered h-32"
-              [class.textarea-error]="form.get('descriptionEn')?.invalid && form.get('descriptionEn')?.touched"
+              [class.textarea-error]="
+                form.get('descriptionEn')?.invalid &&
+                form.get('descriptionEn')?.touched
+              "
               formControlName="descriptionEn"
             ></textarea>
-            @if (form.get('descriptionEn')?.invalid && form.get('descriptionEn')?.touched) {
-              <label class="label">
-                <span class="label-text-alt text-error">
-                  @if (form.get('descriptionEn')?.errors?.['required']) {
-                    English description is required
-                  }
-                  @if (form.get('descriptionEn')?.errors?.['minlength']) {
-                    Minimum 2 characters required
-                  }
-                </span>
-              </label>
+            @if (form.get('descriptionEn')?.invalid &&
+            form.get('descriptionEn')?.touched) {
+            <label class="label">
+              <span class="label-text-alt text-error">
+                @if (form.get('descriptionEn')?.errors?.['required']) { English
+                description is required } @if
+                (form.get('descriptionEn')?.errors?.['minlength']) { Minimum 2
+                characters required }
+              </span>
+            </label>
             }
           </div>
 
@@ -112,21 +118,23 @@
             <textarea
               placeholder="أدخل الوصف باللغة العربية"
               class="textarea textarea-bordered h-32"
-              [class.textarea-error]="form.get('descriptionAr')?.invalid && form.get('descriptionAr')?.touched"
+              [class.textarea-error]="
+                form.get('descriptionAr')?.invalid &&
+                form.get('descriptionAr')?.touched
+              "
               formControlName="descriptionAr"
               dir="rtl"
             ></textarea>
-            @if (form.get('descriptionAr')?.invalid && form.get('descriptionAr')?.touched) {
-              <label class="label">
-                <span class="label-text-alt text-error">
-                  @if (form.get('descriptionAr')?.errors?.['required']) {
-                    Arabic description is required
-                  }
-                  @if (form.get('descriptionAr')?.errors?.['minlength']) {
-                    Minimum 2 characters required
-                  }
-                </span>
-              </label>
+            @if (form.get('descriptionAr')?.invalid &&
+            form.get('descriptionAr')?.touched) {
+            <label class="label">
+              <span class="label-text-alt text-error">
+                @if (form.get('descriptionAr')?.errors?.['required']) { Arabic
+                description is required } @if
+                (form.get('descriptionAr')?.errors?.['minlength']) { Minimum 2
+                characters required }
+              </span>
+            </label>
             }
           </div>
         </div>
@@ -148,20 +156,22 @@
               type="text"
               placeholder="Enter English meta title"
               class="input input-bordered"
-              [class.input-error]="form.get('metaTitleEn')?.invalid && form.get('metaTitleEn')?.touched"
+              [class.input-error]="
+                form.get('metaTitleEn')?.invalid &&
+                form.get('metaTitleEn')?.touched
+              "
               formControlName="metaTitleEn"
             />
-            @if (form.get('metaTitleEn')?.invalid && form.get('metaTitleEn')?.touched) {
-              <label class="label">
-                <span class="label-text-alt text-error">
-                  @if (form.get('metaTitleEn')?.errors?.['required']) {
-                    English meta title is required
-                  }
-                  @if (form.get('metaTitleEn')?.errors?.['minlength']) {
-                    Minimum 2 characters required
-                  }
-                </span>
-              </label>
+            @if (form.get('metaTitleEn')?.invalid &&
+            form.get('metaTitleEn')?.touched) {
+            <label class="label">
+              <span class="label-text-alt text-error">
+                @if (form.get('metaTitleEn')?.errors?.['required']) { English
+                meta title is required } @if
+                (form.get('metaTitleEn')?.errors?.['minlength']) { Minimum 2
+                characters required }
+              </span>
+            </label>
             }
           </div>
 
@@ -174,21 +184,23 @@
               type="text"
               placeholder="أدخل العنوان الوصفي باللغة العربية"
               class="input input-bordered"
-              [class.input-error]="form.get('metaTitleAr')?.invalid && form.get('metaTitleAr')?.touched"
+              [class.input-error]="
+                form.get('metaTitleAr')?.invalid &&
+                form.get('metaTitleAr')?.touched
+              "
               formControlName="metaTitleAr"
               dir="rtl"
             />
-            @if (form.get('metaTitleAr')?.invalid && form.get('metaTitleAr')?.touched) {
-              <label class="label">
-                <span class="label-text-alt text-error">
-                  @if (form.get('metaTitleAr')?.errors?.['required']) {
-                    Arabic meta title is required
-                  }
-                  @if (form.get('metaTitleAr')?.errors?.['minlength']) {
-                    Minimum 2 characters required
-                  }
-                </span>
-              </label>
+            @if (form.get('metaTitleAr')?.invalid &&
+            form.get('metaTitleAr')?.touched) {
+            <label class="label">
+              <span class="label-text-alt text-error">
+                @if (form.get('metaTitleAr')?.errors?.['required']) { Arabic
+                meta title is required } @if
+                (form.get('metaTitleAr')?.errors?.['minlength']) { Minimum 2
+                characters required }
+              </span>
+            </label>
             }
           </div>
         </div>
@@ -203,20 +215,22 @@
             <textarea
               placeholder="Enter English meta description"
               class="textarea textarea-bordered h-24"
-              [class.textarea-error]="form.get('metaDescriptionEn')?.invalid && form.get('metaDescriptionEn')?.touched"
+              [class.textarea-error]="
+                form.get('metaDescriptionEn')?.invalid &&
+                form.get('metaDescriptionEn')?.touched
+              "
               formControlName="metaDescriptionEn"
             ></textarea>
-            @if (form.get('metaDescriptionEn')?.invalid && form.get('metaDescriptionEn')?.touched) {
-              <label class="label">
-                <span class="label-text-alt text-error">
-                  @if (form.get('metaDescriptionEn')?.errors?.['required']) {
-                    English meta description is required
-                  }
-                  @if (form.get('metaDescriptionEn')?.errors?.['minlength']) {
-                    Minimum 2 characters required
-                  }
-                </span>
-              </label>
+            @if (form.get('metaDescriptionEn')?.invalid &&
+            form.get('metaDescriptionEn')?.touched) {
+            <label class="label">
+              <span class="label-text-alt text-error">
+                @if (form.get('metaDescriptionEn')?.errors?.['required']) {
+                English meta description is required } @if
+                (form.get('metaDescriptionEn')?.errors?.['minlength']) { Minimum
+                2 characters required }
+              </span>
+            </label>
             }
           </div>
 
@@ -228,21 +242,23 @@
             <textarea
               placeholder="أدخل الوصف الوصفي باللغة العربية"
               class="textarea textarea-bordered h-24"
-              [class.textarea-error]="form.get('metaDescriptionAr')?.invalid && form.get('metaDescriptionAr')?.touched"
+              [class.textarea-error]="
+                form.get('metaDescriptionAr')?.invalid &&
+                form.get('metaDescriptionAr')?.touched
+              "
               formControlName="metaDescriptionAr"
               dir="rtl"
             ></textarea>
-            @if (form.get('metaDescriptionAr')?.invalid && form.get('metaDescriptionAr')?.touched) {
-              <label class="label">
-                <span class="label-text-alt text-error">
-                  @if (form.get('metaDescriptionAr')?.errors?.['required']) {
-                    Arabic meta description is required
-                  }
-                  @if (form.get('metaDescriptionAr')?.errors?.['minlength']) {
-                    Minimum 2 characters required
-                  }
-                </span>
-              </label>
+            @if (form.get('metaDescriptionAr')?.invalid &&
+            form.get('metaDescriptionAr')?.touched) {
+            <label class="label">
+              <span class="label-text-alt text-error">
+                @if (form.get('metaDescriptionAr')?.errors?.['required']) {
+                Arabic meta description is required } @if
+                (form.get('metaDescriptionAr')?.errors?.['minlength']) { Minimum
+                2 characters required }
+              </span>
+            </label>
             }
           </div>
         </div>
@@ -260,48 +276,61 @@
           </label>
 
           @if (form.value.imageFile) {
-            <!-- Preview uploaded image -->
-            <div class="relative">
-              <img
-                [src]="form.value.imageFile"
-                alt="Uploaded image preview"
-                class="w-full max-w-md h-48 object-cover rounded-lg border mx-auto"
-              />
-              <button
-                type="button"
-                class="btn btn-circle btn-sm btn-error absolute top-2 right-2"
-                (click)="removeThumbnail()"
+          <!-- Preview uploaded image -->
+          <div class="relative">
+            <img
+              [src]="form.value.imageFile"
+              alt="Uploaded image preview"
+              class="w-full max-w-md h-48 object-cover rounded-lg border mx-auto"
+            />
+            <button
+              title="Remove Image"
+              type="button"
+              class="btn btn-circle btn-sm btn-error absolute top-2 right-2"
+              (click)="removeThumbnail()"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
           } @else {
-            <!-- Upload area -->
-            <div class="relative">
-              <input
-                type="file"
-                accept="image/*"
-                class="file-input file-input-bordered w-full"
-                [class.file-input-error]="form.get('imageFile')?.invalid && form.get('imageFile')?.touched"
-                (change)="uploadThumbnail($event)"
-              />
-              <div class="mt-2 text-sm text-base-content/70">
-                <p>Upload a high-quality image (JPG, PNG, WebP)</p>
-                <p>Recommended size: 800x800 pixels, Max size: 5MB</p>
-              </div>
+          <!-- Upload area -->
+          <div class="relative">
+            <input
+              title="Upload Product Image"
+              type="file"
+              accept="image/*"
+              class="file-input file-input-bordered w-full"
+              [class.file-input-error]="
+                form.get('imageFile')?.invalid && form.get('imageFile')?.touched
+              "
+              (change)="uploadThumbnail($event)"
+            />
+            <div class="mt-2 text-sm text-base-content/70">
+              <p>Upload a high-quality image (JPG, PNG, WebP)</p>
+              <p>Recommended size: 800x800 pixels, Max size: 5MB</p>
             </div>
-          }
-
-          @if (form.get('imageFile')?.invalid && form.get('imageFile')?.touched) {
-            <label class="label">
-              <span class="label-text-alt text-error">
-                @if (form.get('imageFile')?.errors?.['required']) {
-                  Product image is required
-                }
-              </span>
-            </label>
+          </div>
+          } @if (form.get('imageFile')?.invalid &&
+          form.get('imageFile')?.touched) {
+          <label class="label">
+            <span class="label-text-alt text-error">
+              @if (form.get('imageFile')?.errors?.['required']) { Product image
+              is required }
+            </span>
+          </label>
           }
         </div>
       </div>
@@ -325,14 +354,23 @@
             [disabled]="form.invalid || isSubmitting()"
           >
             @if (isSubmitting()) {
-              <span class="loading loading-spinner loading-sm"></span>
-              Creating...
-            } @else {
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-              </svg>
-              Create Inspired Product
-            }
+            <span class="loading loading-spinner loading-sm"></span>
+            Creating... } @else {
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            Create Inspired Product }
           </button>
         </div>
       </div>

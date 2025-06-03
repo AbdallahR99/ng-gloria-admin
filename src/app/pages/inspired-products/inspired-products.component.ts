@@ -12,6 +12,7 @@ import {
   InspiredProductsQuery,
 } from '@app/core/models/inspired-product.model';
 import { SHARED_MODULES } from '@app/core/shared/modules/shared.module';
+import { APP_ROUTES } from '@app/core/constants/app-routes.enum';
 
 @Component({
   selector: 'app-inspired-products',
@@ -200,11 +201,11 @@ export class InspiredProductsComponent {
 
   // CRUD operations
   onCreateProduct(): void {
-    this.router.navigate(['/admin/inspired-products/new']);
+    this.router.navigate([APP_ROUTES.INSPIRED_PRODUCT_CREATE]);
   }
 
   onEditProduct(product: InspiredProduct): void {
-    this.router.navigate(['/admin/inspired-products/edit', product.id]);
+    this.router.navigate([APP_ROUTES.INSPIRED_PRODUCT_UPDATE, product.id]);
   }
 
   onDeleteProduct(productId: string): void {

@@ -1,284 +1,352 @@
 <div class="container mx-auto p-4 space-y-6">
   @if (productResource.isLoading()) {
-    <!-- Loading State -->
-    <div class="flex justify-center items-center min-h-96">
-      <div class="flex flex-col items-center gap-4">
-        <span class="loading loading-spinner loading-lg"></span>
-        <p class="text-base-content/70">Loading inspired product details...</p>
-      </div>
+  <!-- Loading State -->
+  <div class="flex justify-center items-center min-h-96">
+    <div class="flex flex-col items-center gap-4">
+      <span class="loading loading-spinner loading-lg"></span>
+      <p class="text-base-content/70">Loading inspired product details...</p>
     </div>
+  </div>
   } @else if (productResource.error()) {
-    <!-- Error State -->
-    <div class="alert alert-error">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+  <!-- Error State -->
+  <div class="alert alert-error">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="h-6 w-6 shrink-0 stroke-current"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+      />
+    </svg>
+    <div>
+      <h3 class="font-bold">Error loading product details</h3>
+      <div class="text-xs">
+        {{
+          productResource.error()?.message ||
+            "Failed to load inspired product details"
+        }}
+      </div>
+    </div>
+    <button class="btn btn-sm btn-ghost" (click)="refreshData()">
+      Try Again
+    </button>
+  </div>
+  } @if (productResource.value(); as product) {
+  <!-- Header Section -->
+  <div
+    class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+  >
+    <div>
+      <h1 class="text-3xl font-bold">
+        {{ product.nameEn || "Untitled Product" }}
+      </h1>
+      <p class="text-base-content/70 mt-1">
+        Inspired product details and information
+      </p>
+    </div>
+
+    <!-- Breadcrumbs -->
+    <div class="breadcrumbs">
+      <ul>
+        <li>
+          <a [routerLink]="[routes.INSPIRED_PRODUCTS]">Inspired Products</a>
+        </li>
+        <li>{{ product.nameEn || "Product Details" }}</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="flex flex-wrap gap-4">
+    <a
+      class="btn btn-primary"
+      [routerLink]="[routes.INSPIRED_PRODUCTS, product.id, 'edit']"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+        />
       </svg>
-      <div>
-        <h3 class="font-bold">Error loading product details</h3>
-        <div class="text-xs">{{ productResource.error()?.message || 'Failed to load inspired product details' }}</div>
-      </div>
-      <button class="btn btn-sm btn-ghost" (click)="refreshData()">
-        Try Again
-      </button>
-    </div>
-  }
-  @if (productResource.value(); as product) {
-    <!-- Header Section -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-      <div>
-        <h1 class="text-3xl font-bold">{{ product.nameEn || 'Untitled Product' }}</h1>
-        <p class="text-base-content/70 mt-1">Inspired product details and information</p>
-      </div>
-
-      <!-- Breadcrumbs -->
-      <div class="breadcrumbs">
-        <ul>
-          <li><a [routerLink]="[routes.INSPIRED_PRODUCTS]">Inspired Products</a></li>
-          <li>{{ product.nameEn || 'Product Details' }}</li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- Action Buttons -->
-    <div class="flex flex-wrap gap-4">
-      <a
-        class="btn btn-primary"
-        [routerLink]="[routes.INSPIRED_PRODUCTS, product.id, 'edit']"
+      Edit Product
+    </a>
+    <button type="button" class="btn btn-ghost" (click)="goBack()">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-        </svg>
-        Edit Product
-      </a>
-      <button
-        type="button"
-        class="btn btn-ghost"
-        (click)="goBack()"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-        </svg>
-        Back
-      </button>
-    </div>
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M10 19l-7-7m0 0l7-7m-7 7h18"
+        />
+      </svg>
+      Back
+    </button>
+  </div>
 
-    <!-- Main Content -->
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-      <!-- Product Image -->
-      <div class="xl:col-span-1">
-        <div class="card bg-base-100 shadow">
-          <div class="card-body">
-            <h2 class="card-title">Product Image</h2>
-            @if (product.image) {
-              <figure class="aspect-square rounded-lg overflow-hidden bg-base-200">
-                <img
-                  [src]="product.image"
-                  [alt]="product.nameEn || 'Product image'"
-                  class="w-full h-full object-cover"
-                  loading="lazy"
+  <!-- Main Content -->
+  <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+    <!-- Product Image -->
+    <div class="xl:col-span-1">
+      <div class="card bg-base-100 shadow">
+        <div class="card-body">
+          <h2 class="card-title">Product Image</h2>
+          @if (product.image) {
+          <figure class="aspect-square rounded-lg overflow-hidden bg-base-200">
+            <img
+              title="{{ product.nameEn || 'Product Image' }}"
+              [src]="product.image"
+              [alt]="product.nameEn || 'Product image'"
+              class="w-full h-full object-cover"
+              loading="lazy"
+            />
+          </figure>
+          } @else {
+          <div
+            class="aspect-square rounded-lg bg-base-200 flex items-center justify-center"
+          >
+            <div class="text-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-16 w-16 mx-auto text-base-content/40"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                 />
-              </figure>
-            } @else {
-              <div class="aspect-square rounded-lg bg-base-200 flex items-center justify-center">
-                <div class="text-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  <p class="text-base-content/60 mt-2">No image available</p>
-                </div>
+              </svg>
+              <p class="text-base-content/60 mt-2">No image available</p>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Information -->
+    <div class="xl:col-span-2 space-y-6">
+      <!-- Basic Information -->
+      <div class="card bg-base-100 shadow">
+        <div class="card-body">
+          <h2 class="card-title">Basic Information</h2>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- English Name -->
+            <div>
+              <label class="label">
+                <span class="label-text font-semibold">Name (English)</span>
+              </label>
+              <div class="p-3 bg-base-200 rounded-lg">
+                {{ product.nameEn || "Not provided" }}
               </div>
+            </div>
+
+            <!-- Arabic Name -->
+            <div>
+              <label class="label">
+                <span class="label-text font-semibold">Name (Arabic)</span>
+              </label>
+              <div class="p-3 bg-base-200 rounded-lg" dir="rtl">
+                {{ product.nameAr || "غير متوفر" }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Descriptions -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- English Description -->
+            <div>
+              <label class="label">
+                <span class="label-text font-semibold"
+                  >Description (English)</span
+                >
+              </label>
+              <div class="p-3 bg-base-200 rounded-lg min-h-24">
+                {{ product.descriptionEn || "No description provided" }}
+              </div>
+            </div>
+
+            <!-- Arabic Description -->
+            <div>
+              <label class="label">
+                <span class="label-text font-semibold"
+                  >Description (Arabic)</span
+                >
+              </label>
+              <div class="p-3 bg-base-200 rounded-lg min-h-24" dir="rtl">
+                {{ product.descriptionAr || "لا يوجد وصف متاح" }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEO Metadata -->
+      <div class="card bg-base-100 shadow">
+        <div class="card-body">
+          <h2 class="card-title">SEO Metadata</h2>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- English Meta Title -->
+            <div>
+              <label class="label">
+                <span class="label-text font-semibold"
+                  >Meta Title (English)</span
+                >
+              </label>
+              <div class="p-3 bg-base-200 rounded-lg">
+                {{ product.metaTitleEn || "Not provided" }}
+              </div>
+            </div>
+
+            <!-- Arabic Meta Title -->
+            <div>
+              <label class="label">
+                <span class="label-text font-semibold"
+                  >Meta Title (Arabic)</span
+                >
+              </label>
+              <div class="p-3 bg-base-200 rounded-lg" dir="rtl">
+                {{ product.metaTitleAr || "غير متوفر" }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Meta Descriptions -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- English Meta Description -->
+            <div>
+              <label class="label">
+                <span class="label-text font-semibold"
+                  >Meta Description (English)</span
+                >
+              </label>
+              <div class="p-3 bg-base-200 rounded-lg min-h-20">
+                {{
+                  product.metaDescriptionEn || "No meta description provided"
+                }}
+              </div>
+            </div>
+
+            <!-- Arabic Meta Description -->
+            <div>
+              <label class="label">
+                <span class="label-text font-semibold"
+                  >Meta Description (Arabic)</span
+                >
+              </label>
+              <div class="p-3 bg-base-200 rounded-lg min-h-20" dir="rtl">
+                {{ product.metaDescriptionAr || "لا يوجد وصف ميتا متاح" }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- System Information -->
+      <div class="card bg-base-100 shadow">
+        <div class="card-body">
+          <h2 class="card-title">System Information</h2>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Product ID -->
+            <div>
+              <label class="label">
+                <span class="label-text font-semibold">Product ID</span>
+              </label>
+              <div class="p-3 bg-base-200 rounded-lg font-mono text-sm">
+                {{ product.id || "Not available" }}
+              </div>
+            </div>
+
+            <!-- Status -->
+            <div>
+              <label class="label">
+                <span class="label-text font-semibold">Status</span>
+              </label>
+              <div class="p-3 bg-base-200 rounded-lg">
+                @if (product.isDeleted) {
+                <span class="badge badge-error">Deleted</span>
+                } @else {
+                <span class="badge badge-success">Active</span>
+                }
+              </div>
+            </div>
+
+            <!-- Created At -->
+            @if (product.createdAt) {
+            <div>
+              <label class="label">
+                <span class="label-text font-semibold">Created At</span>
+              </label>
+              <div class="p-3 bg-base-200 rounded-lg">
+                {{ product.createdAt | date : "full" }}
+              </div>
+            </div>
+            }
+
+            <!-- Updated At -->
+            @if (product.updatedAt) {
+            <div>
+              <label class="label">
+                <span class="label-text font-semibold">Last Updated</span>
+              </label>
+              <div class="p-3 bg-base-200 rounded-lg">
+                {{ product.updatedAt | date : "full" }}
+              </div>
+            </div>
+            }
+
+            <!-- Created By -->
+            @if (product.createdBy) {
+            <div>
+              <label class="label">
+                <span class="label-text font-semibold">Created By</span>
+              </label>
+              <div class="p-3 bg-base-200 rounded-lg">
+                {{ product.createdBy }}
+              </div>
+            </div>
+            }
+
+            <!-- Updated By -->
+            @if (product.updatedBy) {
+            <div>
+              <label class="label">
+                <span class="label-text font-semibold">Updated By</span>
+              </label>
+              <div class="p-3 bg-base-200 rounded-lg">
+                {{ product.updatedBy }}
+              </div>
+            </div>
             }
           </div>
         </div>
       </div>
-
-      <!-- Product Information -->
-      <div class="xl:col-span-2 space-y-6">
-        <!-- Basic Information -->
-        <div class="card bg-base-100 shadow">
-          <div class="card-body">
-            <h2 class="card-title">Basic Information</h2>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <!-- English Name -->
-              <div>
-                <label class="label">
-                  <span class="label-text font-semibold">Name (English)</span>
-                </label>
-                <div class="p-3 bg-base-200 rounded-lg">
-                  {{ product.nameEn || 'Not provided' }}
-                </div>
-              </div>
-
-              <!-- Arabic Name -->
-              <div>
-                <label class="label">
-                  <span class="label-text font-semibold">Name (Arabic)</span>
-                </label>
-                <div class="p-3 bg-base-200 rounded-lg" dir="rtl">
-                  {{ product.nameAr || 'غير متوفر' }}
-                </div>
-              </div>
-            </div>
-
-            <!-- Descriptions -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <!-- English Description -->
-              <div>
-                <label class="label">
-                  <span class="label-text font-semibold">Description (English)</span>
-                </label>
-                <div class="p-3 bg-base-200 rounded-lg min-h-24">
-                  {{ product.descriptionEn || 'No description provided' }}
-                </div>
-              </div>
-
-              <!-- Arabic Description -->
-              <div>
-                <label class="label">
-                  <span class="label-text font-semibold">Description (Arabic)</span>
-                </label>
-                <div class="p-3 bg-base-200 rounded-lg min-h-24" dir="rtl">
-                  {{ product.descriptionAr || 'لا يوجد وصف متاح' }}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- SEO Metadata -->
-        <div class="card bg-base-100 shadow">
-          <div class="card-body">
-            <h2 class="card-title">SEO Metadata</h2>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <!-- English Meta Title -->
-              <div>
-                <label class="label">
-                  <span class="label-text font-semibold">Meta Title (English)</span>
-                </label>
-                <div class="p-3 bg-base-200 rounded-lg">
-                  {{ product.metaTitleEn || 'Not provided' }}
-                </div>
-              </div>
-
-              <!-- Arabic Meta Title -->
-              <div>
-                <label class="label">
-                  <span class="label-text font-semibold">Meta Title (Arabic)</span>
-                </label>
-                <div class="p-3 bg-base-200 rounded-lg" dir="rtl">
-                  {{ product.metaTitleAr || 'غير متوفر' }}
-                </div>
-              </div>
-            </div>
-
-            <!-- Meta Descriptions -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <!-- English Meta Description -->
-              <div>
-                <label class="label">
-                  <span class="label-text font-semibold">Meta Description (English)</span>
-                </label>
-                <div class="p-3 bg-base-200 rounded-lg min-h-20">
-                  {{ product.metaDescriptionEn || 'No meta description provided' }}
-                </div>
-              </div>
-
-              <!-- Arabic Meta Description -->
-              <div>
-                <label class="label">
-                  <span class="label-text font-semibold">Meta Description (Arabic)</span>
-                </label>
-                <div class="p-3 bg-base-200 rounded-lg min-h-20" dir="rtl">
-                  {{ product.metaDescriptionAr || 'لا يوجد وصف ميتا متاح' }}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- System Information -->
-        <div class="card bg-base-100 shadow">
-          <div class="card-body">
-            <h2 class="card-title">System Information</h2>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <!-- Product ID -->
-              <div>
-                <label class="label">
-                  <span class="label-text font-semibold">Product ID</span>
-                </label>
-                <div class="p-3 bg-base-200 rounded-lg font-mono text-sm">
-                  {{ product.id || 'Not available' }}
-                </div>
-              </div>
-
-              <!-- Status -->
-              <div>
-                <label class="label">
-                  <span class="label-text font-semibold">Status</span>
-                </label>
-                <div class="p-3 bg-base-200 rounded-lg">
-                  @if (product.isDeleted) {
-                    <span class="badge badge-error">Deleted</span>
-                  } @else {
-                    <span class="badge badge-success">Active</span>
-                  }
-                </div>
-              </div>
-
-              <!-- Created At -->
-              @if (product.createdAt) {
-                <div>
-                  <label class="label">
-                    <span class="label-text font-semibold">Created At</span>
-                  </label>
-                  <div class="p-3 bg-base-200 rounded-lg">
-                    {{ product.createdAt | date:'full' }}
-                  </div>
-                </div>
-              }
-
-              <!-- Updated At -->
-              @if (product.updatedAt) {
-                <div>
-                  <label class="label">
-                    <span class="label-text font-semibold">Last Updated</span>
-                  </label>
-                  <div class="p-3 bg-base-200 rounded-lg">
-                    {{ product.updatedAt | date:'full' }}
-                  </div>
-                </div>
-              }
-
-              <!-- Created By -->
-              @if (product.createdBy) {
-                <div>
-                  <label class="label">
-                    <span class="label-text font-semibold">Created By</span>
-                  </label>
-                  <div class="p-3 bg-base-200 rounded-lg">
-                    {{ product.createdBy }}
-                  </div>
-                </div>
-              }
-
-              <!-- Updated By -->
-              @if (product.updatedBy) {
-                <div>
-                  <label class="label">
-                    <span class="label-text font-semibold">Updated By</span>
-                  </label>
-                  <div class="p-3 bg-base-200 rounded-lg">
-                    {{ product.updatedBy }}
-                  </div>
-                </div>
-              }
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
+  </div>
   }
 </div>
