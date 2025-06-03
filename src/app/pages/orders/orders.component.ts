@@ -47,7 +47,7 @@ export class OrdersComponent {
     if (!response?.pagination) return null;
 
     return {
-      currentPage: response.pagination.page,
+      page: response.pagination.page,
       pageSize: response.pagination.pageSize,
       totalCount: response.pagination.total,
       totalPages: response.pagination.totalPages,
@@ -98,7 +98,13 @@ export class OrdersComponent {
     });
   }
 
-  paginatedTo = computed(() => this.pageSettings()!.currentPage * this.pageSettings()!.pageSize, (this.pageSettings()?.totalCount ?? 0));
+  paginatedTo = computed(() => {
+    const settings = this.pageSettings();
+    if (!settings) return 0;
+    return Math.min(settings.page * settings.pageSize, settings.totalCount);
+  });
+
+  Math = Math;
 
   async onDeleteOrder(orderId: string) {
     if (confirm('Are you sure you want to delete this order? This action cannot be undone.')) {

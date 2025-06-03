@@ -39,7 +39,7 @@
           <select
             class="select select-bordered"
             [value]="query().categoryId || ''"
-            (change)="onFilterChange({ categoryId: $any($event.target).value || undefined })"
+            (change)="onFilterChange({ categoryId: $any($event.target).value ? $any($event.target).value : undefined })"
           >
             <option value="">All Categories</option>
             <!-- Add category options here when categories are loaded -->
@@ -75,7 +75,7 @@
       </div>
 
       <!-- Additional Filters Row -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
         <div class="form-control">
           <label class="label">
             <span class="label-text">Size</span>
@@ -100,6 +100,21 @@
             [value]="query().color || ''"
             (input)="onFilterChange({ color: $any($event.target).value || undefined })"
           />
+        </div>
+
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Status Filter</span>
+          </label>
+          <select
+            class="select select-bordered"
+            [value]="query().isBanned?.toString() || ''"
+            (change)="onFilterChange({ isBanned: $any($event.target).value === '' ? undefined : $any($event.target).value === 'true' })"
+          >
+            <option value="">All Products</option>
+            <option value="false">Active Only</option>
+            <option value="true">Banned Only</option>
+          </select>
         </div>
 
         <div class="form-control">
@@ -334,9 +349,9 @@
   @if (pageSettings()) {
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div class="text-sm text-base-content/70">
-        Showing {{ (pageSettings()!.currentPage - 1) * pageSettings()!.pageSize + 1 }} to
-        {{ Math.min(pageSettings()!.currentPage * pageSettings()!.pageSize, pageSettings()!.totalCount) }}
-        of {{ pageSettings()!.totalCount }} products
+        Showing {{ (pageSettings()!.page - 1) * pageSettings()!.pageSize + 1 }} to
+        {{ Math.min(pageSettings()!.page * pageSettings()!.pageSize, pageSettings()!.total) }}
+        of {{ pageSettings()!.total }} products
       </div>
 
       <div class="flex items-center gap-2">
@@ -356,31 +371,31 @@
         <div class="join">
           <button
             class="join-item btn btn-sm"
-            [disabled]="pageSettings()!.currentPage === 1"
-            (click)="onPageChange(pageSettings()!.currentPage - 1)"
+            [disabled]="pageSettings()!.page === 1"
+            (click)="onPageChange(pageSettings()!.page - 1)"
           >
             «
           </button>
 
           @for (page of [].constructor(pageSettings()!.totalPages); track $index) {
-            @if ($index + 1 === pageSettings()!.currentPage) {
+            @if ($index + 1 === pageSettings()!.page) {
               <button class="join-item btn btn-sm btn-active">{{ $index + 1 }}</button>
-            } @else if (Math.abs(($index + 1) - pageSettings()!.currentPage) <= 2 || $index + 1 === 1 || $index + 1 === pageSettings()!.totalPages) {
+            } @else if (Math.abs(($index + 1) - pageSettings()!.page) <= 2 || $index + 1 === 1 || $index + 1 === pageSettings()!.totalPages) {
               <button
                 class="join-item btn btn-sm"
                 (click)="onPageChange($index + 1)"
               >
                 {{ $index + 1 }}
               </button>
-            } @else if (Math.abs(($index + 1) - pageSettings()!.currentPage) === 3) {
+            } @else if (Math.abs(($index + 1) - pageSettings()!.page) === 3) {
               <button class="join-item btn btn-sm btn-disabled">...</button>
             }
           }
 
           <button
             class="join-item btn btn-sm"
-            [disabled]="pageSettings()!.currentPage === pageSettings()!.totalPages"
-            (click)="onPageChange(pageSettings()!.currentPage + 1)"
+            [disabled]="pageSettings()!.page === pageSettings()!.totalPages"
+            (click)="onPageChange(pageSettings()!.page + 1)"
           >
             »
           </button>

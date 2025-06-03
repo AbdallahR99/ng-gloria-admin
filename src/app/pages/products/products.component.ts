@@ -39,7 +39,7 @@ export class ProductsComponent {
     params: () => this.query(),
     stream: ({ params }) => this.facadeService.productsService.filter(params),
   });
-
+  Math = Math;
 
   pageSettings = computed(() => this.products.value()?.pagination);
 

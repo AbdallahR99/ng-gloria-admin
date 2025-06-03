@@ -2,7 +2,7 @@ import { Category } from './category.model';
 import { PaginatedRequest } from './common/paginated-request';
 
 export interface ProductQuery extends PaginatedRequest<Product> {
-  categoryId?: string;
+  categoryId?: string; // Changed from string to number to match Product model
   categorySlug?: string; // Slug for category filtering
   minPrice?: number;
   maxPrice?: number;
@@ -10,6 +10,8 @@ export interface ProductQuery extends PaginatedRequest<Product> {
   size?: string;
   color?: string;
 
+  isBanned?: boolean; // Add filter for banned products
+  inspiredById?: string; // Add filter for products inspired by specific product
 }
 
 export interface Product {
