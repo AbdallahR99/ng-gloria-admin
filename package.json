@@ -1,6 +1,9 @@
 {
   "name": "ng-gloria-admin",
   "version": "0.0.0",
+  "imports": {
+    "#tailwindtheme": "./public/styles/tailwind.scss"
+  },
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -24,10 +27,9 @@
     "@auth0/angular-jwt": "^5.2.0",
     "@ngx-translate/core": "^16.0.4",
     "@ngx-translate/http-loader": "^16.0.1",
-    "@supabase/supabase-js": "^2.49.8",
+    "@supabase/supabase-js": "^2.49.9",
     "@tailwindcss/postcss": "^4.1.8",
     "daisyui": "^5.0.43",
-    "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "postcss": "^8.5.4",
     "rxjs": "~7.8.0",
@@ -50,5 +52,5 @@
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~5.8.2"
   },
-  "packageManager": "pnpm@10.9.0+sha512.cce0f9de9c5a7c95bef944169cc5dfe8741abfb145078c0d508b868056848a87c81e626246cb60967cbd7fd29a6c062ef73ff840d96b3c86c40ac92cf4a813ee"
+  "packageManager": "pnpm@9.12.3+sha512.cce0f9de9c5a7c95bef944169cc5dfe8741abfb145078c0d508b868056848a87c81e626246cb60967cbd7fd29a6c062ef73ff840d96b3c86c40ac92cf4a813ee"
 }

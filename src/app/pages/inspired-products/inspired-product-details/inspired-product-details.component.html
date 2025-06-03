@@ -113,7 +113,7 @@
           <figure class="aspect-square rounded-lg overflow-hidden bg-base-200">
             <img
               title="{{ product.nameEn || 'Product Image' }}"
-              [src]="product.image"
+              [src]="product.image | supabaseImage"
               [alt]="product.nameEn || 'Product image'"
               class="w-full h-full object-cover"
               loading="lazy"

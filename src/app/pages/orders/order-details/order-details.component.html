@@ -137,7 +137,7 @@
                   <th>Actions</th>
                 </tr>
               </thead>
-              <!-- <tbody>
+              <tbody>
                 @for (item of orderData.items; track item.productId) {
                 <tr>
                   <td>
@@ -146,8 +146,8 @@
                       <div class="avatar">
                         <div class="mask mask-squircle w-12 h-12">
                           <img
-                            [src]="item.product.thumbnail"
-                            [alt]="item.product.nameEn"
+                            [src]="(item.product?.thumbnail ?? '') | supabaseImage"
+                            [alt]="item.product?.nameEn"
                           />
                         </div>
                       </div>
@@ -158,12 +158,12 @@
                         </div>
                         @if (item.product?.nameAr) {
                         <div class="text-sm text-base-content/70">
-                          {{ item.product.nameAr }}
+                          {{ item.product?.nameAr }}
                         </div>
                         }
                         @if (item.product?.price) {
                         <div class="text-sm font-medium text-primary">
-                          {{ item.product.price | currency:'AED':'symbol':'1.2-2' }}
+                          {{ item.product?.price | currency:'AED':'symbol':'1.2-2' }}
                         </div>
                         }
                       </div>
@@ -189,7 +189,7 @@
                   <td>
                     @if (item.product?.id) {
                     <a
-                      [routerLink]="[routes.PRODUCT_DETAILS, item.product.id]"
+                      [routerLink]="[routes.PRODUCT_DETAILS, item.product?.id]"
                       class="btn btn-ghost btn-sm"
                       title="View Product"
                     >
@@ -202,7 +202,7 @@
                   </td>
                 </tr>
                 }
-              </tbody> -->
+              </tbody>
             </table>
           </div>
         </div>
@@ -211,12 +211,13 @@
 
       <!-- Address Information -->
       @if (orderData.address) {
-      <!-- <div class="card bg-base-100 shadow-xl">
+      <div class="card bg-base-100 shadow-xl">
         <div class="card-body">
           <h2 class="card-title mb-4">Shipping Address</h2>
           <div class="space-y-2">
-            @if (orderData.address.fullName) {
-            <div><strong>Name:</strong> {{ orderData.address.fullName }}</div>
+            @let fullName = orderData.address.firstName + ' ' + orderData.address.lastName;
+            @if (fullName) {
+            <div><strong>Name:</strong> {{ fullName }}</div>
             }
             @if (orderData.address.street) {
             <div><strong>Street:</strong> {{ orderData.address.street }}</div>
@@ -224,21 +225,21 @@
             @if (orderData.address.city) {
             <div><strong>City:</strong> {{ orderData.address.city }}</div>
             }
-            @if (orderData.address.state) {
-            <div><strong>State:</strong> {{ orderData.address.state }}</div>
+            @if (orderData.address.stateCode) {
+            <div><strong>State:</strong> {{ orderData.address.stateCode }}</div>
             }
-            @if (orderData.address.postalCode) {
-            <div><strong>Postal Code:</strong> {{ orderData.address.postalCode }}</div>
+            @if (orderData.address.apartment) {
+            <div><strong>apartment:</strong> {{ orderData.address.apartment }}</div>
             }
-            @if (orderData.address.country) {
-            <div><strong>Country:</strong> {{ orderData.address.country }}</div>
+            @if (orderData.address.building) {
+            <div><strong>building:</strong> {{ orderData.address.building }}</div>
             }
             @if (orderData.address.phone) {
             <div><strong>Phone:</strong> {{ orderData.address.phone }}</div>
             }
           </div>
         </div>
-      </div> -->
+      </div>
       }
     </div>
 

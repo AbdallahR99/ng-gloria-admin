@@ -42,7 +42,7 @@
             formControlName="search"
             [title]="'Search by name or description' | translate"
             [placeholder]="'Search by name, category, etc...' | translate"
-            class="input input-bordered w-full"
+            class="input input-primary border border-1 border-primary/40 w-full"
           />
         </div>
         <button
@@ -208,7 +208,7 @@
                   <div class="avatar">
                     <div class="mask mask-squircle w-12 h-12">
                       <img
-                        [src]="product.image"
+                        [src]="product.image | supabaseImage"
                         [alt]="
                           product.nameEn ||
                           product.nameAr ||
@@ -339,7 +339,7 @@
           "Items per page" | translate
         }}</span>
         <select
-          class="select select-bordered select-sm"
+          class="select select-primary border border-1 border-primary/40 select-sm"
           [title]="'Items per page' | translate"
           [attr.aria-label]="'Items per page' | translate"
           [value]="pageSize()"

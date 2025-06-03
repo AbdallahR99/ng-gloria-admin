@@ -44,32 +44,20 @@ export class CategoriesComponent {
   }));
 
   // Resource for loading categories with pagination
-  readonly categoriesResource = rxResource({
+  categories = rxResource({
     params: this.queryParams,
     stream: ({ params }) => this.facade.categoryService.getFilter(params),
   });
 
   // Computed properties for template
-  readonly categories = computed(
-    () => this.categoriesResource.value()?.data ?? []
-  );
-  readonly pagination = computed(
-    () => this.categoriesResource.value()?.pagination
-  );
-  readonly isLoading = computed(() => this.categoriesResource.isLoading());
-  readonly error = computed(() => this.categoriesResource.error());
 
-  // Computed properties for pagination info
-  readonly totalPages = computed(() => this.pagination()?.totalPages ?? 0);
-  readonly totalItems = computed(() => this.pagination()?.total ?? 0);
-  readonly isFirstPage = computed(() => this.currentPage() === 1);
-  readonly isLastPage = computed(() => this.currentPage() >= this.totalPages());
+  readonly pagination = computed(() => this.categories.value()?.pagination);
 
   // Computed property for pagination math
   readonly paginationInfo = computed(() => {
     const currentPage = this.currentPage();
     const pageSize = this.pageSize();
-    const totalItems = this.totalItems();
+    const totalItems = this.pagination()?.total ?? 0;
 
     const start = (currentPage - 1) * pageSize + 1;
     const end = Math.min(currentPage * pageSize, totalItems);
@@ -122,7 +110,9 @@ export class CategoriesComponent {
   }
 
   onSelectAllCategories(): void {
-    const allIds = this.categories().map((category) => category.id!);
+    const categories = this.categories.value();
+    if (!categories) return;
+    const allIds = categories.data.map((category) => category.id!);
     const currentSelection = this.selectedIds();
 
     if (currentSelection.length === allIds.length) {
@@ -135,11 +125,14 @@ export class CategoriesComponent {
   }
 
   isCategorySelected(id: string): boolean {
-    return this.selectedIds().includes(id);
+    return this.selectedIds()?.includes(id);
   }
 
   isAllSelected(): boolean {
-    const visibleIds = this.categories().map((category) => category.id!);
+    const categories = this.categories.value();
+    if (!categories) return false;
+    const visibleIds = categories.data.map((category) => category.id!);
+    if (!this.selectedIds()) return false;
     return (
       visibleIds.length > 0 &&
       visibleIds.every((id) => this.selectedIds().includes(id))
@@ -199,7 +192,7 @@ export class CategoriesComponent {
   }
 
   getPageNumbers(): number[] {
-    const total = this.totalPages();
+    const total = this.pagination()?.totalPages ?? 0;
     const current = this.currentPage();
     const delta = 2; // Number of pages to show on each side of current page
 

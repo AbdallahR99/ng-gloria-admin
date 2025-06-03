@@ -34,20 +34,22 @@ export class CategoryCreateComponent {
   readonly categoryForm: FormGroup = this.fb.group({
     nameEn: [
       '',
-      [Validators.required, Validators.minLength(2), Validators.maxLength(100)],
+      [],
     ],
     nameAr: [
       '',
-      [Validators.required, Validators.minLength(2), Validators.maxLength(100)],
+      [],
     ],
     slug: [
       '',
-      [Validators.required, Validators.pattern(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)],
+      [],
     ],
     slugAr: [
       '',
-      [Validators.pattern(/^[\u0600-\u06FF0-9]+(?:-[\u0600-\u06FF0-9]+)*$/)],
+      [],
     ],
+    descriptionEn: ['', [Validators.maxLength(500)]],
+    descriptionAr: ['', [Validators.maxLength(500)]],
     metaTitleEn: ['', [Validators.maxLength(60)]],
     metaTitleAr: ['', [Validators.maxLength(60)]],
     metaDescriptionEn: ['', [Validators.maxLength(160)]],

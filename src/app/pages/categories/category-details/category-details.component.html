@@ -67,7 +67,7 @@
         @if (category.image) {
         <img
           title="{{ category.nameEn }}"
-          [src]="category.image"
+          [src]="category.image | supabaseImage"
           [alt]="category.nameEn"
           class="rounded-lg w-full h-64 object-cover"
         />

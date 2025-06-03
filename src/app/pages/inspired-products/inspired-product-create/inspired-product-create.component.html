@@ -37,7 +37,7 @@
             <input
               type="text"
               placeholder="Enter English name"
-              class="input input-bordered"
+              class="input input-primary border border-1 border-primary/40"
               [class.input-error]="
                 form.get('nameEn')?.invalid && form.get('nameEn')?.touched
               "
@@ -62,7 +62,7 @@
             <input
               type="text"
               placeholder="أدخل الاسم باللغة العربية"
-              class="input input-bordered"
+              class="input input-primary border border-1 border-primary/40"
               [class.input-error]="
                 form.get('nameAr')?.invalid && form.get('nameAr')?.touched
               "
@@ -90,7 +90,7 @@
             </label>
             <textarea
               placeholder="Enter English description"
-              class="textarea textarea-bordered h-32"
+              class="textarea textarea-primary border border-1 border-primary/40 h-32"
               [class.textarea-error]="
                 form.get('descriptionEn')?.invalid &&
                 form.get('descriptionEn')?.touched
@@ -117,7 +117,7 @@
             </label>
             <textarea
               placeholder="أدخل الوصف باللغة العربية"
-              class="textarea textarea-bordered h-32"
+              class="textarea textarea-primary border border-1 border-primary/40 h-32"
               [class.textarea-error]="
                 form.get('descriptionAr')?.invalid &&
                 form.get('descriptionAr')?.touched
@@ -155,7 +155,7 @@
             <input
               type="text"
               placeholder="Enter English meta title"
-              class="input input-bordered"
+              class="input input-primary border border-1 border-primary/40"
               [class.input-error]="
                 form.get('metaTitleEn')?.invalid &&
                 form.get('metaTitleEn')?.touched
@@ -183,7 +183,7 @@
             <input
               type="text"
               placeholder="أدخل العنوان الوصفي باللغة العربية"
-              class="input input-bordered"
+              class="input input-primary border border-1 border-primary/40"
               [class.input-error]="
                 form.get('metaTitleAr')?.invalid &&
                 form.get('metaTitleAr')?.touched
@@ -214,7 +214,7 @@
             </label>
             <textarea
               placeholder="Enter English meta description"
-              class="textarea textarea-bordered h-24"
+              class="textarea textarea-primary border border-1 border-primary/40 h-24"
               [class.textarea-error]="
                 form.get('metaDescriptionEn')?.invalid &&
                 form.get('metaDescriptionEn')?.touched
@@ -241,7 +241,7 @@
             </label>
             <textarea
               placeholder="أدخل الوصف الوصفي باللغة العربية"
-              class="textarea textarea-bordered h-24"
+              class="textarea textarea-primary border border-1 border-primary/40 h-24"
               [class.textarea-error]="
                 form.get('metaDescriptionAr')?.invalid &&
                 form.get('metaDescriptionAr')?.touched
@@ -312,7 +312,7 @@
               title="Upload Product Image"
               type="file"
               accept="image/*"
-              class="file-input file-input-bordered w-full"
+              class="file-input file-input-primary border border-1 border-primary/40 w-full"
               [class.file-input-error]="
                 form.get('imageFile')?.invalid && form.get('imageFile')?.touched
               "

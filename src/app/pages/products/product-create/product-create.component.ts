@@ -38,31 +38,31 @@ export class ProductCreateComponent {
 
   readonly isSubmitting = signal(false);
   readonly form: FormGroup = this.formBuilder.group({
-    nameEn: [null, [Validators.required, Validators.minLength(2)]],
-    nameAr: [null, [Validators.required, Validators.minLength(2)]],
-    metaTitleAr: [null, [Validators.required, Validators.minLength(2)]],
-    metaTitleEn: [null, [Validators.required, Validators.minLength(2)]],
-    metaDescriptionAr: [null, [Validators.required, Validators.minLength(2)]],
-    metaDescriptionEn: [null, [Validators.required, Validators.minLength(2)]],
-    metaKeywords: [null, [Validators.required, Validators.minLength(2)]],
-    slug: [null, [Validators.required, Validators.minLength(2)]],
-    slugAr: [null, [Validators.required, Validators.minLength(2)]],
-    oldPrice: [0, [Validators.required, Validators.min(0)]],
-    price: [0, [Validators.required, Validators.min(0)]],
-    inspiredProductId: [null, [Validators.required]],
-    categoriyId: [null, [Validators.required]],
-    sku: [null, [Validators.required, Validators.minLength(2)]],
-    colors: [[], [Validators.required]],
-    sizes: [[], [Validators.required]],
-    imageFiles: [[], [Validators.required]],
+    nameEn: [null, []],
+    nameAr: [null, []],
+    metaTitleAr: [null, []],
+    metaTitleEn: [null, []],
+    metaDescriptionAr: [null, []],
+    metaDescriptionEn: [null, []],
+    metaKeywords: [null, []],
+    slug: [null, []],
+    slugAr: [null, []],
+    oldPrice: [0, []],
+    price: [0, []],
+    inspiredProductId: [null, []],
+    categoriyId: [null, []],
+    sku: [null, []],
+    colors: [[], []],
+    sizes: [[], []],
+    imageFiles: [[], []],
 
 
     descriptionEn: [null],
     descriptionAr: [null],
-    categoryId: [null, [Validators.required]],
-    quantity: [0, [Validators.required, Validators.min(1)]],
+    categoryId: [null, []],
+    quantity: [1, []],
 
-    thumbnail: [null, [Validators.required]],
+    thumbnail: [null, []],
   });
 
   categories = rxResource({

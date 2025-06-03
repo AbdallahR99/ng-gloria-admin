@@ -5,6 +5,7 @@ import { DomElementDirective } from '@app/core/directives/domElement.directive';
 import { TranslateModule } from '@ngx-translate/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { SupabaseImagePipe } from '@app/core/pipes/supabaseImage.pipe';
 
 const SHARED_MATERIAL_MODULES = [MatIconModule, MatProgressBarModule];
 
@@ -16,4 +17,5 @@ export const SHARED_MODULES = [
   FormsModule,
   DomElementDirective,
   ReactiveFormsModule,
+  SupabaseImagePipe,
 ];

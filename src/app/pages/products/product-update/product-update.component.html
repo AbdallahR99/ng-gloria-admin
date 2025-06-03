@@ -14,10 +14,36 @@
     <div class="alert alert-error">
       <span>Error loading product: {{ product.error() }}</span>
     </div>
-  } @else {
+  }
+
+  @if (product.value(); as productData){
     <div class="card">
       <div class="card-body">
         <h1 class="card-title text-2xl mb-6">Update Product</h1>
+        <h2>Thumbnail</h2>
+        @if (productData.thumbnail) {
+          <div class="mt-2">
+            <div class="indicator">
+              <span class="indicator-item badge badge-secondary cursor-pointer" (click)="removeExistingThumbnail()">×</span>
+              <img [src]="productData.thumbnail | supabaseImage" alt="Thumbnail" class="w-24 h-24 object-cover rounded" />
+            </div>
+          </div>
+        }
+        <h2 class="mt-4">Existing Images</h2>
+        @if (productData.images) {
+          <div class="mt-2">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
+              @for (image of productData.images; track $index) {
+                <div class="indicator">
+                  <span class="indicator-item badge badge-secondary cursor-pointer" (click)="removeExistingImage($index)">×</span>
+                  <img [src]="image | supabaseImage" alt="Product image" class="w-24 h-24 object-cover rounded" />
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+
 
         <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
 
@@ -34,7 +60,7 @@
                 type="text"
                 formControlName="nameEn"
                 placeholder="Enter product name in English"
-                class="input input-bordered"
+                class="input input-primary border border-1 border-primary/40"
                 [class.input-error]="form.get('nameEn')?.invalid && form.get('nameEn')?.touched"
               />
               @if (form.get('nameEn')?.invalid && form.get('nameEn')?.touched) {
@@ -53,7 +79,7 @@
                 type="text"
                 formControlName="nameAr"
                 placeholder="Enter product name in Arabic"
-                class="input input-bordered"
+                class="input input-primary border border-1 border-primary/40"
                 [class.input-error]="form.get('nameAr')?.invalid && form.get('nameAr')?.touched"
               />
               @if (form.get('nameAr')?.invalid && form.get('nameAr')?.touched) {
@@ -74,7 +100,7 @@
                 type="text"
                 formControlName="sku"
                 placeholder="Enter product SKU"
-                class="input input-bordered"
+                class="input input-primary border border-1 border-primary/40"
                 [class.input-error]="form.get('sku')?.invalid && form.get('sku')?.touched"
               />
               @if (form.get('sku')?.invalid && form.get('sku')?.touched) {
@@ -93,7 +119,7 @@
                 type="number"
                 formControlName="quantity"
                 placeholder="Enter quantity"
-                class="input input-bordered"
+                class="input input-primary border border-1 border-primary/40"
                 [class.input-error]="form.get('quantity')?.invalid && form.get('quantity')?.touched"
               />
               @if (form.get('quantity')?.invalid && form.get('quantity')?.touched) {
@@ -113,7 +139,7 @@
               </div>
               <select
                 formControlName="categoryId"
-                class="select select-bordered"
+                class="select select-primary border border-1 border-primary/40"
                 [class.select-error]="form.get('categoryId')?.invalid && form.get('categoryId')?.touched"
               >
                 <option value="">Select a category</option>
@@ -137,7 +163,7 @@
               </div>
               <select
                 formControlName="inspiredProductId"
-                class="select select-bordered"
+                class="select select-primary border border-1 border-primary/40"
                 [class.select-error]="form.get('inspiredProductId')?.invalid && form.get('inspiredProductId')?.touched"
               >
                 <option value="">Select an inspired product</option>
@@ -168,7 +194,7 @@
                 type="number"
                 formControlName="oldPrice"
                 placeholder="Enter old price"
-                class="input input-bordered"
+                class="input input-primary border border-1 border-primary/40"
                 [class.input-error]="form.get('oldPrice')?.invalid && form.get('oldPrice')?.touched"
               />
               @if (form.get('oldPrice')?.invalid && form.get('oldPrice')?.touched) {
@@ -187,7 +213,7 @@
                 type="number"
                 formControlName="price"
                 placeholder="Enter current price"
-                class="input input-bordered"
+                class="input input-primary border border-1 border-primary/40"
                 [class.input-error]="form.get('price')?.invalid && form.get('price')?.touched"
               />
               @if (form.get('price')?.invalid && form.get('price')?.touched) {
@@ -211,7 +237,7 @@
                 type="text"
                 formControlName="slug"
                 placeholder="product-slug"
-                class="input input-bordered"
+                class="input input-primary border border-1 border-primary/40"
                 [class.input-error]="form.get('slug')?.invalid && form.get('slug')?.touched"
               />
               @if (form.get('slug')?.invalid && form.get('slug')?.touched) {
@@ -230,7 +256,7 @@
                 type="text"
                 formControlName="slugAr"
                 placeholder="product-slug-ar"
-                class="input input-bordered"
+                class="input input-primary border border-1 border-primary/40"
                 [class.input-error]="form.get('slugAr')?.invalid && form.get('slugAr')?.touched"
               />
               @if (form.get('slugAr')?.invalid && form.get('slugAr')?.touched) {
@@ -251,7 +277,7 @@
                 type="text"
                 formControlName="metaTitleEn"
                 placeholder="Enter meta title in English"
-                class="input input-bordered"
+                class="input input-primary border border-1 border-primary/40"
                 [class.input-error]="form.get('metaTitleEn')?.invalid && form.get('metaTitleEn')?.touched"
               />
               @if (form.get('metaTitleEn')?.invalid && form.get('metaTitleEn')?.touched) {
@@ -270,7 +296,7 @@
                 type="text"
                 formControlName="metaTitleAr"
                 placeholder="Enter meta title in Arabic"
-                class="input input-bordered"
+                class="input input-primary border border-1 border-primary/40"
                 [class.input-error]="form.get('metaTitleAr')?.invalid && form.get('metaTitleAr')?.touched"
               />
               @if (form.get('metaTitleAr')?.invalid && form.get('metaTitleAr')?.touched) {
@@ -290,7 +316,7 @@
               <textarea
                 formControlName="metaDescriptionEn"
                 placeholder="Enter meta description in English"
-                class="textarea textarea-bordered"
+                class="textarea textarea-primary border border-1 border-primary/40"
                 [class.textarea-error]="form.get('metaDescriptionEn')?.invalid && form.get('metaDescriptionEn')?.touched"
               ></textarea>
               @if (form.get('metaDescriptionEn')?.invalid && form.get('metaDescriptionEn')?.touched) {
@@ -308,7 +334,7 @@
               <textarea
                 formControlName="metaDescriptionAr"
                 placeholder="Enter meta description in Arabic"
-                class="textarea textarea-bordered"
+                class="textarea textarea-primary border border-1 border-primary/40"
                 [class.textarea-error]="form.get('metaDescriptionAr')?.invalid && form.get('metaDescriptionAr')?.touched"
               ></textarea>
               @if (form.get('metaDescriptionAr')?.invalid && form.get('metaDescriptionAr')?.touched) {
@@ -328,7 +354,7 @@
               type="text"
               formControlName="metaKeywords"
               placeholder="keyword1, keyword2, keyword3"
-              class="input input-bordered"
+              class="input input-primary border border-1 border-primary/40"
               [class.input-error]="form.get('metaKeywords')?.invalid && form.get('metaKeywords')?.touched"
             />
             @if (form.get('metaKeywords')?.invalid && form.get('metaKeywords')?.touched) {
@@ -350,7 +376,7 @@
               <textarea
                 formControlName="descriptionEn"
                 placeholder="Enter product description in English"
-                class="textarea textarea-bordered h-32"
+                class="textarea textarea-primary border border-1 border-primary/40 h-32"
               ></textarea>
             </label>
 
@@ -362,7 +388,7 @@
               <textarea
                 formControlName="descriptionAr"
                 placeholder="Enter product description in Arabic"
-                class="textarea textarea-bordered h-32"
+                class="textarea textarea-primary border border-1 border-primary/40 h-32"
               ></textarea>
             </label>
           </div>
@@ -379,17 +405,17 @@
               type="file"
               accept="image/*"
               (change)="uploadThumbnail($event)"
-              class="file-input file-input-bordered"
+              class="file-input file-input-primary border border-1 border-primary/40"
             />
-            @if (form.get('thumbnail')?.value) {
+            @if (form.get('thumbnailFile')?.value) {
               <div class="mt-2">
                 <div class="indicator">
                   <span class="indicator-item badge badge-secondary cursor-pointer" (click)="removeThumbnail()">×</span>
-                  <img [src]="form.get('thumbnail')?.value" alt="Thumbnail" class="w-24 h-24 object-cover rounded" />
+                  <img [src]="form.get('thumbnailFile')?.value " alt="Thumbnail" class="w-24 h-24 object-cover rounded" />
                 </div>
               </div>
             }
-            @if (form.get('thumbnail')?.invalid && form.get('thumbnail')?.touched) {
+            @if (form.get('thumbnailFile')?.invalid && form.get('thumbnailFile')?.touched) {
               <div class="label">
                 <span class="label-text-alt text-error">Thumbnail image is required</span>
               </div>
@@ -406,7 +432,7 @@
               accept="image/*"
               multiple
               (change)="uploadImages($event)"
-              class="file-input file-input-bordered"
+              class="file-input file-input-primary border border-1 border-primary/40"
             />
             @if (form.get('imageFiles')?.value?.length > 0) {
               <div class="mt-2">
@@ -445,7 +471,7 @@
               }
             </div>
             <div class="flex gap-2">
-              <input type="text" placeholder="Color name" class="input input-sm input-bordered flex-1" #colorName />
+              <input type="text" placeholder="Color name" class="input input-sm input-primary border border-1 border-primary/40 flex-1" #colorName />
               <input type="color" class="input input-sm w-16" #colorHex />
               <button type="button" class="btn btn-sm btn-primary"
                 (click)="addColor({name: colorName.value, hex: colorHex.value}); colorName.value=''; colorHex.value='#000000'">
@@ -473,7 +499,7 @@
               }
             </div>
             <div class="flex gap-2">
-              <input type="text" placeholder="Size (e.g., S, M, L, XL)" class="input input-sm input-bordered flex-1" #sizeInput />
+              <input type="text" placeholder="Size (e.g., S, M, L, XL)" class="input input-sm input-primary border border-1 border-primary/40 flex-1" #sizeInput />
               <button type="button" class="btn btn-sm btn-primary"
                 (click)="addSize(sizeInput.value); sizeInput.value=''">
                 Add Size

@@ -81,7 +81,7 @@
               type="text"
               formControlName="nameEn"
               placeholder="Enter category name in English"
-              class="input input-bordered w-full"
+              class="input input-primary border border-1 border-primary/40 w-full"
               [class.input-error]="isFieldInvalid('nameEn')"
               maxlength="100"
             />
@@ -106,7 +106,7 @@
               type="text"
               formControlName="nameAr"
               placeholder="أدخل اسم الفئة بالعربية"
-              class="input input-bordered w-full text-right"
+              class="input input-primary border border-1 border-primary/40 w-full text-right"
               [class.input-error]="isFieldInvalid('nameAr')"
               dir="rtl"
               maxlength="100"
@@ -133,7 +133,7 @@
               type="text"
               formControlName="slug"
               placeholder="category-slug"
-              class="input input-bordered w-full font-mono"
+              class="input input-primary border border-1 border-primary/40 w-full font-mono"
               [class.input-error]="isFieldInvalid('slug')"
               maxlength="100"
             />
@@ -161,7 +161,7 @@
               type="text"
               formControlName="slugAr"
               placeholder="فئة-المنتج"
-              class="input input-bordered w-full font-mono text-right"
+              class="input input-primary border border-1 border-primary/40 w-full font-mono text-right"
               [class.input-error]="isFieldInvalid('slugAr')"
               dir="rtl"
               maxlength="100"
@@ -198,7 +198,7 @@
             <textarea
               formControlName="descriptionEn"
               placeholder="Enter category description in English"
-              class="textarea textarea-bordered w-full h-32 resize-none"
+              class="textarea textarea-primary border border-1 border-primary/40 w-full h-32 resize-none"
               [class.textarea-error]="isFieldInvalid('descriptionEn')"
               maxlength="500"
             ></textarea>
@@ -220,7 +220,7 @@
             <textarea
               formControlName="descriptionAr"
               placeholder="أدخل وصف الفئة بالعربية"
-              class="textarea textarea-bordered w-full h-32 resize-none text-right"
+              class="textarea textarea-primary border border-1 border-primary/40 w-full h-32 resize-none text-right"
               [class.textarea-error]="isFieldInvalid('descriptionAr')"
               dir="rtl"
               maxlength="500"
@@ -257,7 +257,7 @@
               type="text"
               formControlName="metaTitleEn"
               placeholder="SEO title for English pages"
-              class="input input-bordered w-full"
+              class="input input-primary border border-1 border-primary/40 w-full"
               [class.input-error]="isFieldInvalid('metaTitleEn')"
               maxlength="60"
             />
@@ -281,7 +281,7 @@
               type="text"
               formControlName="metaTitleAr"
               placeholder="عنوان SEO للصفحات العربية"
-              class="input input-bordered w-full text-right"
+              class="input input-primary border border-1 border-primary/40 w-full text-right"
               [class.input-error]="isFieldInvalid('metaTitleAr')"
               dir="rtl"
               maxlength="60"
@@ -307,7 +307,7 @@
             <textarea
               formControlName="metaDescriptionEn"
               placeholder="SEO description for English pages"
-              class="textarea textarea-bordered w-full h-24 resize-none"
+              class="textarea textarea-primary border border-1 border-primary/40 w-full h-24 resize-none"
               [class.textarea-error]="isFieldInvalid('metaDescriptionEn')"
               maxlength="160"
             ></textarea>
@@ -333,7 +333,7 @@
             <textarea
               formControlName="metaDescriptionAr"
               placeholder="وصف SEO للصفحات العربية"
-              class="textarea textarea-bordered w-full h-24 resize-none text-right"
+              class="textarea textarea-primary border border-1 border-primary/40 w-full h-24 resize-none text-right"
               [class.textarea-error]="isFieldInvalid('metaDescriptionAr')"
               dir="rtl"
               maxlength="160"
@@ -407,7 +407,7 @@
                 #fileInput
                 accept="image/*"
                 (change)="onImageSelected($event)"
-                class="file-input file-input-bordered w-full"
+                class="file-input file-input-primary border border-1 border-primary/40 w-full"
               />
 
               @if (isFieldInvalid('image')) {

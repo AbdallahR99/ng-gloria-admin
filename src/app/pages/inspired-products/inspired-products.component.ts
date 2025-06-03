@@ -213,7 +213,7 @@ export class InspiredProductsComponent {
       this.isDeleting.set(true);
       this.inspiredProductsService
         .delete(productId)
-        .pipe(takeUntilDestroyed())
+
         .subscribe({
           next: () => {
             this.isDeleting.set(false);

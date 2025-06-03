@@ -116,6 +116,7 @@ export async function productPostFilter(
 ) {
   const { supabase } = req;
   const body = req.body;
+  console.log('Filtering products with body:', body);
   try {
     const products = await paginateProducts(body, supabase);
     res.status(200).json(products);

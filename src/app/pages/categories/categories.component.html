@@ -17,10 +17,10 @@
         Add Category
       </button>
 
-      @if (selectedIds().length > 0) {
+      @if ((selectedIds() ?? []).length > 0) {
       <button class="btn btn-error btn-outline" (click)="onBulkDelete()">
         <mat-icon>delete</mat-icon>
-        Delete Selected ({{ selectedIds().length }})
+        Delete Selected ({{ (selectedIds() ?? []).length }})
       </button>
       }
     </div>
@@ -32,7 +32,7 @@
       <div class="flex flex-col lg:flex-row gap-4">
         <!-- Search Input -->
         <div class="flex-1">
-          <label class="input input-bordered flex items-center gap-2">
+          <label class="input input-primary border border-1 border-primary/40 flex items-center gap-2">
             <mat-icon class="w-4 h-4 opacity-70">search</mat-icon>
             <input
               type="text"
@@ -49,7 +49,7 @@
         <div class="flex flex-col sm:flex-row gap-2">
           <!-- Show Deleted Toggle -->
           <label class="label cursor-pointer gap-2">
-            <span class="label-text">Show Deleted</span>
+            <span class="label-text">Hide Deleted</span>
             <input
               type="checkbox"
               class="toggle toggle-primary"
@@ -61,7 +61,7 @@
           <!-- Page Size Selector -->
           <select
             title="Select Page Size"
-            class="select select-bordered w-full sm:w-auto"
+            class="select select-primary border border-1 border-primary/40 w-full sm:w-auto"
             [(ngModel)]="pageSize"
             name="pageSize"
             (change)="onPageSizeChange(+pageSize() || 10)"
@@ -77,22 +77,22 @@
   </div>
 
   <!-- Loading State -->
-  @if (isLoading()) {
+  @if (categories.isLoading()) {
   <div class="flex justify-center items-center py-12">
     <span class="loading loading-spinner loading-lg"></span>
   </div>
   }
 
   <!-- Error State -->
-  @if (error(); as errorMsg) {
+  @if (categories.error(); as errorMsg) {
   <div class="alert alert-error">
     <mat-icon>error</mat-icon>
-    <span>{{ errorMsg }}</span>
+    <span>{{ categories.error() }}</span>
   </div>
   }
 
   <!-- Categories Table -->
-  @if (!isLoading() && !error()) {
+  @if (categories.value(); as categoriesData) {
   <div class="card bg-base-100 shadow-sm border border-base-300">
     <div class="overflow-x-auto">
       <table class="table table-zebra">
@@ -162,7 +162,7 @@
 
         <!-- Table Body -->
         <tbody>
-          @for (category of categories(); track category.id) {
+          @for (category of categoriesData.data; track category.id) {
           <tr class="hover">
             <th>
               <label>
@@ -211,7 +211,7 @@
                 <div class="mask mask-squircle h-12 w-12">
                   <img
                     title="{{ category.nameEn }}"
-                    [src]="category.image"
+                    [src]="category.image | supabaseImage"
                     [alt]="category.nameEn"
                   />
                 </div>
@@ -297,7 +297,7 @@
     </div>
 
     <!-- Pagination -->
-    @if (totalPages() > 1) {
+    @if (categoriesData.pagination.totalPages > 1) {
     <div
       class="card-actions justify-between items-center p-4 border-t border-base-300"
     >
@@ -312,7 +312,7 @@
         <!-- First Page -->
         <button
           class="join-item btn btn-sm"
-          [disabled]="isFirstPage()"
+          [disabled]="currentPage() === 1"
           (click)="onPageChange(1)"
         >
           <mat-icon>first_page</mat-icon>
@@ -321,7 +321,7 @@
         <!-- Previous Page -->
         <button
           class="join-item btn btn-sm"
-          [disabled]="isFirstPage()"
+          [disabled]="currentPage() === 1"
           (click)="onPageChange(currentPage() - 1)"
         >
           <mat-icon>chevron_left</mat-icon>
@@ -341,7 +341,7 @@
         <!-- Next Page -->
         <button
           class="join-item btn btn-sm"
-          [disabled]="isLastPage()"
+          [disabled]="currentPage() === categoriesData.pagination.totalPages"
           (click)="onPageChange(currentPage() + 1)"
         >
           <mat-icon>chevron_right</mat-icon>
@@ -350,8 +350,8 @@
         <!-- Last Page -->
         <button
           class="join-item btn btn-sm"
-          [disabled]="isLastPage()"
-          (click)="onPageChange(totalPages())"
+          [disabled]="currentPage() === categoriesData.pagination.totalPages"
+          (click)="onPageChange( categoriesData.pagination.totalPages)"
         >
           <mat-icon>last_page</mat-icon>
         </button>

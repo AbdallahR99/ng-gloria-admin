@@ -23,12 +23,12 @@
       "@server/*": [
         "src/app/server/*"
       ],
-        "@public/*": [
+      "@public/*": [
         "public/*"
       ],
       "@api/*": [
         "src/api/*"
-      ],
+      ]
     },
     "strict": true,
     "noImplicitOverride": true,

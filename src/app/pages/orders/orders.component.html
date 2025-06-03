@@ -25,7 +25,7 @@
           <input
             type="text"
             placeholder="Search by order ID, customer..."
-            class="input input-bordered"
+            class="input input-primary border border-1 border-primary/40"
             [value]="query().queryString || ''"
             (input)="onSearch($any($event.target).value)"
           />
@@ -37,7 +37,7 @@
             <span class="label-text">Order Status</span>
           </label>
           <select
-            class="select select-bordered"
+            class="select select-primary border border-1 border-primary/40"
             [value]="query().status || ''"
             (change)="onFilterChange({ status: $any($event.target).value || undefined })"
           >
@@ -61,7 +61,7 @@
           </label>
           <input
             type="date"
-            class="input input-bordered"
+            class="input input-primary border border-1 border-primary/40"
             [value]="query().fromDate || ''"
             (input)="onFilterChange({ fromDate: $any($event.target).value || undefined })"
           />
@@ -73,7 +73,7 @@
           </label>
           <input
             type="date"
-            class="input input-bordered"
+            class="input input-primary border border-1 border-primary/40"
             [value]="query().toDate || ''"
             (input)="onFilterChange({ toDate: $any($event.target).value || undefined })"
           />
@@ -89,7 +89,7 @@
           <input
             type="text"
             placeholder="Filter by user ID"
-            class="input input-bordered"
+            class="input input-primary border border-1 border-primary/40"
             [value]="query().userId || ''"
             (input)="onFilterChange({ userId: $any($event.target).value || undefined })"
           />
@@ -102,7 +102,7 @@
           <input
             type="text"
             placeholder="Filter by address ID"
-            class="input input-bordered"
+            class="input input-primary border border-1 border-primary/40"
             [value]="query().addressId || ''"
             (input)="onFilterChange({ addressId: $any($event.target).value || undefined })"
           />
@@ -322,7 +322,7 @@
       <div class="flex items-center gap-2">
         <!-- Page Size Selector -->
         <select
-          class="select select-bordered select-sm"
+          class="select select-primary border border-1 border-primary/40 select-sm"
           [value]="query().pageSize"
           (change)="onPageSizeChange(+$any($event.target).value)"
         >

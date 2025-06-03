@@ -50,7 +50,7 @@
               type="text"
               formControlName="nameEn"
               placeholder="Enter category name in English"
-              class="input input-bordered w-full"
+              class="input input-primary border border-1 border-primary/40 w-full"
               [class.input-error]="isFieldInvalid('nameEn')"
               maxlength="100"
             />
@@ -80,7 +80,7 @@
               type="text"
               formControlName="nameAr"
               placeholder="أدخل اسم الفئة بالعربية"
-              class="input input-bordered w-full"
+              class="input input-primary border border-1 border-primary/40 w-full"
               [class.input-error]="isFieldInvalid('nameAr')"
               maxlength="100"
               dir="rtl"
@@ -112,23 +112,23 @@
             </label>
             <input
               type="text"
-              formControlName="slugEn"
+              formControlName="slug"
               placeholder="category-slug"
-              class="input input-bordered w-full"
-              [class.input-error]="isFieldInvalid('slugEn')"
+              class="input input-primary border border-1 border-primary/40 w-full"
+              [class.input-error]="isFieldInvalid('slug')"
               maxlength="100"
             />
-            @if (isFieldInvalid('slugEn')) {
+            @if (isFieldInvalid('slug')) {
             <label class="label">
               <span class="label-text-alt text-error">
-                @if (categoryForm.get('slugEn')?.errors?.['required']) {
+                @if (categoryForm.get('slug')?.errors?.['required']) {
                 {{ "English slug is required" | translate }}
-                } @if (categoryForm.get('slugEn')?.errors?.['invalidSlug']) {
+                } @if (categoryForm.get('slug')?.errors?.['invalidSlug']) {
                 {{
                   "Slug can only contain lowercase letters, numbers, and hyphens"
                     | translate
                 }}
-                } @if (categoryForm.get('slugEn')?.errors?.['maxlength']) {
+                } @if (categoryForm.get('slug')?.errors?.['maxlength']) {
                 {{ "Slug must not exceed 100 characters" | translate }}
                 }
               </span>
@@ -150,7 +150,7 @@
               type="text"
               formControlName="slugAr"
               placeholder="فئة-المنتجات"
-              class="input input-bordered w-full"
+              class="input input-primary border border-1 border-primary/40 w-full"
               [class.input-error]="isFieldInvalid('slugAr')"
               maxlength="100"
               dir="rtl"
@@ -196,7 +196,7 @@
             <textarea
               formControlName="descriptionEn"
               placeholder="Enter category description in English"
-              class="textarea textarea-bordered h-24 resize-none"
+              class="textarea textarea-primary border border-1 border-primary/40 h-24 resize-none"
               [class.textarea-error]="isFieldInvalid('descriptionEn')"
               maxlength="500"
             ></textarea>
@@ -221,7 +221,7 @@
             <textarea
               formControlName="descriptionAr"
               placeholder="أدخل وصف الفئة بالعربية"
-              class="textarea textarea-bordered h-24 resize-none"
+              class="textarea textarea-primary border border-1 border-primary/40 h-24 resize-none"
               [class.textarea-error]="isFieldInvalid('descriptionAr')"
               maxlength="500"
               dir="rtl"
@@ -268,7 +268,7 @@
                 #fileInput
                 (change)="onImageSelected($event)"
                 accept="image/*"
-                class="file-input file-input-bordered w-full"
+                class="file-input file-input-primary border border-1 border-primary/40 w-full"
                 [class.file-input-error]="isFieldInvalid('image')"
               />
 
@@ -313,7 +313,7 @@
             <div class="card bg-base-200 border border-base-300">
               <figure class="px-4 pt-4">
                 <img
-                  [src]="preview"
+                  [src]="preview "
                   alt="Category preview"
                   class="rounded-lg w-full h-48 object-cover"
                 />
@@ -353,7 +353,7 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <!-- Is Active -->
-          <div class="form-control">
+          <!-- <div class="form-control">
             <label class="label cursor-pointer justify-start">
               <input
                 type="checkbox"
@@ -367,10 +367,10 @@
             <p class="text-sm text-base-content/70 mt-1">
               {{ "Active categories are visible to customers" | translate }}
             </p>
-          </div>
+          </div> -->
 
           <!-- Is Featured -->
-          <div class="form-control">
+          <!-- <div class="form-control">
             <label class="label cursor-pointer justify-start">
               <input
                 type="checkbox"
@@ -384,7 +384,7 @@
             <p class="text-sm text-base-content/70 mt-1">
               {{ "Featured categories appear prominently" | translate }}
             </p>
-          </div>
+          </div> -->
         </div>
       </div>
 

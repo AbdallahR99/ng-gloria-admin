@@ -3,11 +3,12 @@ import { NextFunction, Request, Response } from 'express';
 import { AppRequest } from './types';
 import { environment } from '@environments/environment';
 import { env } from 'process';
+import { SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, SUPABASE_URL } from '@api/keys';
 
 export function createSupabaseClient() {
   // Replace with your actual Supabase URL and Anon Key
-  const supabaseUrl = environment.supabaseUrl;
-  const supabaseAnonKey = environment.anonymousJwt;
+  const supabaseUrl = SUPABASE_URL;
+  const supabaseAnonKey = SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error('Supabase URL and Anon Key must be provided');
@@ -22,8 +23,8 @@ export function createSupabaseAuthClient(
   next: NextFunction
 ) {
   // Replace with your actual Supabase URL and Anon Key
-  const supabaseUrl = process.env['SUPABASE_URL'];
-  const supabaseAnonKey = process.env['SUPABASE_ANON_KEY'];
+  const supabaseUrl = SUPABASE_URL;
+  const supabaseAnonKey = SUPABASE_ANON_KEY ;
   if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error('Supabase URL and Anon Key must be provided');
   }
@@ -42,8 +43,8 @@ export function createSupabaseAuthClient(
 
 export function createSupabaseAdminClient() {
   // Replace with your actual Supabase URL and Service Role Key
-  const supabaseUrl = environment.supabaseUrl;
-  const supabaseServiceRoleKey = environment.apiAdminKey;
+  const supabaseUrl = SUPABASE_URL ?? environment.supabaseUrl;
+  const supabaseServiceRoleKey = SUPABASE_SERVICE_ROLE_KEY ?? environment.apiAdminKey;
 
   if (!supabaseUrl || !supabaseServiceRoleKey) {
     throw new Error('Supabase URL and Service Role Key must be provided');

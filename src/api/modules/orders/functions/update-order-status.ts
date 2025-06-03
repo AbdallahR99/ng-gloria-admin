@@ -16,9 +16,10 @@ export async function updateOrderStatus(
   const { data: { user }, error } = await supabase.auth.getUser();
 
   if (!userId) {
-    if (error || !user) {
-      throw new BadRequestException('User ID is required to create an order');
-    }
+    // if (error || !user) {
+    //   throw new BadRequestException('User ID is required to create an order');
+    // }
+    if (user)
     userId = user.id;
   }
 

@@ -18,6 +18,7 @@
           "builder": "@angular/build:application",
           "options": {
             "browser": "src/main.ts",
+            "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -26,13 +27,9 @@
                 "input": "public"
               }
             ],
-            "styles": [
-              "src/styles.scss"
-            ],
-             "stylePreprocessorOptions": {
-              "includePaths": [
-                "public/styles"
-              ]
+            "styles": ["src/styles.scss"],
+            "stylePreprocessorOptions": {
+              "includePaths": ["public/styles"]
             },
             "server": "src/main.server.ts",
             "outputMode": "server",
@@ -88,6 +85,7 @@
         "test": {
           "builder": "@angular/build:karma",
           "options": {
+            "polyfills": ["zone.js", "zone.js/testing"],
             "tsConfig": "tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -96,20 +94,13 @@
                 "input": "public"
               }
             ],
-            "styles": [
-              "src/styles.scss"
-            ],
-             "stylePreprocessorOptions": {
-              "includePaths": [
-                "public/styles"
-              ]
-            }
+            "stylePreprocessorOptions": {
+              "includePaths": ["public/styles"]
+            },
+            "styles": ["src/styles.scss"]
           }
         }
       }
     }
-  },
-  "cli": {
-    "analytics": false
   }
 }

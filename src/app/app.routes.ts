@@ -124,9 +124,4 @@ export const routes: Routes = [
         (m) => m.NotFoundComponent
       ),
   },
-  {
-    path: '',
-    redirectTo: APP_ROUTES.HOME,
-    pathMatch: 'full',
-  },
 ];

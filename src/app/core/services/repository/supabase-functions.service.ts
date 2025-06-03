@@ -71,8 +71,8 @@ export class SupabaseFunctionsService {
   ): string {
     const url = new URL(`${this.baseUrl}${path}`, location.origin);
     if (queryParams) {
-      Object.entries(queryParams).forEach(([key, value]) =>
-        url.searchParams.append(key, String(value))
+      Object.entries(JSON.parse(JSON.stringify(queryParams))).forEach(
+        ([key, value]) => url.searchParams.append(key, String(value))
       );
     }
     return url.toString();

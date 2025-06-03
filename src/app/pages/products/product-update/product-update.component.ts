@@ -40,39 +40,38 @@ export class ProductUpdateComponent {
   id = input.required<string>();
   product = rxResource({
     params: () => ({ id: this.id() }),
-    stream: ({ params: { id } }) => this.facadeService.productsService.getById(id),
+    stream: ({ params: { id } }) =>
+      this.facadeService.productsService.getById(id),
   });
-
 
   readonly isSubmitting = signal(false);
   readonly form: FormGroup = this.formBuilder.group({
-    nameEn: [null, [Validators.required, Validators.minLength(2)]],
-    nameAr: [null, [Validators.required, Validators.minLength(2)]],
-    metaTitleAr: [null, [Validators.required, Validators.minLength(2)]],
-    metaTitleEn: [null, [Validators.required, Validators.minLength(2)]],
-    metaDescriptionAr: [null, [Validators.required, Validators.minLength(2)]],
-    metaDescriptionEn: [null, [Validators.required, Validators.minLength(2)]],
-    metaKeywords: [null, [Validators.required, Validators.minLength(2)]],
-    slug: [null, [Validators.required, Validators.minLength(2)]],
-    slugAr: [null, [Validators.required, Validators.minLength(2)]],
-    oldPrice: [0, [Validators.required, Validators.min(0)]],
-    price: [0, [Validators.required, Validators.min(0)]],
-    inspiredProductId: [null, [Validators.required]],
-    categoriyId: [null, [Validators.required]],
-    sku: [null, [Validators.required, Validators.minLength(2)]],
-    colors: [[], [Validators.required]],
-    sizes: [[], [Validators.required]],
-    imageFiles: [[], [Validators.required]],
+    nameEn: [null, []],
+    nameAr: [null, []],
+    metaTitleAr: [null, []],
+    metaTitleEn: [null, []],
+    metaDescriptionAr: [null, []],
+    metaDescriptionEn: [null, []],
+    metaKeywords: [null, []],
+    slug: [null, []],
+    slugAr: [null, []],
+    oldPrice: [0, []],
+    price: [0, []],
+    inspiredProductId: [null, []],
+    categoriyId: [null, []],
+    sku: [null, []],
+    colors: [[], []],
+    sizes: [[], []],
+    imageFiles: [[], []],
+    thumbnailFile: [null, []],
 
     descriptionEn: [null],
     descriptionAr: [null],
-    categoryId: [null, [Validators.required]],
-    quantity: [0, [Validators.required, Validators.min(1)]],
+    categoryId: [null, []],
+    quantity: [0, [, Validators.min(1)]],
 
-    thumbnail: [null, [Validators.required]],
+    thumbnail: [null, []],
   });
-
-
 
   categories = rxResource({
     stream: () => this.facadeService.categoryService.get(),
@@ -104,7 +103,7 @@ export class ProductUpdateComponent {
           sku: productData.sku,
           colors: productData.colors || [],
           sizes: productData.sizes || [],
-          imageFiles: productData.images || [],
+          images: productData.images || [],
           descriptionEn: productData.descriptionEn,
           descriptionAr: productData.descriptionAr,
           quantity: productData.quantity,
@@ -119,8 +118,8 @@ export class ProductUpdateComponent {
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
       const results = await resizeImage(file);
-      this.form.patchValue({ thumbnail: results.base64 });
-      this.form.get('thumbnail')?.updateValueAndValidity();
+      this.form.patchValue({ thumbnailFile: results.base64 });
+      this.form.get('thumbnailFile')?.updateValueAndValidity();
     }
   }
 
@@ -133,7 +132,9 @@ export class ProductUpdateComponent {
 
   removeColor(name: string): void {
     const currentColors = this.form.get('colors')?.value || [];
-    const updatedColors = currentColors.filter((color: { name: string }) => color.name !== name);
+    const updatedColors = currentColors.filter(
+      (color: { name: string }) => color.name !== name
+    );
     this.form.patchValue({ colors: updatedColors });
     this.form.get('colors')?.updateValueAndValidity();
   }
@@ -155,8 +156,8 @@ export class ProductUpdateComponent {
   }
 
   removeThumbnail(): void {
-    this.form.patchValue({ thumbnail: '' });
-    this.form.get('thumbnail')?.updateValueAndValidity();
+    this.form.patchValue({ thumbnailFile: '' });
+    this.form.get('thumbnailFile')?.updateValueAndValidity();
   }
 
   async uploadImages(event: Event): Promise<void> {
@@ -164,7 +165,9 @@ export class ProductUpdateComponent {
     if (input.files && input.files.length > 0) {
       const files = Array.from(input.files);
       const resizedImages = await resizeImages(files);
-      this.form.patchValue({ imageFiles: resizedImages.map((img) => img.base64) });
+      this.form.patchValue({
+        imageFiles: resizedImages.map((img) => img.base64),
+      });
       this.form.get('imageFiles')?.updateValueAndValidity();
     }
   }
@@ -174,6 +177,18 @@ export class ProductUpdateComponent {
     currentImages.splice(index, 1);
     this.form.patchValue({ imageFiles: currentImages });
     this.form.get('imageFiles')?.updateValueAndValidity();
+  }
+
+  removeExistingImage(index: number): void {
+    const currentImages = this.form.get('images')?.value || [];
+    currentImages.splice(index, 1);
+    this.form.patchValue({ images: currentImages });
+    this.form.get('images')?.updateValueAndValidity();
+  }
+
+  removeExistingThumbnail(): void {
+    this.form.patchValue({ thumbnail: '' });
+    this.form.get('thumbnail')?.updateValueAndValidity();
   }
 
   async onSubmit(): Promise<void> {
@@ -207,7 +222,9 @@ export class ProductUpdateComponent {
     };
 
     try {
-      await firstValueFrom(this.facadeService.productsService.update(this.id(), payLoad));
+      await firstValueFrom(
+        this.facadeService.productsService.update(this.id(), payLoad)
+      );
       this.router.navigate([APP_ROUTES.PRODUCTS]);
     } catch (error) {
       console.error('Error updating product:', error);
