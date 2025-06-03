@@ -6,7 +6,7 @@ export enum APP_ROUTES {
   PRODUCT_UPDATE = `/products/update`,
 
   ORDERS = '/orders',
-  ORDER_DETAIL = '/orders',
+  ORDER_DETAILS = '/orders',
   ORDER_CREATE = '/orders/create',
   ORDER_UPDATE = '/orders/update',
 

@@ -27,6 +27,7 @@ export class OrdersComponent {
   private readonly router = inject(Router);
   routes = APP_ROUTES;
   statuses = OrderStatus;
+
   query = signal<OrderQuery>({
     page: 1,
     pageSize: 10,
@@ -36,15 +37,22 @@ export class OrdersComponent {
     showDeleted: true,
   });
 
-
   orders = rxResource({
     params: () => (this.query()),
     stream: ({ params }) => this.facadeService.ordersService.filter(params),
-  })
+  });
 
+  pageSettings = computed(() => {
+    const response = this.orders.value();
+    if (!response?.pagination) return null;
 
-
-  pageSettings = computed(() => this.orders.value()?.pagination);
+    return {
+      currentPage: response.pagination.page,
+      pageSize: response.pagination.pageSize,
+      totalCount: response.pagination.total,
+      totalPages: response.pagination.totalPages,
+    };
+  });
 
   updateQuery(newQuery: Partial<OrderQuery>) {
     this.query.set({
@@ -53,70 +61,60 @@ export class OrdersComponent {
     });
   }
 
-
   onPageChange(page: number) {
     this.updateQuery({ page });
   }
+
   onPageSizeChange(pageSize: number) {
     this.updateQuery({ pageSize, page: 1 });
   }
+
   onSearch(queryString: string) {
     this.updateQuery({ queryString, page: 1 });
   }
+
   onSortChange(sortBy: keyof Order, sortOrder: 'asc' | 'desc') {
     this.updateQuery({ sortBy, sortOrder, page: 1 });
   }
+
   onFilterChange(filter: Partial<OrderQuery>) {
     this.updateQuery({
       ...filter,
       page: 1,
     });
   }
+
   onResetFilters() {
     this.updateQuery({
       page: 1,
       pageSize: 10,
       queryString: '',
       status: undefined,
-
-
+      fromDate: undefined,
+      toDate: undefined,
       showDeleted: true,
       sortBy: undefined,
       sortOrder: undefined,
     });
   }
 
+  paginatedTo = computed(() => this.pageSettings()!.currentPage * this.pageSettings()!.pageSize, (this.pageSettings()?.totalCount ?? 0));
+
   async onDeleteOrder(orderId: string) {
     if (confirm('Are you sure you want to delete this order? This action cannot be undone.')) {
       await firstValueFrom(this.facadeService.ordersService.delete(orderId));
-      this.updateQuery({ page: 1 }); // Refresh the product list
+      this.updateQuery({ page: 1 }); // Refresh the order list
     }
   }
-  /**
-   *
-   * @param orderStatusUpdate {
-     productId: string; // ID of the product to be ordered
-     quantity?: number; // Quantity of the product to be ordered
-     size?: string | null; // Size of the product (optional)
-     color?: string | null; // Color of the product (optional)
-   }
-   */
+
   async setOrderStatus(orderStatusUpdate: OrderStatusUpdate) {
     if (!orderStatusUpdate.id) throw new Error('Order ID is required for status update');
-
 
     if (confirm(`Are you sure you want to set the order status to ${orderStatusUpdate.status}?`)) {
       const result = await firstValueFrom(this.facadeService.ordersService.updateStatus(orderStatusUpdate.id, orderStatusUpdate));
       this.orders.reload(); // Refresh the order list
     }
   }
-
-  // for update use [routerLink]="[routes.ODRDER_UPDATE, order.value()?.id]"
-  // for create use [routerLink]="routes..ODRDER_CREATE"
-  // for details use [routerLink]="[routes..ODRDER_DETAILS, order.value()?.id]"
-
-
-
 
   getStatusBadgeClass(status: string): string {
     switch (status.toLowerCase()) {
@@ -133,7 +131,7 @@ export class OrdersComponent {
       case OrderStatus.Cancelled:
         return 'badge-error';
       case OrderStatus.Confirmed:
-        return 'badge-success\\40';
+        return 'badge-success';
       case OrderStatus.Refunded:
         return 'badge-neutral';
       case OrderStatus.Returned:
@@ -142,10 +140,4 @@ export class OrdersComponent {
         return 'badge-neutral';
     }
   }
-
-
-  // currency is AED
-  // for date use the DatePipe in the template
-
-
 }

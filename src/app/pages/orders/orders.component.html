@@ -62,8 +62,8 @@
           <input
             type="date"
             class="input input-bordered"
-            [value]="query().startDate || ''"
-            (input)="onFilterChange({ startDate: $any($event.target).value || undefined })"
+            [value]="query().fromDate || ''"
+            (input)="onFilterChange({ fromDate: $any($event.target).value || undefined })"
           />
         </div>
 
@@ -74,8 +74,8 @@
           <input
             type="date"
             class="input input-bordered"
-            [value]="query().endDate || ''"
-            (input)="onFilterChange({ endDate: $any($event.target).value || undefined })"
+            [value]="query().toDate || ''"
+            (input)="onFilterChange({ toDate: $any($event.target).value || undefined })"
           />
         </div>
       </div>
@@ -84,27 +84,27 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
         <div class="form-control">
           <label class="label">
-            <span class="label-text">Min Amount (AED)</span>
+            <span class="label-text">User ID</span>
           </label>
           <input
-            type="number"
-            placeholder="0"
+            type="text"
+            placeholder="Filter by user ID"
             class="input input-bordered"
-            [value]="query().minAmount || ''"
-            (input)="onFilterChange({ minAmount: $any($event.target).value ? +$any($event.target).value : undefined })"
+            [value]="query().userId || ''"
+            (input)="onFilterChange({ userId: $any($event.target).value || undefined })"
           />
         </div>
 
         <div class="form-control">
           <label class="label">
-            <span class="label-text">Max Amount (AED)</span>
+            <span class="label-text">Address ID</span>
           </label>
           <input
-            type="number"
-            placeholder="10000"
+            type="text"
+            placeholder="Filter by address ID"
             class="input input-bordered"
-            [value]="query().maxAmount || ''"
-            (input)="onFilterChange({ maxAmount: $any($event.target).value ? +$any($event.target).value : undefined })"
+            [value]="query().addressId || ''"
+            (input)="onFilterChange({ addressId: $any($event.target).value || undefined })"
           />
         </div>
 
@@ -160,7 +160,7 @@
                     }
                   </button>
                 </th>
-                <th>Customer</th>
+                <th>Order Code</th>
                 <th>
                   <button
                     class="btn btn-ghost btn-xs"
@@ -175,10 +175,10 @@
                 <th>
                   <button
                     class="btn btn-ghost btn-xs"
-                    (click)="onSortChange('totalAmount', query().sortOrder === 'asc' ? 'desc' : 'asc')"
+                    (click)="onSortChange('totalPrice', query().sortOrder === 'asc' ? 'desc' : 'asc')"
                   >
-                    Amount
-                    @if (query().sortBy === 'totalAmount') {
+                    Total Price
+                    @if (query().sortBy === 'totalPrice') {
                       <span class="ml-1">{{ query().sortOrder === 'asc' ? '↑' : '↓' }}</span>
                     }
                   </button>
@@ -195,7 +195,7 @@
                     }
                   </button>
                 </th>
-                <th>Payment</th>
+                <th>User</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -204,25 +204,12 @@
                 <tr>
                   <td>
                     <div class="font-mono text-sm">
-                      #{{ order.id.slice(-8).toUpperCase() }}
+                      {{ order.id?.slice(-8)?.toUpperCase() || 'N/A' }}
                     </div>
                   </td>
                   <td>
-                    <div class="flex items-center gap-3">
-                      <div class="avatar placeholder">
-                        <div class="bg-neutral text-neutral-content w-12 rounded-full">
-                          <span class="text-xs">{{ order.customerName?.charAt(0) || 'G' }}</span>
-                        </div>
-                      </div>
-                      <div>
-                        <div class="font-bold">{{ order.customerName || 'Guest' }}</div>
-                        @if (order.customerEmail) {
-                          <div class="text-sm text-base-content/70">{{ order.customerEmail }}</div>
-                        }
-                        @if (order.customerPhone) {
-                          <div class="text-sm text-base-content/70">{{ order.customerPhone }}</div>
-                        }
-                      </div>
+                    <div class="font-medium">
+                      {{ order.orderCode || 'N/A' }}
                     </div>
                   </td>
                   <td>
@@ -231,27 +218,26 @@
                     </div>
                   </td>
                   <td>
-                    <div class="font-semibold">{{ order.totalAmount | currency:'AED':'symbol':'1.2-2' }}</div>
-                    @if (order.discountAmount && order.discountAmount > 0) {
-                      <div class="text-sm text-success">-{{ order.discountAmount | currency:'AED':'symbol':'1.2-2' }} discount</div>
-                    }
+                    <div class="font-semibold">
+                      {{ order.totalPrice | currency:'AED':'symbol':'1.2-2' }}
+                    </div>
                   </td>
                   <td>
                     <div class="text-sm">
-                      {{ order.orderItems?.length || 0 }} item(s)
+                      {{ order.items?.length || 0 }} item(s)
                     </div>
-                    @if (order.orderItems && order.orderItems.length > 0) {
+                    @if (order.items && order.items.length > 0) {
                       <div class="text-xs text-base-content/70">
-                        {{ order.orderItems[0].productName }}
-                        @if (order.orderItems.length > 1) {
-                          <span>+{{ order.orderItems.length - 1 }} more</span>
+                        Product ID: {{ order.items[0].productId }}
+                        @if (order.items.length > 1) {
+                          <span> +{{ order.items.length - 1 }} more</span>
                         }
                       </div>
                     }
                   </td>
                   <td>
                     <div class="dropdown dropdown-end">
-                      <div tabindex="0" role="button" class="badge {{ getStatusBadgeClass(order.status) }}">
+                      <div tabindex="0" role="button" class="badge {{ getStatusBadgeClass(order.status || '') }}">
                         {{ order.status }}
                       </div>
                       <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
@@ -268,15 +254,12 @@
                     </div>
                   </td>
                   <td>
-                    @if (order.paymentMethod) {
-                      <div class="badge badge-outline">{{ order.paymentMethod }}</div>
-                    }
-                    @if (order.paymentStatus) {
-                      <div class="text-xs mt-1"
-                           [class.text-success]="order.paymentStatus === 'paid'"
-                           [class.text-warning]="order.paymentStatus === 'pending'"
-                           [class.text-error]="order.paymentStatus === 'failed'">
-                        {{ order.paymentStatus }}
+                    <div class="text-sm">
+                      {{ order.userId || 'N/A' }}
+                    </div>
+                    @if (order.addressId) {
+                      <div class="text-xs text-base-content/70">
+                        Address: {{ order.addressId }}
                       </div>
                     }
                   </td>
@@ -304,7 +287,7 @@
                       <button
                         class="btn btn-ghost btn-sm text-error"
                         title="Delete Order"
-                        (click)="onDeleteOrder(order.id)"
+                        (click)="onDeleteOrder(order.id!)"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
