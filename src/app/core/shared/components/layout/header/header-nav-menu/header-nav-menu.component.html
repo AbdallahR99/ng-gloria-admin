@@ -11,25 +11,5 @@
     }
 
   </div>
-  <div class="flex flex-col  bg-neutral-content py-4 gap-4 ">
-    <div class="flex px-3 gap-2">
-      <a (click)="navigated.emit()" [routerLink]="appRoutes.AUTH_SIGNUP"
-        class="btn flex-1 border-2 btn-outline btn-primary shadow-none">
-        {{"Sign Up" | translate}}
-      </a>
-      <a (click)="navigated.emit()" [routerLink]="appRoutes.AUTH_LOGIN"
-        class="btn flex-1 btn-primary shadow-none text-white">
-        {{"Login" | translate}}
-      </a>
 
-    </div>
-    <div class="flex gap-3">
-      <a href="btn btn-link text-secondary">
-        <mat-icon svgIcon="fb" />
-        <mat-icon svgIcon="insta" />
-        <mat-icon svgIcon="whatsapp" />
-        <mat-icon svgIcon="linkedin" />
-      </a>
-    </div>
-  </div>
 </div>

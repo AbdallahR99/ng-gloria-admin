@@ -19,12 +19,9 @@ export class HeaderNavMenuComponent {
   navigated = output<void>();
   appRoutes = APP_ROUTES;
   navItems: { name: string; route: string }[] = [
-    { name: `Home`, route: APP_ROUTES.HOME },
-    { name: `Shop`, route: APP_ROUTES.PRODUCTS },
-    // { name: `Men's Perfume`, route: APP_ROUTES.MEN_PERFUME },
-    // { name: `Women's Perfume`, route: APP_ROUTES.WOMEN_PERFUME },
-    // { name: `Skin Care`, route: APP_ROUTES.SKIN_CARE },
-    // { name: `Hair Care`, route: APP_ROUTES.HAIR_CARE },
-    { name: `Services`, route: APP_ROUTES.Services },
+    { name: 'Products', route: APP_ROUTES.PRODUCTS },
+    { name: 'Inspired', route: APP_ROUTES.INSPIRED_PRODUCTS },
+    { name: 'Categories', route: APP_ROUTES.CATEGORIES },
+    { name: 'Orders', route: APP_ROUTES.ORDERS },
   ];
 }

@@ -46,9 +46,10 @@ export class HeaderComponent {
   menuCollapse = model(false);
   appRoutes = APP_ROUTES;
   navItems: { name: string; route: string }[] = [
-    { name: 'Home', route: APP_ROUTES.HOME },
-    { name: 'Shop', route: APP_ROUTES.PRODUCTS },
-    { name: 'Services', route: APP_ROUTES.Services },
+    { name: 'Products', route: APP_ROUTES.PRODUCTS },
+    { name: 'Inspired', route: APP_ROUTES.INSPIRED_PRODUCTS },
+    { name: 'Categories', route: APP_ROUTES.CATEGORIES },
+    { name: 'Orders', route: APP_ROUTES.ORDERS },
   ];
   setLang(lang: 'en' | 'ar') {
     this.TranslatorService.setCurrentLang(lang);
@@ -56,5 +57,5 @@ export class HeaderComponent {
   toggleLanguage() {
     this.setLang(this.isEn ? 'ar' : 'en');
   }
-  logout() {}
+  logout() { }
 }
