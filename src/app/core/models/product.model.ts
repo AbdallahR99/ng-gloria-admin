@@ -54,7 +54,8 @@ export interface Product {
   cartQuantity?: number; // Quantity of the product in the user's cart
 }
 
-export interface ProductCreateOrUpdate extends Product {
+export interface ProductCreateOrUpdate extends Partial<Product> {
+
   imagesFiles?: string[]; // Array of image file paths for upload
   thumbnailFile?: string; // Path to the thumbnail image file for upload
   categorySlug?: string; // Slug for category filtering

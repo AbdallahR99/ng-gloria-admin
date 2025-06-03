@@ -1,1 +1,254 @@
-<p>product-details works!</p>,
+<div class="container mx-auto p-4">
+  @if (product.isLoading()) {
+    <div class="flex justify-center items-center min-h-96">
+      <span class="loading loading-spinner loading-lg"></span>
+    </div>
+  }
+
+  @if (product.error()) {
+    <div class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <span>Error loading product: {{ product.error()?.message }}</span>
+    </div>
+  }
+
+  @if (product.value(); as productValue) {
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Product Images -->
+      <div class="space-y-4">
+        <div class="card bg-base-100 shadow-xl">
+          <figure class="px-4 pt-4">
+            <img
+              [src]="productValue.thumbnail || 'https://picsum.photos/400/400'"
+              [alt]="productValue.nameEn"
+              class="rounded-xl object-cover w-full h-96"
+            />
+          </figure>
+        </div>
+
+        @if (productValue.images && productValue.images.length > 0) {
+          <div class="carousel carousel-center max-w-full space-x-4 p-4">
+            @for (image of productValue.images; track $index) {
+              <div class="carousel-item">
+                <img
+                  [src]="image"
+                  [alt]="productValue.nameEn"
+                  class="rounded-box w-24 h-24 object-cover cursor-pointer hover:opacity-80"
+                />
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Product Info -->
+      <div class="space-y-6">
+        <!-- Header -->
+        <div>
+          <div class="breadcrumbs text-sm">
+            <ul>
+              <li><a class="link link-hover">Products</a></li>
+              <li>{{ productValue.category?.nameEn || 'Category' }}</li>
+              <li>{{ productValue.nameEn }}</li>
+            </ul>
+          </div>
+
+          <h1 class="text-3xl font-bold">{{ productValue.nameEn }}</h1>
+
+          @if (productValue.nameAr) {
+            <p class="text-lg text-base-content/70">{{ productValue.nameAr }}</p>
+          }
+
+          @if (productValue.inspiredBy) {
+            <div class="mt-2">
+              <span class="text-sm text-base-content/60">Inspired by: </span>
+              <span class="text-sm font-medium">{{ productValue.inspiredBy.nameEn }}</span>
+            </div>
+          }
+        </div>
+
+        <!-- Price & Status -->
+        <div class="card bg-base-200 p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              @if (productValue.oldPrice && productValue.oldPrice > productValue.price) {
+                <span class="text-2xl font-bold text-error">${{ productValue.price }}</span>
+                <span class="text-lg line-through text-base-content/50 ml-2">${{ productValue.oldPrice }}</span>
+                <div class="badge badge-error ml-2">
+                  {{ ((productValue.oldPrice - productValue.price) / productValue.oldPrice * 100).toFixed(0) }}% OFF
+                </div>
+              } @else {
+                <span class="text-2xl font-bold">${{ productValue.price }}</span>
+              }
+            </div>
+
+            <div class="flex flex-col items-end gap-2">
+              @if (productValue.isBanned) {
+                <div class="badge badge-error">Banned</div>
+              } @else if (productValue.isDeleted) {
+                <div class="badge badge-warning">Deleted</div>
+              } @else {
+                <div class="badge badge-success">Active</div>
+              }
+
+              <div class="text-sm">
+                Stock: <span class="font-semibold">{{ productValue.quantity }}</span>
+              </div>
+
+              @if (productValue.stars > 0) {
+                <div class="flex items-center gap-1 text-sm">
+                  <div class="rating rating-sm">
+                    @for (star of [1,2,3,4,5]; track star) {
+                      <span class="mask mask-star"
+                            [class]="star <= productValue.stars ? 'bg-warning' : 'bg-base-300'"></span>
+                    }
+                  </div>
+                  <span>({{ productValue.reviews }} reviews)</span>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        @if (productValue.descriptionEn) {
+          <div class="card bg-base-100 shadow">
+            <div class="card-body">
+              <h3 class="card-title">Description</h3>
+              <p class="text-base-content/80">{{ productValue.descriptionEn }}</p>
+              @if (productValue.descriptionAr) {
+                <div class="divider"></div>
+                <p class="text-base-content/80" dir="rtl">{{ productValue.descriptionAr }}</p>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Product Details -->
+        <div class="card bg-base-100 shadow">
+          <div class="card-body">
+            <h3 class="card-title">Product Details</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              @if (productValue.sku) {
+                <div>
+                  <span class="font-semibold">SKU:</span>
+                  <span class="ml-2">{{ productValue.sku }}</span>
+                </div>
+              }
+
+              @if (productValue.slug) {
+                <div>
+                  <span class="font-semibold">Slug:</span>
+                  <span class="ml-2">{{ productValue.slug }}</span>
+                </div>
+              }
+
+              @if (productValue.categoryId) {
+                <div>
+                  <span class="font-semibold">Category ID:</span>
+                  <span class="ml-2">{{ productValue.categoryId }}</span>
+                </div>
+              }
+
+              @if (productValue.createdAt) {
+                <div>
+                  <span class="font-semibold">Created:</span>
+                  <span class="ml-2">{{ productValue.createdAt | date:'medium' }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Sizes & Colors -->
+        @if (productValue.sizes || productValue.colors) {
+          <div class="card bg-base-100 shadow">
+            <div class="card-body">
+              <h3 class="card-title">Variants</h3>
+
+              @if (productValue.sizes && productValue.sizes.length > 0) {
+                <div class="space-y-2">
+                  <h4 class="font-semibold">Available Sizes</h4>
+                  <div class="flex flex-wrap gap-2">
+                    @for (size of productValue.sizes; track size) {
+                      <div class="badge badge-outline">{{ size }}</div>
+                    }
+                  </div>
+                </div>
+              }
+
+              @if (productValue.colors && productValue.colors.length > 0) {
+                <div class="space-y-2">
+                  <h4 class="font-semibold">Available Colors</h4>
+                  <div class="flex flex-wrap gap-2">
+                    @for (color of productValue.colors; track color.name) {
+                      <div class="flex items-center gap-2 badge badge-outline">
+                        <div class="w-3 h-3 rounded-full border" [style.background-color]="color.hex"></div>
+                        {{ color.name }}
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Keywords/Tags -->
+        @if (productValue.keywords && productValue.keywords.length > 0) {
+          <div class="card bg-base-100 shadow">
+            <div class="card-body">
+              <h3 class="card-title">Keywords</h3>
+              <div class="flex flex-wrap gap-2">
+                @for (keyword of productValue.keywords; track keyword) {
+                  <div class="badge badge-outline">{{ keyword }}</div>
+                }
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Inspired By Details -->
+        @if (productValue.inspiredBy) {
+          <div class="card bg-base-100 shadow">
+            <div class="card-body">
+              <h3 class="card-title">Inspired By</h3>
+              <div class="flex gap-4">
+                @if (productValue.inspiredBy.image) {
+                  <img [src]="productValue.inspiredBy.image"
+                       [alt]="productValue.inspiredBy.nameEn"
+                       class="w-16 h-16 object-cover rounded-lg">
+                }
+                <div class="flex-1">
+                  <h4 class="font-semibold">{{ productValue.inspiredBy.nameEn }}</h4>
+                  @if (productValue.inspiredBy.nameAr) {
+                    <p class="text-sm text-base-content/70" dir="rtl">{{ productValue.inspiredBy.nameAr }}</p>
+                  }
+                  <p class="text-sm text-base-content/60 mt-1">{{ productValue.inspiredBy.descriptionEn }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Actions -->
+        <div class="card-actions justify-end pt-4">
+          <button class="btn btn-outline">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            Edit Product
+          </button>
+          <button class="btn btn-error btn-outline">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

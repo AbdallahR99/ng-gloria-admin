@@ -1,14 +1,19 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   inject,
   signal,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { SHARED_MODULES } from '@app/core/shared/modules/shared.module';
 import { OrdersService } from '@app/core/services/repository/orders.service';
-import type { Order } from '@app/core/models/order.model';
+import { OrderQuery, Order, OrderStatusUpdate } from '@app/core/models/order.model';
+import { FacadeService } from '@app/core/services/facade-service.service';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { firstValueFrom } from 'rxjs';
 import { APP_ROUTES } from '@app/core/constants/app-routes.enum';
+import { OrderStatus } from '@app/core/constants/order-status.enum';
 
 @Component({
   selector: 'app-orders',
@@ -18,87 +23,129 @@ import { APP_ROUTES } from '@app/core/constants/app-routes.enum';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrdersComponent {
-  private readonly ordersService = inject(OrdersService);
+  private readonly facadeService = inject(FacadeService);
   private readonly router = inject(Router);
+  routes = APP_ROUTES;
+  statuses = OrderStatus;
+  query = signal<OrderQuery>({
+    page: 1,
+    pageSize: 10,
+    sortBy: undefined,
+    sortOrder: undefined,
+    status: undefined,
+    showDeleted: true,
+  });
 
-  readonly orders = signal<Order[]>([]);
-  readonly loading = signal(false);
-  readonly error = signal<string | null>(null);
 
-  ngOnInit() {
-    this.loadOrders();
-  }
+  orders = rxResource({
+    params: () => (this.query()),
+    stream: ({ params }) => this.facadeService.ordersService.filter(params),
+  })
 
-  loadOrders() {
-    this.loading.set(true);
-    this.error.set(null);
 
-    this.ordersService.list().subscribe({
-      next: (orders) => {
-        this.orders.set(orders);
-        this.loading.set(false);
-      },
-      error: (error) => {
-        this.error.set('Failed to load orders');
-        console.error('Error loading orders:', error);
-        this.loading.set(false);
-      },
+
+  pageSettings = computed(() => this.orders.value()?.pagination);
+
+  updateQuery(newQuery: Partial<OrderQuery>) {
+    this.query.set({
+      ...this.query(),
+      ...newQuery,
     });
   }
 
-  navigateToOrder(orderId: string) {
-    this.router.navigate([APP_ROUTES.ORDERS, orderId]);
+
+  onPageChange(page: number) {
+    this.updateQuery({ page });
+  }
+  onPageSizeChange(pageSize: number) {
+    this.updateQuery({ pageSize, page: 1 });
+  }
+  onSearch(queryString: string) {
+    this.updateQuery({ queryString, page: 1 });
+  }
+  onSortChange(sortBy: keyof Order, sortOrder: 'asc' | 'desc') {
+    this.updateQuery({ sortBy, sortOrder, page: 1 });
+  }
+  onFilterChange(filter: Partial<OrderQuery>) {
+    this.updateQuery({
+      ...filter,
+      page: 1,
+    });
+  }
+  onResetFilters() {
+    this.updateQuery({
+      page: 1,
+      pageSize: 10,
+      queryString: '',
+      status: undefined,
+
+
+      showDeleted: true,
+      sortBy: undefined,
+      sortOrder: undefined,
+    });
   }
 
-  navigateToCreate() {
-    this.router.navigate([APP_ROUTES.ORDERS, 'create']);
-  }
-
-  navigateToUpdate(orderId: string) {
-    this.router.navigate([APP_ROUTES.ORDERS, 'update', orderId]);
-  }
-
-  deleteOrder(orderId: string) {
-    if (!confirm('Are you sure you want to delete this order?')) {
-      return;
+  async onDeleteOrder(orderId: string) {
+    if (confirm('Are you sure you want to delete this order? This action cannot be undone.')) {
+      await firstValueFrom(this.facadeService.ordersService.delete(orderId));
+      this.updateQuery({ page: 1 }); // Refresh the product list
     }
-
-    this.ordersService.delete(orderId).subscribe({
-      next: () => {
-        this.loadOrders(); // Reload the list
-      },
-      error: (error) => {
-        this.error.set('Failed to delete order');
-        console.error('Error deleting order:', error);
-      },
-    });
   }
+  /**
+   *
+   * @param orderStatusUpdate {
+     productId: string; // ID of the product to be ordered
+     quantity?: number; // Quantity of the product to be ordered
+     size?: string | null; // Size of the product (optional)
+     color?: string | null; // Color of the product (optional)
+   }
+   */
+  async setOrderStatus(orderStatusUpdate: OrderStatusUpdate) {
+    if (!orderStatusUpdate.id) throw new Error('Order ID is required for status update');
+
+
+    if (confirm(`Are you sure you want to set the order status to ${orderStatusUpdate.status}?`)) {
+      const result = await firstValueFrom(this.facadeService.ordersService.updateStatus(orderStatusUpdate.id, orderStatusUpdate));
+      this.orders.reload(); // Refresh the order list
+    }
+  }
+
+  // for update use [routerLink]="[routes.ODRDER_UPDATE, order.value()?.id]"
+  // for create use [routerLink]="routes..ODRDER_CREATE"
+  // for details use [routerLink]="[routes..ODRDER_DETAILS, order.value()?.id]"
+
+
+
 
   getStatusBadgeClass(status: string): string {
     switch (status.toLowerCase()) {
-      case 'pending':
+      case OrderStatus.Pending:
         return 'badge-warning';
-      case 'processing':
+      case OrderStatus.Processing:
         return 'badge-info';
-      case 'shipped':
+      case OrderStatus.Shipped:
         return 'badge-primary';
-      case 'delivered':
+      case OrderStatus.Delivered:
         return 'badge-success';
-      case 'cancelled':
+      case OrderStatus.Failed:
         return 'badge-error';
+      case OrderStatus.Cancelled:
+        return 'badge-error';
+      case OrderStatus.Confirmed:
+        return 'badge-success\\40';
+      case OrderStatus.Refunded:
+        return 'badge-neutral';
+      case OrderStatus.Returned:
+        return 'badge-neutral';
       default:
         return 'badge-neutral';
     }
   }
 
-  formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount);
-  }
 
-  formatDate(date: string): string {
-    return new Date(date).toLocaleDateString();
-  }
+  // currency is AED
+  // for date use the DatePipe in the template
+
+
 }

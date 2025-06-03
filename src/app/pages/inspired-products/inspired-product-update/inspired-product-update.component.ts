@@ -1,23 +1,15 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  inject,
-  input,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input, signal } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { rxResource } from '@angular/core/rxjs-interop';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { firstValueFrom } from 'rxjs';
+import { APP_ROUTES } from '@app/core/constants/app-routes.enum';
+import { InspiredProductCreateOrUpdate } from '@app/core/models/inspired-product.model';
+import { ProductCreateOrUpdate } from '@app/core/models/product.model';
+import { FacadeService } from '@app/core/services/facade-service.service';
 import { SHARED_MODULES } from '@app/core/shared/modules/shared.module';
-import { InspiredProductsService } from '@app/core/services/repository/inspired-products.service';
-import {
-  InspiredProduct,
-  InspiredProductCreateOrUpdate,
-} from '@app/core/models/inspired-product.model';
+import { resizeImage, resizeImages } from '@app/core/utils/image-resizer';
+import { firstValueFrom } from 'rxjs';
+
 
 @Component({
   selector: 'app-inspired-product-update',
@@ -27,244 +19,107 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InspiredProductUpdateComponent {
-  private readonly fb = inject(FormBuilder);
-  private readonly inspiredProductsService = inject(InspiredProductsService);
+  private readonly facadeService = inject(FacadeService);
+  private readonly formBuilder = inject(FormBuilder);
   private readonly router = inject(Router);
 
-  // Input signal for product ID from route
-  readonly id = input.required<string>();
+  routes = APP_ROUTES;
+  id = input.required<string>();
+  inspiredProduct = rxResource({
+    params: () => ({ id: this.id() }),
+    stream: ({ params: { id } }) => this.facadeService.inspiredProductsService.getById(id),
 
-  // Form for product data
-  readonly productForm: FormGroup = this.fb.group({
-    nameEn: [
-      '',
-      [Validators.required, Validators.minLength(2), Validators.maxLength(100)],
-    ],
-    nameAr: [
-      '',
-      [Validators.required, Validators.minLength(2), Validators.maxLength(100)],
-    ],
-    descriptionEn: ['', [Validators.maxLength(1000)]],
-    descriptionAr: ['', [Validators.maxLength(1000)]],
-    imagePath: [''],
-    isActive: [true, [Validators.required]],
   });
 
-  // Signals for component state
+
   readonly isSubmitting = signal(false);
-  readonly imagePreview = signal<string | null>(null);
-  readonly uploadError = signal<string | null>(null);
-  readonly showSuccessToast = signal(false);
+  readonly form: FormGroup = this.formBuilder.group({
+    nameEn: [null, [Validators.required, Validators.minLength(2)]],
+    nameAr: [null, [Validators.required, Validators.minLength(2)]],
+    descriptionEn: [null, [Validators.required, Validators.minLength(2)]],
+    descriptionAr: [null, [Validators.required, Validators.minLength(2)]],
+    metaTitleEn: [null, [Validators.required, Validators.minLength(2)]],
+    metaTitleAr: [null, [Validators.required, Validators.minLength(2)]],
+    metaDescriptionEn: [null, [Validators.required, Validators.minLength(2)]],
+    metaDescriptionAr: [null, [Validators.required, Validators.minLength(2)]],
+    imageFile: [null, [Validators.required]],
 
-  // Resource for fetching product details
-  readonly productResource = rxResource({
-    request: this.id,
-    loader: ({ request: id }) =>
-      this.inspiredProductsService.getById(id).pipe(takeUntilDestroyed()),
   });
 
-  // Computed properties for template
-  readonly product = computed(() => this.productResource.value());
-  readonly loading = computed(() => this.productResource.isLoading());
-  readonly error = computed(() => this.productResource.error());
+
 
   constructor() {
-    // Effect to populate form when product loads
+    // Effect to populate form when product data loads
     effect(() => {
-      const product = this.product();
-      if (product) {
-        this.populateForm(product);
+      const productData = this.inspiredProduct.value();
+      if (productData) {
+        this.form.patchValue({
+          nameEn: productData.nameEn,
+          nameAr: productData.nameAr,
+          descriptionEn: productData.descriptionEn,
+          descriptionAr: productData.descriptionAr,
+          metaTitleEn: productData.metaTitleEn,
+          metaTitleAr: productData.metaTitleAr,
+          metaDescriptionEn: productData.metaDescriptionEn,
+          metaDescriptionAr: productData.metaDescriptionAr,
+        });
       }
     });
   }
 
-  /**
-   * Populate form with product data
-   */
-  private populateForm(product: InspiredProduct): void {
-    this.productForm.patchValue({
-      nameEn: product.nameEn || '',
-      nameAr: product.nameAr || '',
-      descriptionEn: product.descriptionEn || '',
-      descriptionAr: product.descriptionAr || '',
-      imagePath: product.imagePath || '',
-      isActive: product.isActive ?? true,
-    });
-
-    // Set image preview if exists
-    if (product.imagePath) {
-      this.imagePreview.set(this.getImageUrl(product.imagePath));
-    }
-  }
-
-  /**
-   * Handle file selection for image upload
-   */
-  async onFileSelected(event: Event): Promise<void> {
+  async uploadThumbnail(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-
-    if (!file) return;
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      this.uploadError.set('Please select a valid image file');
-      return;
-    }
-
-    // Validate file size (5MB limit)
-    if (file.size > 5 * 1024 * 1024) {
-      this.uploadError.set('Image size must be less than 5MB');
-      return;
-    }
-
-    try {
-      this.uploadError.set(null);
-
-      // Convert to base64 for preview
-      const base64 = await this.fileToBase64(file);
-      this.imagePreview.set(base64);
-
-      // Update form with base64 data
-      this.productForm.patchValue({ imagePath: base64 });
-    } catch (error) {
-      console.error('Error processing image:', error);
-      this.uploadError.set('Error processing image. Please try again.');
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      const results = await resizeImage(file);
+      this.form.patchValue({ imageFile: results.base64 });
+      this.form.get('imageFile')?.updateValueAndValidity();
     }
   }
 
-  /**
-   * Convert file to base64
-   */
-  private fileToBase64(file: File): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
+
+
+  removeThumbnail(): void {
+    this.form.patchValue({ imageFile: null });
+    this.form.get('imageFile')?.updateValueAndValidity();
   }
 
-  /**
-   * Remove selected image
-   */
-  removeImage(): void {
-    this.imagePreview.set(null);
-    this.uploadError.set(null);
-    this.productForm.patchValue({ imagePath: '' });
 
-    // Clear file input
-    const fileInput = document.querySelector(
-      'input[type="file"]'
-    ) as HTMLInputElement;
-    if (fileInput) {
-      fileInput.value = '';
-    }
-  }
 
-  /**
-   * Submit form to update product
-   */
+
   async onSubmit(): Promise<void> {
-    if (this.productForm.invalid || this.isSubmitting()) {
-      this.markFormGroupTouched();
-      return;
-    }
-
-    const product = this.product();
-    if (!product) return;
+    if (this.form.invalid) return;
 
     this.isSubmitting.set(true);
-    this.uploadError.set(null);
+    const payLoad: InspiredProductCreateOrUpdate = {
+
+      nameEn: this.form.value.nameEn,
+      nameAr: this.form.value.nameAr,
+      descriptionEn: this.form.value.descriptionEn,
+      descriptionAr: this.form.value.descriptionAr,
+      metaTitleEn: this.form.value.metaTitleEn,
+      metaTitleAr: this.form.value.metaTitleAr,
+      metaDescriptionEn: this.form.value.metaDescriptionEn,
+      metaDescriptionAr: this.form.value.metaDescriptionAr,
+      imageFile: this.form.value.imageFile, // base64 image
+      id: this.id(), // Include the ID for update
+      // Note: No need to include isDeleted, createdAt, updatedAt, deletedAt, createdBy, updatedBy as they are managed by the backend
+
+    };
 
     try {
-      const formData: InspiredProductCreateOrUpdate = this.productForm.value;
-
-      await firstValueFrom(
-        this.inspiredProductsService
-          .update(product.id, formData)
-          .pipe(takeUntilDestroyed())
-      );
-
-      this.showSuccessToast.set(true);
-      setTimeout(() => this.showSuccessToast.set(false), 3000);
-
-      // Navigate back to details
-      await this.router.navigate(['/inspired-products', product.id]);
+      await firstValueFrom(this.facadeService.inspiredProductsService.update(this.id(), payLoad));
+      this.router.navigate([APP_ROUTES.INSPIRED_PRODUCTS]);
     } catch (error) {
       console.error('Error updating product:', error);
-      this.uploadError.set('Error updating product. Please try again.');
+      alert('Failed to update product. Please try again.');
     } finally {
       this.isSubmitting.set(false);
     }
   }
 
-  /**
-   * Mark all form fields as touched to show validation errors
-   */
-  private markFormGroupTouched(): void {
-    Object.keys(this.productForm.controls).forEach((key) => {
-      const control = this.productForm.get(key);
-      control?.markAsTouched();
-    });
+  onCancel(): void {
+    this.router.navigate([APP_ROUTES.INSPIRED_PRODUCTS]);
   }
 
-  /**
-   * Navigate back to product details
-   */
-  goBack(): void {
-    const productId = this.id();
-    if (productId) {
-      this.router.navigate(['/inspired-products', productId]);
-    } else {
-      this.router.navigate(['/inspired-products']);
-    }
-  }
-
-  /**
-   * Navigate to products list
-   */
-  goToList(): void {
-    this.router.navigate(['/inspired-products']);
-  }
-
-  /**
-   * Get full image URL
-   */
-  getImageUrl(imagePath: string | null): string {
-    if (!imagePath) return 'https://picsum.photos/400/300';
-    return imagePath.startsWith('http')
-      ? imagePath
-      : `assets/images/${imagePath}`;
-  }
-
-  /**
-   * Check if form field has error
-   */
-  hasError(fieldName: string, errorType?: string): boolean {
-    const field = this.productForm.get(fieldName);
-    if (!field) return false;
-
-    if (errorType) {
-      return field.hasError(errorType) && (field.dirty || field.touched);
-    }
-    return field.invalid && (field.dirty || field.touched);
-  }
-
-  /**
-   * Get error message for form field
-   */
-  getErrorMessage(fieldName: string): string {
-    const field = this.productForm.get(fieldName);
-    if (!field || !field.errors) return '';
-
-    const errors = field.errors;
-    if (errors['required']) return `${fieldName} is required`;
-    if (errors['minlength'])
-      return `${fieldName} must be at least ${errors['minlength'].requiredLength} characters`;
-    if (errors['maxlength'])
-      return `${fieldName} must be no more than ${errors['maxlength'].requiredLength} characters`;
-
-    return 'Invalid value';
-  }
 }

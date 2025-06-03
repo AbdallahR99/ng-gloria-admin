@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal, effect } from '@angular/core';
+import { Component, computed, inject, model, effect } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -24,15 +24,15 @@ export class InspiredProductsComponent {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
 
-  // Signals for component state
-  readonly currentPage = signal(1);
-  readonly pageSize = signal(10);
-  readonly sortBy = signal<keyof InspiredProduct>('createdAt');
-  readonly sortOrder = signal<'asc' | 'desc'>('desc');
-  readonly searchQuery = signal('');
-  readonly selectedProducts = signal<string[]>([]);
-  readonly isDeleting = signal(false);
-  readonly showDeleted = signal(false);
+  // State variables using model
+  readonly currentPage = model(1);
+  readonly pageSize = model(10);
+  readonly sortBy = model<keyof InspiredProduct>('createdAt');
+  readonly sortOrder = model<'asc' | 'desc'>('desc');
+  readonly searchQuery = model('');
+  readonly selectedProducts = model<string[]>([]);
+  readonly isDeleting = model(false);
+  readonly showDeleted = model(false);
 
   // Search form
   readonly searchForm = this.fb.group({

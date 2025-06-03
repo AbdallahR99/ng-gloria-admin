@@ -1,10 +1,32 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  input,
+} from '@angular/core';
+import { ProductsService } from '@core/services/repository/products.service';
+import { Product } from '@core/models/product.model';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { SHARED_MODULES } from '@app/core/shared/modules/shared.module';
 
 @Component({
   selector: 'app-product-details',
-  imports: [],
+  imports: [SHARED_MODULES],
   templateUrl: './product-details.component.html',
-  styleUrl: './product-details.component.scss',
+  styleUrls: ['./product-details.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProductDetailsComponent {}
+export class ProductDetailsComponent {
+  private readonly productsService = inject(ProductsService);
+
+  id = input.required<string>();
+
+  product = rxResource({
+    params: () => ({ id: this.id() }),
+    stream: ({ params: { id } }) => this.productsService.getById(id),
+  });
+
+  
+
+
+}

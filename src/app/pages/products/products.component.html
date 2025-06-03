@@ -1,626 +1,391 @@
-<div class="container mx-auto p-6">
-  <!-- Header -->
-  <div
-    class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6"
-  >
+<div class="container mx-auto p-4 space-y-6">
+  <!-- Header Section -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
     <div>
       <h1 class="text-3xl font-bold">Products Management</h1>
       <p class="text-base-content/70 mt-1">Manage your product catalog</p>
     </div>
-    <div class="flex gap-2">
-      <button
-        class="btn btn-outline btn-sm"
-        (click)="onToggleDeleted()"
-        [class.btn-active]="showDeleted()"
-      >
-        @if (showDeleted()) { Show Active } @else { Show Deleted }
-      </button>
-      <button class="btn btn-primary" (click)="onCreateProduct()">
-        <svg
-          class="w-4 h-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 4v16m8-8H4"
-          />
-        </svg>
-        Add Product
-      </button>
-    </div>
+    <a [routerLink]="routes.PRODUCT_CREATE" class="btn btn-primary">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+      </svg>
+      Add Product
+    </a>
   </div>
 
   <!-- Search and Filters -->
-  <div class="card bg-base-100 shadow-sm mb-6">
+  <div class="card bg-base-100 shadow">
     <div class="card-body">
-      <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="space-y-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <!-- Search Input -->
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text">Search Products</span>
-            </label>
-            <input
-              type="text"
-              placeholder="Search by name, SKU, or description..."
-              class="input input-bordered"
-              formControlName="search"
-            />
-          </div>
-
-          <!-- Category Filter -->
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text">Category</span>
-            </label>
-            <select class="select select-bordered" formControlName="categoryId">
-              <option value="">All Categories</option>
-              @for (category of categories(); track category.id) {
-              <option [value]="category.id">{{ category.nameEn }}</option>
-              }
-            </select>
-          </div>
-
-          <!-- Min Price -->
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text">Min Price ($)</span>
-            </label>
-            <input
-              type="number"
-              placeholder="0.00"
-              class="input input-bordered"
-              formControlName="minPrice"
-              min="0"
-              step="0.01"
-            />
-          </div>
-
-          <!-- Max Price -->
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text">Max Price ($)</span>
-            </label>
-            <input
-              type="number"
-              placeholder="999.99"
-              class="input input-bordered"
-              formControlName="maxPrice"
-              min="0"
-              step="0.01"
-            />
-          </div>
-        </div>
-
-        <div class="flex gap-2">
-          <button type="submit" class="btn btn-primary">
-            <svg
-              class="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-            Search
-          </button>
-          <button type="button" class="btn btn-ghost" (click)="onClearSearch()">
-            Clear
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Bulk Actions -->
-  @if (hasSelection()) {
-  <div class="alert alert-info mb-4">
-    <div class="flex-1">
-      <span>{{ selectedProducts().length }} product(s) selected</span>
-    </div>
-    <div class="flex gap-2">
-      <button
-        class="btn btn-error btn-sm"
-        (click)="onBulkDelete()"
-        [class.loading]="isDeleting()"
-      >
-        @if (isDeleting()) {
-        <span class="loading loading-spinner loading-xs"></span>
-        } @else {
-        <svg
-          class="w-4 h-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Search -->
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Search Products</span>
+          </label>
+          <input
+            type="text"
+            placeholder="Search by name, SKU..."
+            class="input input-bordered"
+            [value]="query().queryString || ''"
+            (input)="onSearch($any($event.target).value)"
           />
-        </svg>
-        } Delete Selected
-      </button>
+        </div>
+
+        <!-- Category Filter -->
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Category</span>
+          </label>
+          <select
+            class="select select-bordered"
+            [value]="query().categoryId || ''"
+            (change)="onFilterChange({ categoryId: $any($event.target).value || undefined })"
+          >
+            <option value="">All Categories</option>
+            <!-- Add category options here when categories are loaded -->
+          </select>
+        </div>
+
+        <!-- Price Range -->
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Min Price</span>
+          </label>
+          <input
+            type="number"
+            placeholder="0"
+            class="input input-bordered"
+            [value]="query().minPrice || ''"
+            (input)="onFilterChange({ minPrice: $any($event.target).value ? +$any($event.target).value : undefined })"
+          />
+        </div>
+
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Max Price</span>
+          </label>
+          <input
+            type="number"
+            placeholder="1000"
+            class="input input-bordered"
+            [value]="query().maxPrice || ''"
+            (input)="onFilterChange({ maxPrice: $any($event.target).value ? +$any($event.target).value : undefined })"
+          />
+        </div>
+      </div>
+
+      <!-- Additional Filters Row -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Size</span>
+          </label>
+          <input
+            type="text"
+            placeholder="S, M, L, XL..."
+            class="input input-bordered"
+            [value]="query().size || ''"
+            (input)="onFilterChange({ size: $any($event.target).value || undefined })"
+          />
+        </div>
+
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Color</span>
+          </label>
+          <input
+            type="text"
+            placeholder="Red, Blue, Green..."
+            class="input input-bordered"
+            [value]="query().color || ''"
+            (input)="onFilterChange({ color: $any($event.target).value || undefined })"
+          />
+        </div>
+
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Show Deleted</span>
+          </label>
+          <input
+            type="checkbox"
+            class="toggle toggle-primary"
+            [checked]="query().showDeleted || false"
+            (change)="onFilterChange({ showDeleted: $any($event.target).checked })"
+          />
+        </div>
+      </div>
+
+      <!-- Filter Actions -->
+      <div class="card-actions justify-end mt-4">
+        <button class="btn btn-ghost" (click)="onResetFilters()">
+          Reset Filters
+        </button>
+      </div>
     </div>
   </div>
-  }
 
   <!-- Products Table -->
-  <div class="card bg-base-100 shadow-sm">
+  <div class="card bg-base-100 shadow">
     <div class="card-body p-0">
-      <!-- Loading State -->
-      @if (isLoading()) {
-      <div class="flex justify-center items-center p-12">
-        <span class="loading loading-spinner loading-lg"></span>
-      </div>
-      }
-
-      <!-- Error State -->
-      @else if (error()) {
-      <div class="alert alert-error m-6">
-        <svg
-          class="w-6 h-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-        <span>Error loading products: {{ error()?.message }}</span>
-      </div>
-      }
-
-      <!-- Empty State -->
-      @else if (!hasProducts()) {
-      <div class="text-center p-12">
-        <svg
-          class="w-16 h-16 mx-auto text-base-content/30 mb-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-          />
-        </svg>
-        <h3 class="text-lg font-semibold mb-2">No Products Found</h3>
-        <p class="text-base-content/70 mb-4">
-          @if (searchQuery() || selectedCategoryId() || minPrice() ||
-          maxPrice()) { Try adjusting your search criteria or filters. } @else {
-          Start by creating your first product. }
-        </p>
-        @if (!searchQuery() && !selectedCategoryId() && !minPrice() &&
-        !maxPrice()) {
-        <button class="btn btn-primary" (click)="onCreateProduct()">
-          Create First Product
-        </button>
-        }
-      </div>
-      }
-
-      <!-- Products Table -->
-      @else {
-      <div class="overflow-x-auto">
-        <table class="table table-zebra">
-          <thead>
-            <tr>
-              <th>
-                <input
-                  type="checkbox"
-                  class="checkbox"
-                  [checked]="allSelected()"
-                  (change)="onSelectAll()"
-                />
-              </th>
-              <th>Product</th>
-              <th
-                class="cursor-pointer hover:bg-base-200"
-                (click)="onSort('nameEn')"
-              >
-                <div class="flex items-center gap-1">
-                  Name @if (sortBy() === 'nameEn') {
-                  <svg
-                    class="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+      @if (products.isLoading()) {
+        <div class="flex justify-center items-center py-12">
+          <span class="loading loading-spinner loading-lg"></span>
+        </div>
+      } @else if (products.error()) {
+        <div class="alert alert-error m-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+          </svg>
+          Error loading products: {{ products.error()?.message }}
+        </div>
+      } @else if (products.value()?.data && products.value()!.data.length > 0) {
+        <div class="overflow-x-auto">
+          <table class="table table-zebra">
+            <thead>
+              <tr>
+                <th>
+                  <button
+                    class="btn btn-ghost btn-xs"
+                    (click)="onSortChange('thumbnail', query().sortOrder === 'asc' ? 'desc' : 'asc')"
                   >
-                    @if (sortOrder() === 'asc') {
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M7 11l5-5m0 0l5 5m-5-5v12"
-                    />
-                    } @else {
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M17 13l-5 5m0 0l-5-5m5 5V6"
-                    />
-                    }
-                  </svg>
-                  }
-                </div>
-              </th>
-              <th>Category</th>
-              <th
-                class="cursor-pointer hover:bg-base-200"
-                (click)="onSort('price')"
-              >
-                <div class="flex items-center gap-1">
-                  Price @if (sortBy() === 'price') {
-                  <svg
-                    class="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                    Image
+                  </button>
+                </th>
+                <th>
+                  <button
+                    class="btn btn-ghost btn-xs"
+                    (click)="onSortChange('nameEn', query().sortOrder === 'asc' ? 'desc' : 'asc')"
                   >
-                    @if (sortOrder() === 'asc') {
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M7 11l5-5m0 0l5 5m-5-5v12"
-                    />
-                    } @else {
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M17 13l-5 5m0 0l-5-5m5 5V6"
-                    />
+                    Name
+                    @if (query().sortBy === 'nameEn') {
+                      <span class="ml-1">{{ query().sortOrder === 'asc' ? '↑' : '↓' }}</span>
                     }
-                  </svg>
-                  }
-                </div>
-              </th>
-              <th
-                class="cursor-pointer hover:bg-base-200"
-                (click)="onSort('quantity')"
-              >
-                <div class="flex items-center gap-1">
-                  Stock @if (sortBy() === 'quantity') {
-                  <svg
-                    class="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                  </button>
+                </th>
+                <th>
+                  <button
+                    class="btn btn-ghost btn-xs"
+                    (click)="onSortChange('sku', query().sortOrder === 'asc' ? 'desc' : 'asc')"
                   >
-                    @if (sortOrder() === 'asc') {
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M7 11l5-5m0 0l5 5m-5-5v12"
-                    />
-                    } @else {
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M17 13l-5 5m0 0l-5-5m5 5V6"
-                    />
+                    SKU
+                    @if (query().sortBy === 'sku') {
+                      <span class="ml-1">{{ query().sortOrder === 'asc' ? '↑' : '↓' }}</span>
                     }
-                  </svg>
-                  }
-                </div>
-              </th>
-              <th>Rating</th>
-              <th
-                class="cursor-pointer hover:bg-base-200"
-                (click)="onSort('createdAt')"
-              >
-                <div class="flex items-center gap-1">
-                  Created @if (sortBy() === 'createdAt') {
-                  <svg
-                    class="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                  </button>
+                </th>
+                <th>
+                  <button
+                    class="btn btn-ghost btn-xs"
+                    (click)="onSortChange('price', query().sortOrder === 'asc' ? 'desc' : 'asc')"
                   >
-                    @if (sortOrder() === 'asc') {
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M7 11l5-5m0 0l5 5m-5-5v12"
-                    />
-                    } @else {
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M17 13l-5 5m0 0l-5-5m5 5V6"
-                    />
+                    Price
+                    @if (query().sortBy === 'price') {
+                      <span class="ml-1">{{ query().sortOrder === 'asc' ? '↑' : '↓' }}</span>
                     }
-                  </svg>
-                  }
-                </div>
-              </th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (product of products(); track product.id) {
-            <tr [class.opacity-50]="product.isDeleted">
-              <td>
-                <input
-                  type="checkbox"
-                  class="checkbox"
-                  [checked]="selectedProducts().includes(product.id)"
-                  (change)="onSelectProduct(product.id)"
-                />
-              </td>
-              <td>
-                <div class="flex items-center gap-3">
-                  <div class="avatar">
-                    <div class="w-12 h-12 rounded">
-                      @if (product.thumbnail) {
-                      <img
-                        [src]="product.thumbnail"
-                        [alt]="product.nameEn"
-                        class="object-cover"
-                      />
-                      } @else {
-                      <div
-                        class="w-full h-full bg-base-200 flex items-center justify-center"
-                      >
-                        <svg
-                          class="w-6 h-6 text-base-content/50"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                          />
-                        </svg>
+                  </button>
+                </th>
+                <th>
+                  <button
+                    class="btn btn-ghost btn-xs"
+                    (click)="onSortChange('quantity', query().sortOrder === 'asc' ? 'desc' : 'asc')"
+                  >
+                    Stock
+                    @if (query().sortBy === 'quantity') {
+                      <span class="ml-1">{{ query().sortOrder === 'asc' ? '↑' : '↓' }}</span>
+                    }
+                  </button>
+                </th>
+                <th>
+                  <button
+                    class="btn btn-ghost btn-xs"
+                    (click)="onSortChange('stars', query().sortOrder === 'asc' ? 'desc' : 'asc')"
+                  >
+                    Rating
+                    @if (query().sortBy === 'stars') {
+                      <span class="ml-1">{{ query().sortOrder === 'asc' ? '↑' : '↓' }}</span>
+                    }
+                  </button>
+                </th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (product of products.value()!.data; track product.id) {
+                <tr>
+                  <td>
+                    <div class="avatar">
+                      <div class="w-12 h-12 rounded">
+                        <img [src]="product.thumbnail" [alt]="product.nameEn" />
                       </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div>
+                      <div class="font-bold">{{ product.nameEn }}</div>
+                      @if (product.nameAr) {
+                        <div class="text-sm text-base-content/70" dir="rtl">{{ product.nameAr }}</div>
+                      }
+                      @if (product.category) {
+                        <div class="text-xs text-base-content/50">{{ product.category.nameEn }}</div>
                       }
                     </div>
-                  </div>
-                  <div>
-                    <div class="font-medium">{{ product.nameEn }}</div>
+                  </td>
+                  <td>
                     @if (product.sku) {
-                    <div class="text-sm text-base-content/70">
-                      SKU: {{ product.sku }}
+                      <span class="badge badge-ghost">{{ product.sku }}</span>
+                    } @else {
+                      <span class="text-base-content/50">—</span>
+                    }
+                  </td>
+                  <td>
+                    <div class="flex flex-col">
+                      <span class="font-semibold">${{ product.price }}</span>
+                      @if (product.oldPrice && product.oldPrice > product.price) {
+                        <span class="text-sm text-base-content/50 line-through">${{ product.oldPrice }}</span>
+                      }
                     </div>
+                  </td>
+                  <td>
+                    @if (product.quantity > 0) {
+                      <span class="badge badge-success">{{ product.quantity }}</span>
+                    } @else {
+                      <span class="badge badge-error">Out of Stock</span>
                     }
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div>
-                  <div class="font-medium">{{ product.nameEn }}</div>
-                  <div class="text-sm text-base-content/70">
-                    {{ product.nameAr }}
-                  </div>
-                </div>
-              </td>
-              <td>
-                <span class="badge badge-neutral">{{
-                  getCategoryName(product.categoryId)
-                }}</span>
-              </td>
-              <td>
-                <div class="flex items-center gap-2">
-                  <span class="font-semibold">{{
-                    formatPrice(product.price)
-                  }}</span>
-                  @if (product.oldPrice && product.oldPrice > product.price) {
-                  <span class="text-sm text-base-content/50 line-through">{{
-                    formatPrice(product.oldPrice)
-                  }}</span>
-                  <span class="badge badge-success badge-sm"
-                    >-{{
-                      getDiscountPercentage(product.price, product.oldPrice)
-                    }}%</span
-                  >
-                  }
-                </div>
-              </td>
-              <td>
-                <div class="flex items-center gap-2">
-                  <span
-                    [class]="
-                      product.quantity > 10
-                        ? 'text-success'
-                        : product.quantity > 0
-                        ? 'text-warning'
-                        : 'text-error'
-                    "
-                  >
-                    {{ product.quantity }}
-                  </span>
-                  @if (product.quantity === 0) {
-                  <span class="badge badge-error badge-xs">Out of Stock</span>
-                  } @else if (product.quantity <= 10) {
-                  <span class="badge badge-warning badge-xs">Low Stock</span>
-                  }
-                </div>
-              </td>
-              <td>
-                <div class="flex items-center gap-1">
-                  <div class="rating rating-sm">
-                    @for (star of [1,2,3,4,5]; track star) {
-                    <input
-                      type="radio"
-                      class="mask mask-star-2"
-                      [class.bg-orange-400]="star <= product.stars"
-                      [class.bg-base-300]="star > product.stars"
-                      disabled
-                    />
-                    }
-                  </div>
-                  <span class="text-sm text-base-content/70"
-                    >({{ product.reviews }})</span
-                  >
-                </div>
-              </td>
-              <td>
-                @if (product.createdAt) {
-                <div class="text-sm">
-                  {{ new Date(product.createdAt).toLocaleDateString() }}
-                </div>
-                }
-              </td>
-              <td>
-                <div class="flex gap-1">
-                  <button
-                    class="btn btn-ghost btn-xs"
-                    (click)="onViewProduct(product)"
-                    title="View Details"
-                  >
-                    <svg
-                      class="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                      />
-                    </svg>
-                  </button>
-                  <button
-                    class="btn btn-ghost btn-xs"
-                    (click)="onEditProduct(product)"
-                    title="Edit Product"
-                  >
-                    <svg
-                      class="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                      />
-                    </svg>
-                  </button>
-                  @if (!product.isDeleted) {
-                  <button
-                    class="btn btn-ghost btn-xs text-error"
-                    (click)="onDeleteProduct(product)"
-                    title="Delete Product"
-                  >
-                    <svg
-                      class="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      />
-                    </svg>
-                  </button>
-                  }
-                </div>
-              </td>
-            </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Pagination -->
-      @if (totalPages() > 1) {
-      <div class="flex justify-between items-center p-4 border-t">
-        <div class="text-sm text-base-content/70">
-          Showing {{ (currentPage() - 1) * pageSize() + 1 }} to
-          {{ Math.min(currentPage() * pageSize(), totalItems()) }} of
-          {{ totalItems() }} products
+                  </td>
+                  <td>
+                    <div class="flex items-center gap-1">
+                      <div class="rating rating-sm">
+                        @for (star of [1,2,3,4,5]; track star) {
+                          <span
+                            class="mask mask-star"
+                            [class.bg-warning]="star <= product.stars"
+                            [class.bg-base-300]="star > product.stars"
+                          ></span>
+                        }
+                      </div>
+                      <span class="text-xs text-base-content/70">({{ product.reviews }})</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="flex flex-col gap-1">
+                      @if (product.isBanned) {
+                        <span class="badge badge-error badge-sm">Banned</span>
+                      }
+                      @if (product.isDeleted) {
+                        <span class="badge badge-warning badge-sm">Deleted</span>
+                      }
+                      @if (!product.isBanned && !product.isDeleted) {
+                        <span class="badge badge-success badge-sm">Active</span>
+                      }
+                    </div>
+                  </td>
+                  <td>
+                    <div class="flex gap-2">
+                      <a
+                        [routerLink]="[routes.PRODUCT_DETAILS, product.id]"
+                        class="btn btn-ghost btn-sm"
+                        title="View Details"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                      </a>
+                      <a
+                        [routerLink]="[routes.PRODUCT_UPDATE, product.id]"
+                        class="btn btn-ghost btn-sm"
+                        title="Edit Product"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </a>
+                      <button
+                        class="btn btn-ghost btn-sm text-error"
+                        title="Delete Product"
+                        (click)="onDeleteProduct(product.id)"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
         </div>
-
-        <div class="flex items-center gap-2">
-          <!-- Page Size Selector -->
-          <select
-            class="select select-bordered select-sm"
-            [value]="pageSize()"
-            (change)="onPageSizeChange(+($event.target as HTMLSelectElement).value)"
-          >
-            <option value="10">10 per page</option>
-            <option value="25">25 per page</option>
-            <option value="50">50 per page</option>
-            <option value="100">100 per page</option>
-          </select>
-
-          <!-- Pagination Controls -->
-          <div class="join">
-            <button
-              class="join-item btn btn-sm"
-              [disabled]="currentPage() === 1"
-              (click)="onPageChange(currentPage() - 1)"
-            >
-              «
-            </button>
-
-            @for (page of Array(totalPages()).fill(0).map((_, i) => i + 1);
-            track page) { @if (page === 1 || page === totalPages() || (page >=
-            currentPage() - 2 && page <= currentPage() + 2)) {
-            <button
-              class="join-item btn btn-sm"
-              [class.btn-active]="page === currentPage()"
-              (click)="onPageChange(page)"
-            >
-              {{ page }}
-            </button>
-            } @else if (page === currentPage() - 3 || page === currentPage() +
-            3) {
-            <button class="join-item btn btn-sm btn-disabled">...</button>
-            } }
-
-            <button
-              class="join-item btn btn-sm"
-              [disabled]="currentPage() === totalPages()"
-              (click)="onPageChange(currentPage() + 1)"
-            >
-              »
-            </button>
-          </div>
+      } @else {
+        <div class="text-center py-12">
+          <div class="text-6xl mb-4">📦</div>
+          <h3 class="text-lg font-semibold mb-2">No Products Found</h3>
+          <p class="text-base-content/70 mb-4">There are no products matching your criteria.</p>
+          <a [routerLink]="routes.PRODUCT_CREATE" class="btn btn-primary">
+            Create First Product
+          </a>
         </div>
-      </div>
-      } }
+      }
     </div>
   </div>
+
+  <!-- Pagination -->
+  @if (pageSettings()) {
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div class="text-sm text-base-content/70">
+        Showing {{ (pageSettings()!.currentPage - 1) * pageSettings()!.pageSize + 1 }} to
+        {{ Math.min(pageSettings()!.currentPage * pageSettings()!.pageSize, pageSettings()!.totalCount) }}
+        of {{ pageSettings()!.totalCount }} products
+      </div>
+
+      <div class="flex items-center gap-2">
+        <!-- Page Size Selector -->
+        <select
+          class="select select-bordered select-sm"
+          [value]="query().pageSize"
+          (change)="onPageSizeChange(+$any($event.target).value)"
+        >
+          <option value="10">10 per page</option>
+          <option value="25">25 per page</option>
+          <option value="50">50 per page</option>
+          <option value="100">100 per page</option>
+        </select>
+
+        <!-- Pagination Controls -->
+        <div class="join">
+          <button
+            class="join-item btn btn-sm"
+            [disabled]="pageSettings()!.currentPage === 1"
+            (click)="onPageChange(pageSettings()!.currentPage - 1)"
+          >
+            «
+          </button>
+
+          @for (page of [].constructor(pageSettings()!.totalPages); track $index) {
+            @if ($index + 1 === pageSettings()!.currentPage) {
+              <button class="join-item btn btn-sm btn-active">{{ $index + 1 }}</button>
+            } @else if (Math.abs(($index + 1) - pageSettings()!.currentPage) <= 2 || $index + 1 === 1 || $index + 1 === pageSettings()!.totalPages) {
+              <button
+                class="join-item btn btn-sm"
+                (click)="onPageChange($index + 1)"
+              >
+                {{ $index + 1 }}
+              </button>
+            } @else if (Math.abs(($index + 1) - pageSettings()!.currentPage) === 3) {
+              <button class="join-item btn btn-sm btn-disabled">...</button>
+            }
+          }
+
+          <button
+            class="join-item btn btn-sm"
+            [disabled]="pageSettings()!.currentPage === pageSettings()!.totalPages"
+            (click)="onPageChange(pageSettings()!.currentPage + 1)"
+          >
+            »
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 </div>
-,

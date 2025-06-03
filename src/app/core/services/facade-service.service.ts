@@ -14,6 +14,7 @@ import { AuthService } from './repository/auth.service';
 import { AddressesService } from './repository/addresses.service';
 import { InvoicesService } from './repository/invoices.service';
 import { VouchersService } from './repository/vouchers.service';
+import { InspiredProductsService } from './repository/inspired-products.service';
 
 @Injectable({
   providedIn: 'root',
@@ -36,6 +37,7 @@ export class FacadeService {
   private _addressesService?: AddressesService;
   private _invoicesService?: InvoicesService;
   private _vouchersService?: VouchersService;
+  private _inspiredProductsService?: InspiredProductsService;
 
   get translatorService() {
     if (!this._translatorService) {
@@ -138,5 +140,12 @@ export class FacadeService {
       this._vouchersService = this.inject.get(VouchersService);
     }
     return this._vouchersService;
+  }
+
+  get inspiredProductsService() {
+    if (!this._inspiredProductsService) {
+      this._inspiredProductsService = this.inject.get(InspiredProductsService);
+    }
+    return this._inspiredProductsService;
   }
 }

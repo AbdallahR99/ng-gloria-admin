@@ -1,1 +1,507 @@
-<p>product-update works!</p>,
+<div class="container mx-auto p-4">
+  <div class="breadcrumbs mb-6">
+    <ul>
+      <li><a [routerLink]="routes.PRODUCTS">Products</a></li>
+      <li>Update Product</li>
+    </ul>
+  </div>
+
+  @if (product.isLoading()) {
+    <div class="flex justify-center items-center h-64">
+      <span class="loading loading-spinner loading-lg"></span>
+    </div>
+  } @else if (product.error()) {
+    <div class="alert alert-error">
+      <span>Error loading product: {{ product.error() }}</span>
+    </div>
+  } @else {
+    <div class="card">
+      <div class="card-body">
+        <h1 class="card-title text-2xl mb-6">Update Product</h1>
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
+
+          <!-- Basic Information Section -->
+          <div class="divider">Basic Information</div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <!-- Product Name English -->
+            <label class="form-control">
+              <div class="label">
+                <span class="label-text">Product Name (English) *</span>
+              </div>
+              <input
+                type="text"
+                formControlName="nameEn"
+                placeholder="Enter product name in English"
+                class="input input-bordered"
+                [class.input-error]="form.get('nameEn')?.invalid && form.get('nameEn')?.touched"
+              />
+              @if (form.get('nameEn')?.invalid && form.get('nameEn')?.touched) {
+                <div class="label">
+                  <span class="label-text-alt text-error">Product name in English is required (min 2 characters)</span>
+                </div>
+              }
+            </label>
+
+            <!-- Product Name Arabic -->
+            <label class="form-control">
+              <div class="label">
+                <span class="label-text">Product Name (Arabic) *</span>
+              </div>
+              <input
+                type="text"
+                formControlName="nameAr"
+                placeholder="Enter product name in Arabic"
+                class="input input-bordered"
+                [class.input-error]="form.get('nameAr')?.invalid && form.get('nameAr')?.touched"
+              />
+              @if (form.get('nameAr')?.invalid && form.get('nameAr')?.touched) {
+                <div class="label">
+                  <span class="label-text-alt text-error">Product name in Arabic is required (min 2 characters)</span>
+                </div>
+              }
+            </label>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <!-- SKU -->
+            <label class="form-control">
+              <div class="label">
+                <span class="label-text">SKU *</span>
+              </div>
+              <input
+                type="text"
+                formControlName="sku"
+                placeholder="Enter product SKU"
+                class="input input-bordered"
+                [class.input-error]="form.get('sku')?.invalid && form.get('sku')?.touched"
+              />
+              @if (form.get('sku')?.invalid && form.get('sku')?.touched) {
+                <div class="label">
+                  <span class="label-text-alt text-error">SKU is required (min 2 characters)</span>
+                </div>
+              }
+            </label>
+
+            <!-- Quantity -->
+            <label class="form-control">
+              <div class="label">
+                <span class="label-text">Quantity *</span>
+              </div>
+              <input
+                type="number"
+                formControlName="quantity"
+                placeholder="Enter quantity"
+                class="input input-bordered"
+                [class.input-error]="form.get('quantity')?.invalid && form.get('quantity')?.touched"
+              />
+              @if (form.get('quantity')?.invalid && form.get('quantity')?.touched) {
+                <div class="label">
+                  <span class="label-text-alt text-error">Quantity is required (min 1)</span>
+                </div>
+              }
+            </label>
+          </div>
+
+          <!-- Category and Inspired Product -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <!-- Category -->
+            <label class="form-control">
+              <div class="label">
+                <span class="label-text">Category *</span>
+              </div>
+              <select
+                formControlName="categoryId"
+                class="select select-bordered"
+                [class.select-error]="form.get('categoryId')?.invalid && form.get('categoryId')?.touched"
+              >
+                <option value="">Select a category</option>
+                @if (categories.value(); as categoriesList) {
+                  @for (category of categoriesList; track category.id) {
+                    <option [value]="category.id">{{ category.nameEn }}</option>
+                  }
+                }
+              </select>
+              @if (form.get('categoryId')?.invalid && form.get('categoryId')?.touched) {
+                <div class="label">
+                  <span class="label-text-alt text-error">Category is required</span>
+                </div>
+              }
+            </label>
+
+            <!-- Inspired Product -->
+            <label class="form-control">
+              <div class="label">
+                <span class="label-text">Inspired Product *</span>
+              </div>
+              <select
+                formControlName="inspiredProductId"
+                class="select select-bordered"
+                [class.select-error]="form.get('inspiredProductId')?.invalid && form.get('inspiredProductId')?.touched"
+              >
+                <option value="">Select an inspired product</option>
+                @if (inspiredProducts.value(); as inspiredProductsList) {
+                  @for (product of inspiredProductsList; track product.id) {
+                    <option [value]="product.id">{{ product.nameEn }}</option>
+                  }
+                }
+              </select>
+              @if (form.get('inspiredProductId')?.invalid && form.get('inspiredProductId')?.touched) {
+                <div class="label">
+                  <span class="label-text-alt text-error">Inspired product is required</span>
+                </div>
+              }
+            </label>
+          </div>
+
+          <!-- Pricing Section -->
+          <div class="divider">Pricing</div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <!-- Old Price -->
+            <label class="form-control">
+              <div class="label">
+                <span class="label-text">Old Price *</span>
+              </div>
+              <input
+                type="number"
+                formControlName="oldPrice"
+                placeholder="Enter old price"
+                class="input input-bordered"
+                [class.input-error]="form.get('oldPrice')?.invalid && form.get('oldPrice')?.touched"
+              />
+              @if (form.get('oldPrice')?.invalid && form.get('oldPrice')?.touched) {
+                <div class="label">
+                  <span class="label-text-alt text-error">Old price is required (min 0)</span>
+                </div>
+              }
+            </label>
+
+            <!-- Current Price -->
+            <label class="form-control">
+              <div class="label">
+                <span class="label-text">Current Price *</span>
+              </div>
+              <input
+                type="number"
+                formControlName="price"
+                placeholder="Enter current price"
+                class="input input-bordered"
+                [class.input-error]="form.get('price')?.invalid && form.get('price')?.touched"
+              />
+              @if (form.get('price')?.invalid && form.get('price')?.touched) {
+                <div class="label">
+                  <span class="label-text-alt text-error">Price is required (min 0)</span>
+                </div>
+              }
+            </label>
+          </div>
+
+          <!-- SEO Section -->
+          <div class="divider">SEO Information</div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <!-- Slug English -->
+            <label class="form-control">
+              <div class="label">
+                <span class="label-text">Slug (English) *</span>
+              </div>
+              <input
+                type="text"
+                formControlName="slug"
+                placeholder="product-slug"
+                class="input input-bordered"
+                [class.input-error]="form.get('slug')?.invalid && form.get('slug')?.touched"
+              />
+              @if (form.get('slug')?.invalid && form.get('slug')?.touched) {
+                <div class="label">
+                  <span class="label-text-alt text-error">Slug is required (min 2 characters)</span>
+                </div>
+              }
+            </label>
+
+            <!-- Slug Arabic -->
+            <label class="form-control">
+              <div class="label">
+                <span class="label-text">Slug (Arabic) *</span>
+              </div>
+              <input
+                type="text"
+                formControlName="slugAr"
+                placeholder="product-slug-ar"
+                class="input input-bordered"
+                [class.input-error]="form.get('slugAr')?.invalid && form.get('slugAr')?.touched"
+              />
+              @if (form.get('slugAr')?.invalid && form.get('slugAr')?.touched) {
+                <div class="label">
+                  <span class="label-text-alt text-error">Arabic slug is required (min 2 characters)</span>
+                </div>
+              }
+            </label>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <!-- Meta Title English -->
+            <label class="form-control">
+              <div class="label">
+                <span class="label-text">Meta Title (English) *</span>
+              </div>
+              <input
+                type="text"
+                formControlName="metaTitleEn"
+                placeholder="Enter meta title in English"
+                class="input input-bordered"
+                [class.input-error]="form.get('metaTitleEn')?.invalid && form.get('metaTitleEn')?.touched"
+              />
+              @if (form.get('metaTitleEn')?.invalid && form.get('metaTitleEn')?.touched) {
+                <div class="label">
+                  <span class="label-text-alt text-error">Meta title in English is required (min 2 characters)</span>
+                </div>
+              }
+            </label>
+
+            <!-- Meta Title Arabic -->
+            <label class="form-control">
+              <div class="label">
+                <span class="label-text">Meta Title (Arabic) *</span>
+              </div>
+              <input
+                type="text"
+                formControlName="metaTitleAr"
+                placeholder="Enter meta title in Arabic"
+                class="input input-bordered"
+                [class.input-error]="form.get('metaTitleAr')?.invalid && form.get('metaTitleAr')?.touched"
+              />
+              @if (form.get('metaTitleAr')?.invalid && form.get('metaTitleAr')?.touched) {
+                <div class="label">
+                  <span class="label-text-alt text-error">Meta title in Arabic is required (min 2 characters)</span>
+                </div>
+              }
+            </label>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <!-- Meta Description English -->
+            <label class="form-control">
+              <div class="label">
+                <span class="label-text">Meta Description (English) *</span>
+              </div>
+              <textarea
+                formControlName="metaDescriptionEn"
+                placeholder="Enter meta description in English"
+                class="textarea textarea-bordered"
+                [class.textarea-error]="form.get('metaDescriptionEn')?.invalid && form.get('metaDescriptionEn')?.touched"
+              ></textarea>
+              @if (form.get('metaDescriptionEn')?.invalid && form.get('metaDescriptionEn')?.touched) {
+                <div class="label">
+                  <span class="label-text-alt text-error">Meta description in English is required (min 2 characters)</span>
+                </div>
+              }
+            </label>
+
+            <!-- Meta Description Arabic -->
+            <label class="form-control">
+              <div class="label">
+                <span class="label-text">Meta Description (Arabic) *</span>
+              </div>
+              <textarea
+                formControlName="metaDescriptionAr"
+                placeholder="Enter meta description in Arabic"
+                class="textarea textarea-bordered"
+                [class.textarea-error]="form.get('metaDescriptionAr')?.invalid && form.get('metaDescriptionAr')?.touched"
+              ></textarea>
+              @if (form.get('metaDescriptionAr')?.invalid && form.get('metaDescriptionAr')?.touched) {
+                <div class="label">
+                  <span class="label-text-alt text-error">Meta description in Arabic is required (min 2 characters)</span>
+                </div>
+              }
+            </label>
+          </div>
+
+          <!-- Meta Keywords -->
+          <label class="form-control">
+            <div class="label">
+              <span class="label-text">Meta Keywords *</span>
+            </div>
+            <input
+              type="text"
+              formControlName="metaKeywords"
+              placeholder="keyword1, keyword2, keyword3"
+              class="input input-bordered"
+              [class.input-error]="form.get('metaKeywords')?.invalid && form.get('metaKeywords')?.touched"
+            />
+            @if (form.get('metaKeywords')?.invalid && form.get('metaKeywords')?.touched) {
+              <div class="label">
+                <span class="label-text-alt text-error">Meta keywords are required (min 2 characters)</span>
+              </div>
+            }
+          </label>
+
+          <!-- Descriptions Section -->
+          <div class="divider">Product Descriptions</div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <!-- Description English -->
+            <label class="form-control">
+              <div class="label">
+                <span class="label-text">Description (English)</span>
+              </div>
+              <textarea
+                formControlName="descriptionEn"
+                placeholder="Enter product description in English"
+                class="textarea textarea-bordered h-32"
+              ></textarea>
+            </label>
+
+            <!-- Description Arabic -->
+            <label class="form-control">
+              <div class="label">
+                <span class="label-text">Description (Arabic)</span>
+              </div>
+              <textarea
+                formControlName="descriptionAr"
+                placeholder="Enter product description in Arabic"
+                class="textarea textarea-bordered h-32"
+              ></textarea>
+            </label>
+          </div>
+
+          <!-- Images Section -->
+          <div class="divider">Product Images</div>
+
+          <!-- Thumbnail Upload -->
+          <div class="form-control">
+            <div class="label">
+              <span class="label-text">Thumbnail Image *</span>
+            </div>
+            <input
+              type="file"
+              accept="image/*"
+              (change)="uploadThumbnail($event)"
+              class="file-input file-input-bordered"
+            />
+            @if (form.get('thumbnail')?.value) {
+              <div class="mt-2">
+                <div class="indicator">
+                  <span class="indicator-item badge badge-secondary cursor-pointer" (click)="removeThumbnail()">×</span>
+                  <img [src]="form.get('thumbnail')?.value" alt="Thumbnail" class="w-24 h-24 object-cover rounded" />
+                </div>
+              </div>
+            }
+            @if (form.get('thumbnail')?.invalid && form.get('thumbnail')?.touched) {
+              <div class="label">
+                <span class="label-text-alt text-error">Thumbnail image is required</span>
+              </div>
+            }
+          </div>
+
+          <!-- Product Images Upload -->
+          <div class="form-control">
+            <div class="label">
+              <span class="label-text">Product Images *</span>
+            </div>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              (change)="uploadImages($event)"
+              class="file-input file-input-bordered"
+            />
+            @if (form.get('imageFiles')?.value?.length > 0) {
+              <div class="mt-2">
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
+                  @for (image of form.get('imageFiles')?.value; track $index) {
+                    <div class="indicator">
+                      <span class="indicator-item badge badge-secondary cursor-pointer" (click)="removeImage($index)">×</span>
+                      <img [src]="image" alt="Product image" class="w-24 h-24 object-cover rounded" />
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+            @if (form.get('imageFiles')?.invalid && form.get('imageFiles')?.touched) {
+              <div class="label">
+                <span class="label-text-alt text-error">At least one product image is required</span>
+              </div>
+            }
+          </div>
+
+          <!-- Colors and Sizes Section -->
+          <div class="divider">Product Variants</div>
+
+          <!-- Colors -->
+          <div class="form-control">
+            <div class="label">
+              <span class="label-text">Colors *</span>
+            </div>
+            <div class="flex flex-wrap gap-2 mb-2">
+              @for (color of form.get('colors')?.value; track color.name) {
+                <div class="badge badge-outline gap-2">
+                  <div class="w-4 h-4 rounded-full" [style.background-color]="color.hex"></div>
+                  {{ color.name }}
+                  <button type="button" class="btn btn-ghost btn-xs" (click)="removeColor(color.name)">×</button>
+                </div>
+              }
+            </div>
+            <div class="flex gap-2">
+              <input type="text" placeholder="Color name" class="input input-sm input-bordered flex-1" #colorName />
+              <input type="color" class="input input-sm w-16" #colorHex />
+              <button type="button" class="btn btn-sm btn-primary"
+                (click)="addColor({name: colorName.value, hex: colorHex.value}); colorName.value=''; colorHex.value='#000000'">
+                Add Color
+              </button>
+            </div>
+            @if (form.get('colors')?.invalid && form.get('colors')?.touched) {
+              <div class="label">
+                <span class="label-text-alt text-error">At least one color is required</span>
+              </div>
+            }
+          </div>
+
+          <!-- Sizes -->
+          <div class="form-control">
+            <div class="label">
+              <span class="label-text">Sizes *</span>
+            </div>
+            <div class="flex flex-wrap gap-2 mb-2">
+              @for (size of form.get('sizes')?.value; track size) {
+                <div class="badge badge-outline gap-2">
+                  {{ size }}
+                  <button type="button" class="btn btn-ghost btn-xs" (click)="removeSize(size)">×</button>
+                </div>
+              }
+            </div>
+            <div class="flex gap-2">
+              <input type="text" placeholder="Size (e.g., S, M, L, XL)" class="input input-sm input-bordered flex-1" #sizeInput />
+              <button type="button" class="btn btn-sm btn-primary"
+                (click)="addSize(sizeInput.value); sizeInput.value=''">
+                Add Size
+              </button>
+            </div>
+            @if (form.get('sizes')?.invalid && form.get('sizes')?.touched) {
+              <div class="label">
+                <span class="label-text-alt text-error">At least one size is required</span>
+              </div>
+            }
+          </div>
+
+          <!-- Form Actions -->
+          <div class="card-actions justify-end pt-6">
+            <button type="button" class="btn btn-ghost" (click)="onCancel()" [disabled]="isSubmitting()">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="form.invalid || isSubmitting()">
+              @if (isSubmitting()) {
+                <span class="loading loading-spinner loading-sm"></span>
+                Updating...
+              } @else {
+                Update Product
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>,

@@ -32,7 +32,7 @@ export interface OrderCreateOrUpdate extends Omit<Order, 'createdAt' | 'address'
 }
 
 export interface Order {
-  id?: number; // ID of the order
+  id?: string; // ID of the order
   orderCode?: string; // Unique order code
   status?: OrderStatus; // Status of the order (e.g., pending, completed)
   note?: string; // Optional note for the order

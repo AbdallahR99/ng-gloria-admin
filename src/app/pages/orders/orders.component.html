@@ -1,202 +1,388 @@
-<div class="container mx-auto p-6">
-  <!-- Header -->
-  <div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold">Orders Management</h1>
-    <button class="btn btn-primary" (click)="navigateToCreate()">
-      <svg
-        class="w-5 h-5 mr-2"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M12 4v16m8-8H4"
-        ></path>
-      </svg>
-      Create Order
-    </button>
-  </div>
-
-  <!-- Loading State -->
-  @if (loading()) {
-  <div class="flex justify-center items-center py-12">
-    <span class="loading loading-spinner loading-lg"></span>
-  </div>
-  }
-
-  <!-- Error State -->
-  @if (error()) {
-  <div class="alert alert-error mb-6">
-    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-      ></path>
-    </svg>
-    <span>{{ error() }}</span>
-    <button class="btn btn-sm btn-ghost" (click)="loadOrders()">Retry</button>
-  </div>
-  }
-
-  <!-- Empty State -->
-  @if (!loading() && !error() && orders().length === 0) {
-  <div class="text-center py-12">
-    <div class="text-6xl mb-4">📦</div>
-    <h3 class="text-xl font-semibold mb-2">No orders found</h3>
-    <p class="text-base-content/70 mb-4">
-      Get started by creating your first order.
-    </p>
-    <button class="btn btn-primary" (click)="navigateToCreate()">
-      Create Order
-    </button>
-  </div>
-  }
-
-  <!-- Orders List -->
-  @if (!loading() && !error() && orders().length > 0) {
-  <div class="card bg-base-100 shadow-xl">
-    <div class="card-body p-0">
-      <div class="overflow-x-auto">
-        <table class="table table-zebra">
-          <thead>
-            <tr>
-              <th>Order ID</th>
-              <th>Customer</th>
-              <th>Status</th>
-              <th>Total</th>
-              <th>Date</th>
-              <th class="text-center">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (order of orders(); track order.id) {
-            <tr class="hover">
-              <td>
-                <div class="font-mono text-sm">
-                  {{ order.orderCode || order.id }}
-                </div>
-              </td>
-              <td>
-                <div class="flex items-center space-x-3">
-                  <div class="avatar placeholder">
-                    <div
-                      class="bg-neutral text-neutral-content w-8 h-8 rounded-full"
-                    >
-                      <span class="text-xs">{{
-                        (order.customerEmail ||
-                          order.guestEmail ||
-                          "U")[0].toUpperCase()
-                      }}</span>
-                    </div>
-                  </div>
-                  <div>
-                    <div class="font-medium">
-                      {{ order.customerEmail || order.guestEmail || "Guest" }}
-                    </div>
-                    @if (order.customerName || order.guestName) {
-                    <div class="text-sm text-base-content/70">
-                      {{ order.customerName || order.guestName }}
-                    </div>
-                    }
-                  </div>
-                </div>
-              </td>
-              <td>
-                <span class="badge" [class]="getStatusBadgeClass(order.status)">
-                  {{ order.status }}
-                </span>
-              </td>
-              <td>
-                <div class="font-medium">
-                  {{ formatCurrency(order.totalAmount) }}
-                </div>
-                @if (order.items?.length) {
-                <div class="text-sm text-base-content/70">
-                  {{ order.items.length }} item(s)
-                </div>
-                }
-              </td>
-              <td>
-                <div class="text-sm">{{ formatDate(order.createdAt) }}</div>
-              </td>
-              <td>
-                <div class="flex justify-center space-x-2">
-                  <button
-                    class="btn btn-ghost btn-xs"
-                    (click)="navigateToOrder(order.id)"
-                    title="View Details"
-                  >
-                    <svg
-                      class="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                      ></path>
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                      ></path>
-                    </svg>
-                  </button>
-                  <button
-                    class="btn btn-ghost btn-xs"
-                    (click)="navigateToUpdate(order.id)"
-                    title="Edit Order"
-                  >
-                    <svg
-                      class="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                      ></path>
-                    </svg>
-                  </button>
-                  <button
-                    class="btn btn-ghost btn-xs text-error"
-                    (click)="deleteOrder(order.id)"
-                    title="Delete Order"
-                  >
-                    <svg
-                      class="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      ></path>
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-            }
-          </tbody>
-        </table>
+<div class="container mx-auto p-4 space-y-6">
+  <!-- Header Section -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold">Orders Management</h1>
+      <p class="text-base-content/70 mt-1">Manage customer orders and track fulfillment</p>
+    </div>
+    <div class="stats stats-horizontal shadow">
+      <div class="stat">
+        <div class="stat-title">Total Orders</div>
+        <div class="stat-value text-primary">{{ pageSettings()?.totalCount || 0 }}</div>
       </div>
     </div>
   </div>
+
+  <!-- Search and Filters -->
+  <div class="card bg-base-100 shadow">
+    <div class="card-body">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Search -->
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Search Orders</span>
+          </label>
+          <input
+            type="text"
+            placeholder="Search by order ID, customer..."
+            class="input input-bordered"
+            [value]="query().queryString || ''"
+            (input)="onSearch($any($event.target).value)"
+          />
+        </div>
+
+        <!-- Status Filter -->
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Order Status</span>
+          </label>
+          <select
+            class="select select-bordered"
+            [value]="query().status || ''"
+            (change)="onFilterChange({ status: $any($event.target).value || undefined })"
+          >
+            <option value="">All Statuses</option>
+            <option [value]="statuses.Pending">Pending</option>
+            <option [value]="statuses.Confirmed">Confirmed</option>
+            <option [value]="statuses.Processing">Processing</option>
+            <option [value]="statuses.Shipped">Shipped</option>
+            <option [value]="statuses.Delivered">Delivered</option>
+            <option [value]="statuses.Cancelled">Cancelled</option>
+            <option [value]="statuses.Failed">Failed</option>
+            <option [value]="statuses.Refunded">Refunded</option>
+            <option [value]="statuses.Returned">Returned</option>
+          </select>
+        </div>
+
+        <!-- Date Range -->
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Date From</span>
+          </label>
+          <input
+            type="date"
+            class="input input-bordered"
+            [value]="query().startDate || ''"
+            (input)="onFilterChange({ startDate: $any($event.target).value || undefined })"
+          />
+        </div>
+
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Date To</span>
+          </label>
+          <input
+            type="date"
+            class="input input-bordered"
+            [value]="query().endDate || ''"
+            (input)="onFilterChange({ endDate: $any($event.target).value || undefined })"
+          />
+        </div>
+      </div>
+
+      <!-- Additional Filters Row -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Min Amount (AED)</span>
+          </label>
+          <input
+            type="number"
+            placeholder="0"
+            class="input input-bordered"
+            [value]="query().minAmount || ''"
+            (input)="onFilterChange({ minAmount: $any($event.target).value ? +$any($event.target).value : undefined })"
+          />
+        </div>
+
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Max Amount (AED)</span>
+          </label>
+          <input
+            type="number"
+            placeholder="10000"
+            class="input input-bordered"
+            [value]="query().maxAmount || ''"
+            (input)="onFilterChange({ maxAmount: $any($event.target).value ? +$any($event.target).value : undefined })"
+          />
+        </div>
+
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Show Deleted</span>
+          </label>
+          <input
+            type="checkbox"
+            class="toggle toggle-primary"
+            [checked]="query().showDeleted || false"
+            (change)="onFilterChange({ showDeleted: $any($event.target).checked })"
+          />
+        </div>
+      </div>
+
+      <!-- Filter Actions -->
+      <div class="card-actions justify-end mt-4">
+        <button class="btn btn-ghost" (click)="onResetFilters()">
+          Reset Filters
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Orders Table -->
+  <div class="card bg-base-100 shadow">
+    <div class="card-body p-0">
+      @if (orders.isLoading()) {
+        <div class="flex justify-center items-center py-12">
+          <span class="loading loading-spinner loading-lg"></span>
+        </div>
+      } @else if (orders.error()) {
+        <div class="alert alert-error m-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+          </svg>
+          Error loading orders: {{ orders.error()?.message }}
+        </div>
+      } @else if (orders.value()?.data && orders.value()!.data.length > 0) {
+        <div class="overflow-x-auto">
+          <table class="table table-zebra">
+            <thead>
+              <tr>
+                <th>
+                  <button
+                    class="btn btn-ghost btn-xs"
+                    (click)="onSortChange('id', query().sortOrder === 'asc' ? 'desc' : 'asc')"
+                  >
+                    Order ID
+                    @if (query().sortBy === 'id') {
+                      <span class="ml-1">{{ query().sortOrder === 'asc' ? '↑' : '↓' }}</span>
+                    }
+                  </button>
+                </th>
+                <th>Customer</th>
+                <th>
+                  <button
+                    class="btn btn-ghost btn-xs"
+                    (click)="onSortChange('createdAt', query().sortOrder === 'asc' ? 'desc' : 'asc')"
+                  >
+                    Date
+                    @if (query().sortBy === 'createdAt') {
+                      <span class="ml-1">{{ query().sortOrder === 'asc' ? '↑' : '↓' }}</span>
+                    }
+                  </button>
+                </th>
+                <th>
+                  <button
+                    class="btn btn-ghost btn-xs"
+                    (click)="onSortChange('totalAmount', query().sortOrder === 'asc' ? 'desc' : 'asc')"
+                  >
+                    Amount
+                    @if (query().sortBy === 'totalAmount') {
+                      <span class="ml-1">{{ query().sortOrder === 'asc' ? '↑' : '↓' }}</span>
+                    }
+                  </button>
+                </th>
+                <th>Items</th>
+                <th>
+                  <button
+                    class="btn btn-ghost btn-xs"
+                    (click)="onSortChange('status', query().sortOrder === 'asc' ? 'desc' : 'asc')"
+                  >
+                    Status
+                    @if (query().sortBy === 'status') {
+                      <span class="ml-1">{{ query().sortOrder === 'asc' ? '↑' : '↓' }}</span>
+                    }
+                  </button>
+                </th>
+                <th>Payment</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (order of orders.value()!.data; track order.id) {
+                <tr>
+                  <td>
+                    <div class="font-mono text-sm">
+                      #{{ order.id.slice(-8).toUpperCase() }}
+                    </div>
+                  </td>
+                  <td>
+                    <div class="flex items-center gap-3">
+                      <div class="avatar placeholder">
+                        <div class="bg-neutral text-neutral-content w-12 rounded-full">
+                          <span class="text-xs">{{ order.customerName?.charAt(0) || 'G' }}</span>
+                        </div>
+                      </div>
+                      <div>
+                        <div class="font-bold">{{ order.customerName || 'Guest' }}</div>
+                        @if (order.customerEmail) {
+                          <div class="text-sm text-base-content/70">{{ order.customerEmail }}</div>
+                        }
+                        @if (order.customerPhone) {
+                          <div class="text-sm text-base-content/70">{{ order.customerPhone }}</div>
+                        }
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="text-sm">
+                      {{ order.createdAt | date:'short' }}
+                    </div>
+                  </td>
+                  <td>
+                    <div class="font-semibold">{{ order.totalAmount | currency:'AED':'symbol':'1.2-2' }}</div>
+                    @if (order.discountAmount && order.discountAmount > 0) {
+                      <div class="text-sm text-success">-{{ order.discountAmount | currency:'AED':'symbol':'1.2-2' }} discount</div>
+                    }
+                  </td>
+                  <td>
+                    <div class="text-sm">
+                      {{ order.orderItems?.length || 0 }} item(s)
+                    </div>
+                    @if (order.orderItems && order.orderItems.length > 0) {
+                      <div class="text-xs text-base-content/70">
+                        {{ order.orderItems[0].productName }}
+                        @if (order.orderItems.length > 1) {
+                          <span>+{{ order.orderItems.length - 1 }} more</span>
+                        }
+                      </div>
+                    }
+                  </td>
+                  <td>
+                    <div class="dropdown dropdown-end">
+                      <div tabindex="0" role="button" class="badge {{ getStatusBadgeClass(order.status) }}">
+                        {{ order.status }}
+                      </div>
+                      <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+                        <li><button (click)="setOrderStatus({ id: order.id, status: statuses.Pending })">Pending</button></li>
+                        <li><button (click)="setOrderStatus({ id: order.id, status: statuses.Confirmed })">Confirmed</button></li>
+                        <li><button (click)="setOrderStatus({ id: order.id, status: statuses.Processing })">Processing</button></li>
+                        <li><button (click)="setOrderStatus({ id: order.id, status: statuses.Shipped })">Shipped</button></li>
+                        <li><button (click)="setOrderStatus({ id: order.id, status: statuses.Delivered })">Delivered</button></li>
+                        <li><button (click)="setOrderStatus({ id: order.id, status: statuses.Cancelled })">Cancelled</button></li>
+                        <li><button (click)="setOrderStatus({ id: order.id, status: statuses.Failed })">Failed</button></li>
+                        <li><button (click)="setOrderStatus({ id: order.id, status: statuses.Refunded })">Refunded</button></li>
+                        <li><button (click)="setOrderStatus({ id: order.id, status: statuses.Returned })">Returned</button></li>
+                      </ul>
+                    </div>
+                  </td>
+                  <td>
+                    @if (order.paymentMethod) {
+                      <div class="badge badge-outline">{{ order.paymentMethod }}</div>
+                    }
+                    @if (order.paymentStatus) {
+                      <div class="text-xs mt-1"
+                           [class.text-success]="order.paymentStatus === 'paid'"
+                           [class.text-warning]="order.paymentStatus === 'pending'"
+                           [class.text-error]="order.paymentStatus === 'failed'">
+                        {{ order.paymentStatus }}
+                      </div>
+                    }
+                  </td>
+                  <td>
+                    <div class="flex gap-2">
+                      <a
+                        [routerLink]="[routes.ORDER_DETAILS, order.id]"
+                        class="btn btn-ghost btn-sm"
+                        title="View Details"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                      </a>
+                      <a
+                        [routerLink]="[routes.ORDER_UPDATE, order.id]"
+                        class="btn btn-ghost btn-sm"
+                        title="Edit Order"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </a>
+                      <button
+                        class="btn btn-ghost btn-sm text-error"
+                        title="Delete Order"
+                        (click)="onDeleteOrder(order.id)"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <div class="text-center py-12">
+          <div class="text-6xl mb-4">📦</div>
+          <h3 class="text-lg font-semibold mb-2">No Orders Found</h3>
+          <p class="text-base-content/70 mb-4">There are no orders matching your criteria.</p>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  @if (pageSettings()) {
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div class="text-sm text-base-content/70">
+        Showing {{ (pageSettings()!.currentPage - 1) * pageSettings()!.pageSize + 1 }} to
+        {{ Math.min(pageSettings()!.currentPage * pageSettings()!.pageSize, pageSettings()!.totalCount) }}
+        of {{ pageSettings()!.totalCount }} orders
+      </div>
+
+      <div class="flex items-center gap-2">
+        <!-- Page Size Selector -->
+        <select
+          class="select select-bordered select-sm"
+          [value]="query().pageSize"
+          (change)="onPageSizeChange(+$any($event.target).value)"
+        >
+          <option value="10">10 per page</option>
+          <option value="25">25 per page</option>
+          <option value="50">50 per page</option>
+          <option value="100">100 per page</option>
+        </select>
+
+        <!-- Pagination Controls -->
+        <div class="join">
+          <button
+            class="join-item btn btn-sm"
+            [disabled]="pageSettings()!.currentPage === 1"
+            (click)="onPageChange(pageSettings()!.currentPage - 1)"
+          >
+            «
+          </button>
+
+          @for (page of [].constructor(pageSettings()!.totalPages); track $index) {
+            @if ($index + 1 === pageSettings()!.currentPage) {
+              <button class="join-item btn btn-sm btn-active">{{ $index + 1 }}</button>
+            } @else if (Math.abs(($index + 1) - pageSettings()!.currentPage) <= 2 || $index + 1 === 1 || $index + 1 === pageSettings()!.totalPages) {
+              <button
+                class="join-item btn btn-sm"
+                (click)="onPageChange($index + 1)"
+              >
+                {{ $index + 1 }}
+              </button>
+            } @else if (Math.abs(($index + 1) - pageSettings()!.currentPage) === 3) {
+              <button class="join-item btn btn-sm btn-disabled">...</button>
+            }
+          }
+
+          <button
+            class="join-item btn btn-sm"
+            [disabled]="pageSettings()!.currentPage === pageSettings()!.totalPages"
+            (click)="onPageChange(pageSettings()!.currentPage + 1)"
+          >
+            »
+          </button>
+        </div>
+      </div>
+    </div>
   }
 </div>
